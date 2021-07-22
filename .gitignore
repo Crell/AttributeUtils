@@ -1,0 +1,6 @@
+build
+composer.lock
+vendor
+.phpunit.result.cache
+/vendor-bin/**/vendor
+.env
