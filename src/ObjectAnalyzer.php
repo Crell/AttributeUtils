@@ -23,19 +23,21 @@ class ObjectAnalyzer
         }
 
         if ($classDef instanceof Fieldable) {
-            $fields = $this->getPropertyDefinitions($subject, $classDef::propertyAttribute());
+            $fields = $this->getPropertyDefinitions($subject, $classDef::propertyAttribute(), $classDef->includeByDefault());
             $classDef->setFields($fields);
         }
 
         return $classDef;
     }
 
-    protected function getPropertyDefinitions(\ReflectionObject|\ReflectionClass $subject, string $propertyAttribute): array
+    protected function getPropertyDefinitions(\ReflectionObject|\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array
     {
         // @todo This needs a pipe.
         $rProperties = $subject->getProperties();
-        $props = $this->indexBy($rProperties, fn(\ReflectionProperty $r) => $r->getName());
-        $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute), $props);
+        $props = $this->indexBy($rProperties, fn (\ReflectionProperty $r) => $r->getName());
+        $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault), $props);
+        $properties = array_filter($properties);
+        $properties = array_filter($properties, static fn (object $prop) => !($prop->exclude ?? false));
         //$fields = array_filter($fields, fn(Field $f): bool => !$f->skip);
         return $properties;
     }
@@ -52,11 +54,12 @@ class ObjectAnalyzer
         return $ret;
     }
 
-    protected function getPropertyDefinition(\ReflectionProperty $property, string $propertyAttribute): object
+    protected function getPropertyDefinition(\ReflectionProperty $property, string $propertyAttribute, bool $includeByDefault): ?object
     {
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $propDef = $this->getAttribute($property, $propertyAttribute) ?? new $propertyAttribute();
+        $propDef = $this->getAttribute($property, $propertyAttribute)
+            ?? ($includeByDefault ?  new $propertyAttribute() : null);
         if ($propDef instanceof ReflectionPopulatable) {
             $propDef->fromReflection($property);
         }
@@ -71,7 +74,7 @@ class ObjectAnalyzer
 
     protected function getAttributes(\Reflector $target, string $name): array
     {
-        return array_map(static fn(\ReflectionAttribute $attrib)
+        return array_map(static fn (\ReflectionAttribute $attrib)
         => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
     }
 }

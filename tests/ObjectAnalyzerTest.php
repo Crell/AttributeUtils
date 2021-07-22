@@ -8,6 +8,7 @@ use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
 use Crell\ObjectAnalyzer\Attributes\BasicClassReflectable;
 use Crell\ObjectAnalyzer\Attributes\BasicClass;
 use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFields;
+use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFieldsExcludeByDefault;
 use Crell\ObjectAnalyzer\Records\BasicWithDefaultFields;
 use Crell\ObjectAnalyzer\Records\NoProps;
 use Crell\ObjectAnalyzer\Records\NoPropsOverride;
@@ -35,8 +36,7 @@ class ObjectAnalyzerTest extends TestCase
         yield 'Generic' => [
             'subject' => Point::class,
             'attribute' => BasicClass::class,
-            'test' => static function(object $classDef) {
-                static::assertInstanceOf(BasicClass::class, $classDef);
+            'test' => static function(BasicClass $classDef) {
                 static::assertEquals(0, $classDef->a);
                 static::assertEquals(0, $classDef->b);
             },
@@ -45,8 +45,7 @@ class ObjectAnalyzerTest extends TestCase
         yield 'Reflectable with no override value' => [
             'subject' => NoProps::class,
             'attribute' => BasicClassReflectable::class,
-            'test' => static function(object $classDef) {
-                static::assertInstanceOf(BasicClassReflectable::class, $classDef);
+            'test' => static function(BasicClassReflectable $classDef) {
                 static::assertEquals(1, $classDef->a);
                 static::assertEquals(0, $classDef->b);
                 static::assertEquals('NoProps', $classDef->name);
@@ -56,8 +55,7 @@ class ObjectAnalyzerTest extends TestCase
         yield 'Reflectable with an override value' => [
             'subject' => NoPropsOverride::class,
             'attribute' => BasicClassReflectable::class,
-            'test' => static function(object $classDef) {
-                static::assertInstanceOf(BasicClassReflectable::class, $classDef);
+            'test' => static function(BasicClassReflectable $classDef) {
                 static::assertEquals(1, $classDef->a);
                 static::assertEquals(0, $classDef->b);
                 static::assertEquals('Overridden', $classDef->name);
@@ -67,8 +65,7 @@ class ObjectAnalyzerTest extends TestCase
         yield 'Fieldable with default properties' => [
             'subject' => BasicWithDefaultFields::class,
             'attribute' => BasicClassFielded::class,
-            'test' => static function(object $classDef) {
-                static::assertInstanceOf(BasicClassFielded::class, $classDef);
+            'test' => static function(BasicClassFielded $classDef) {
                 static::assertEquals('a', $classDef->fields['i']->a);
                 static::assertEquals('b', $classDef->fields['i']->b);
                 static::assertEquals('a', $classDef->fields['s']->a);
@@ -81,8 +78,7 @@ class ObjectAnalyzerTest extends TestCase
         yield 'Fieldable with customized properties' => [
             'subject' => BasicWithCustomizedFields::class,
             'attribute' => BasicClassFielded::class,
-            'test' => static function(object $classDef) {
-                static::assertInstanceOf(BasicClassFielded::class, $classDef);
+            'test' => static function(BasicClassFielded $classDef) {
                 static::assertEquals('a', $classDef->fields['i']->a);
                 static::assertEquals('b', $classDef->fields['i']->b);
                 static::assertEquals('A', $classDef->fields['s']->a);
@@ -91,5 +87,19 @@ class ObjectAnalyzerTest extends TestCase
                 static::assertEquals('B', $classDef->fields['f']->b);
             },
         ];
+
+        yield 'Fieldable default no-include fields' => [
+            'subject' => BasicWithCustomizedFieldsExcludeByDefault::class,
+            'attribute' => BasicClassFielded::class,
+            'test' => static function(BasicClassFielded $classDef) {
+                static::assertArrayNotHasKey('i', $classDef->fields);
+                static::assertEquals('A', $classDef->fields['s']->a);
+                static::assertEquals('b', $classDef->fields['s']->b);
+                static::assertEquals('a', $classDef->fields['f']->a);
+                static::assertEquals('B', $classDef->fields['f']->b);
+            },
+        ];
+
+
     }
 }

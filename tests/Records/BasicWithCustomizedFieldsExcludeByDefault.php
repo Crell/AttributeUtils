@@ -7,10 +7,9 @@ namespace Crell\ObjectAnalyzer\Records;
 use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
 use Crell\ObjectAnalyzer\Attributes\BasicProperty;
 
-#[BasicClassFielded]
-class BasicWithCustomizedFields
+#[BasicClassFielded(include: false)]
+class BasicWithCustomizedFieldsExcludeByDefault
 {
-
     public int $i;
     #[BasicProperty(a: 'A')]
     public string $s;

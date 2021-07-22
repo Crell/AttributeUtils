@@ -8,7 +8,7 @@ use Attribute;
 use Crell\ObjectAnalyzer\Fieldable;
 
 /**
- * The most basic class-level attribute. No fancy integration at all.
+ * A simple class attribute that includes support for fields/properties.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 class BasicClassFielded implements Fieldable
@@ -18,6 +18,7 @@ class BasicClassFielded implements Fieldable
     public function __construct(
         public int $a = 0,
         public int $b = 0,
+        public bool $include = true,
     ) {}
 
     public function setFields(array $fields): void
@@ -25,19 +26,9 @@ class BasicClassFielded implements Fieldable
         $this->fields = $fields;
     }
 
-    public function includeProperties(): array
-    {
-        // TODO: Implement includeProperties() method.
-    }
-
-    public function excludeProperties(): array
-    {
-        // TODO: Implement excludeProperties() method.
-    }
-
     public function includeByDefault(): bool
     {
-        // TODO: Implement includeByDefault() method.
+        return $this->include;
     }
 
     public static function propertyAttribute(): string
