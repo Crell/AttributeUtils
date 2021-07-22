@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer;
 
-class ObjectAnalyzer
+class Analyzer implements ClassAnalyzer
 {
 
     public function analyze(string|object $class, string $attribute): object

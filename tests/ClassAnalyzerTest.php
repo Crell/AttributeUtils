@@ -17,7 +17,7 @@ use Crell\ObjectAnalyzer\Records\NoPropsOverride;
 use Crell\ObjectAnalyzer\Records\Point;
 use PHPUnit\Framework\TestCase;
 
-class ObjectAnalyzerTest extends TestCase
+class ClassAnalyzerTest extends TestCase
 {
 
     /**
@@ -26,7 +26,7 @@ class ObjectAnalyzerTest extends TestCase
      */
     public function analyze_classes(string $subject, string $attribute, callable $test): void
     {
-        $analyzer = new ObjectAnalyzer();
+        $analyzer = new Analyzer();
 
         $classDef = $analyzer->analyze($subject, $attribute);
 
@@ -39,7 +39,7 @@ class ObjectAnalyzerTest extends TestCase
      */
     public function analyze_objects(object $subject, string $attribute, callable $test): void
     {
-        $analyzer = new ObjectAnalyzer();
+        $analyzer = new Analyzer();
 
         $classDef = $analyzer->analyze($subject, $attribute);
 
