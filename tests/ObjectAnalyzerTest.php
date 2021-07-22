@@ -7,9 +7,12 @@ namespace Crell\ObjectAnalyzer;
 use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
 use Crell\ObjectAnalyzer\Attributes\BasicClassReflectable;
 use Crell\ObjectAnalyzer\Attributes\BasicClass;
+use Crell\ObjectAnalyzer\Attributes\BasicClassReflectableProperties;
+use Crell\ObjectAnalyzer\Attributes\BasicPropertyReflectable;
 use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFields;
 use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFieldsExcludeByDefault;
 use Crell\ObjectAnalyzer\Records\BasicWithDefaultFields;
+use Crell\ObjectAnalyzer\Records\BasicWithReflectableProperties;
 use Crell\ObjectAnalyzer\Records\NoProps;
 use Crell\ObjectAnalyzer\Records\NoPropsOverride;
 use Crell\ObjectAnalyzer\Records\Point;
@@ -115,6 +118,17 @@ class ObjectAnalyzerTest extends TestCase
                 static::assertEquals('B', $classDef->fields['f']->b);
             },
         ];
+
+        yield 'Fieldable reflectable fields' => [
+            'subject' => BasicWithReflectableProperties::class,
+            'attribute' => BasicClassReflectableProperties::class,
+            'test' => static function(BasicClassReflectableProperties $classDef) {
+                static::assertEquals('i', $classDef->fields['i']->name);
+                static::assertEquals('beep', $classDef->fields['s']->name);
+                static::assertEquals('f', $classDef->fields['f']->name);
+            },
+        ];
+
     }
 
     /**

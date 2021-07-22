@@ -10,7 +10,6 @@ use Crell\ObjectAnalyzer\Attributes\BasicProperty;
 #[BasicClassFielded]
 class BasicWithCustomizedFields
 {
-
     public int $i;
     #[BasicProperty(a: 'A')]
     public string $s;
