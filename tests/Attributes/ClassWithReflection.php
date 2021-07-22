@@ -7,11 +7,8 @@ namespace Crell\ObjectAnalyzer\Attributes;
 use Attribute;
 use Crell\ObjectAnalyzer\FromReflectionClass;
 
-/**
- * The most basic class-level attribute. No fancy integration at all.
- */
 #[Attribute(Attribute::TARGET_CLASS)]
-class BasicClassReflectable implements FromReflectionClass
+class ClassWithReflection implements FromReflectionClass
 {
     public function __construct(
         public int $a = 0,

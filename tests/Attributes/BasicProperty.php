@@ -6,9 +6,6 @@ namespace Crell\ObjectAnalyzer\Attributes;
 
 use Attribute;
 
-/**
- * A basic property attribute.
- */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class BasicProperty
 {

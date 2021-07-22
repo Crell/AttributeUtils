@@ -7,11 +7,8 @@ namespace Crell\ObjectAnalyzer\Attributes;
 use Attribute;
 use Crell\ObjectAnalyzer\FromReflectionProperty;
 
-/**
- * A basic property attribute.
- */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class BasicPropertyReflectable implements FromReflectionProperty
+class PropertyWithReflection implements FromReflectionProperty
 {
     public function __construct(
         public string $a = 'a',

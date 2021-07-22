@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer\Records;
 
-use Crell\ObjectAnalyzer\Attributes\BasicClassReflectable;
+use Crell\ObjectAnalyzer\Attributes\ClassWithReflection;
 
-/**
- * A very basic class w no properties.
- */
-#[BasicClassReflectable(a: 1)]
+#[ClassWithReflection(a: 1)]
 class NoProps
 {
 }

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Crell\ObjectAnalyzer;
 
 use Crell\ObjectAnalyzer\Attributes\BasicClass;
-use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
-use Crell\ObjectAnalyzer\Attributes\BasicClassReflectable;
-use Crell\ObjectAnalyzer\Attributes\BasicClassReflectableProperties;
-use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFields;
-use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFieldsExcludeByDefault;
-use Crell\ObjectAnalyzer\Records\BasicWithDefaultFields;
-use Crell\ObjectAnalyzer\Records\BasicWithReflectableProperties;
+use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
+use Crell\ObjectAnalyzer\Attributes\ClassWithReflection;
+use Crell\ObjectAnalyzer\Attributes\ClassWithReflectableProperties;
+use Crell\ObjectAnalyzer\Records\ClassWithCustomizedFields;
+use Crell\ObjectAnalyzer\Records\ClassWithCustomizedPropertiesExcludeByDefault;
+use Crell\ObjectAnalyzer\Records\ClassWithDefaultFields;
+use Crell\ObjectAnalyzer\Records\ClassWithPropertiesWithReflection;
 use Crell\ObjectAnalyzer\Records\NoProps;
 use Crell\ObjectAnalyzer\Records\NoPropsOverride;
 use Crell\ObjectAnalyzer\Records\Point;
@@ -62,8 +62,8 @@ class ObjectAnalyzerTest extends TestCase
 
         yield 'Reflectable with no override value' => [
             'subject' => NoProps::class,
-            'attribute' => BasicClassReflectable::class,
-            'test' => static function(BasicClassReflectable $classDef) {
+            'attribute' => ClassWithReflection::class,
+            'test' => static function(ClassWithReflection $classDef) {
                 static::assertEquals(1, $classDef->a);
                 static::assertEquals(0, $classDef->b);
                 static::assertEquals('NoProps', $classDef->name);
@@ -72,8 +72,8 @@ class ObjectAnalyzerTest extends TestCase
 
         yield 'Reflectable with an override value' => [
             'subject' => NoPropsOverride::class,
-            'attribute' => BasicClassReflectable::class,
-            'test' => static function(BasicClassReflectable $classDef) {
+            'attribute' => ClassWithReflection::class,
+            'test' => static function(ClassWithReflection $classDef) {
                 static::assertEquals(1, $classDef->a);
                 static::assertEquals(0, $classDef->b);
                 static::assertEquals('Overridden', $classDef->name);
@@ -81,9 +81,9 @@ class ObjectAnalyzerTest extends TestCase
         ];
 
         yield 'Fieldable with default properties' => [
-            'subject' => BasicWithDefaultFields::class,
-            'attribute' => BasicClassFielded::class,
-            'test' => static function(BasicClassFielded $classDef) {
+            'subject' => ClassWithDefaultFields::class,
+            'attribute' => ClassWithProperties::class,
+            'test' => static function(ClassWithProperties $classDef) {
                 static::assertEquals('a', $classDef->properties['i']->a);
                 static::assertEquals('b', $classDef->properties['i']->b);
                 static::assertEquals('a', $classDef->properties['s']->a);
@@ -94,9 +94,9 @@ class ObjectAnalyzerTest extends TestCase
         ];
 
         yield 'Fieldable with customized properties' => [
-            'subject' => BasicWithCustomizedFields::class,
-            'attribute' => BasicClassFielded::class,
-            'test' => static function(BasicClassFielded $classDef) {
+            'subject' => ClassWithCustomizedFields::class,
+            'attribute' => ClassWithProperties::class,
+            'test' => static function(ClassWithProperties $classDef) {
                 static::assertEquals('a', $classDef->properties['i']->a);
                 static::assertEquals('b', $classDef->properties['i']->b);
                 static::assertEquals('A', $classDef->properties['s']->a);
@@ -107,9 +107,9 @@ class ObjectAnalyzerTest extends TestCase
         ];
 
         yield 'Fieldable default no-include fields' => [
-            'subject' => BasicWithCustomizedFieldsExcludeByDefault::class,
-            'attribute' => BasicClassFielded::class,
-            'test' => static function(BasicClassFielded $classDef) {
+            'subject' => ClassWithCustomizedPropertiesExcludeByDefault::class,
+            'attribute' => ClassWithProperties::class,
+            'test' => static function(ClassWithProperties $classDef) {
                 static::assertArrayNotHasKey('i', $classDef->properties);
                 static::assertEquals('A', $classDef->properties['s']->a);
                 static::assertEquals('b', $classDef->properties['s']->b);
@@ -119,9 +119,9 @@ class ObjectAnalyzerTest extends TestCase
         ];
 
         yield 'Fieldable reflectable fields' => [
-            'subject' => BasicWithReflectableProperties::class,
-            'attribute' => BasicClassReflectableProperties::class,
-            'test' => static function(BasicClassReflectableProperties $classDef) {
+            'subject' => ClassWithPropertiesWithReflection::class,
+            'attribute' => ClassWithReflectableProperties::class,
+            'test' => static function(ClassWithReflectableProperties $classDef) {
                 static::assertEquals('i', $classDef->properties['i']->name);
                 static::assertEquals('beep', $classDef->properties['s']->name);
                 static::assertEquals('f', $classDef->properties['f']->name);

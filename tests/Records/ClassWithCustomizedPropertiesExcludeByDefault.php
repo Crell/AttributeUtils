@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer\Records;
 
-use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
+use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
 use Crell\ObjectAnalyzer\Attributes\BasicProperty;
 
-#[BasicClassFielded]
-class BasicWithCustomizedFields
+#[ClassWithProperties(include: false)]
+class ClassWithCustomizedPropertiesExcludeByDefault
 {
     public int $i;
     #[BasicProperty(a: 'A')]

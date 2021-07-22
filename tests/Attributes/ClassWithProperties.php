@@ -7,15 +7,14 @@ namespace Crell\ObjectAnalyzer\Attributes;
 use Attribute;
 use Crell\ObjectAnalyzer\ParseProperties;
 
-/**
- * Includes fields that are themselves reflectable.
- */
 #[Attribute(Attribute::TARGET_CLASS)]
-class BasicClassReflectableProperties implements ParseProperties
+class ClassWithProperties implements ParseProperties
 {
     public array $properties = [];
 
     public function __construct(
+        public int $a = 0,
+        public int $b = 0,
         public bool $include = true,
     ) {}
 
@@ -31,6 +30,6 @@ class BasicClassReflectableProperties implements ParseProperties
 
     public static function propertyAttribute(): string
     {
-        return BasicPropertyReflectable::class;
+        return BasicProperty::class;
     }
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer\Records;
 
-use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
+use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
 
-#[BasicClassFielded]
-class BasicWithDefaultFields
+#[ClassWithProperties]
+class ClassWithDefaultFields
 {
     public int $i;
     public string $s;
