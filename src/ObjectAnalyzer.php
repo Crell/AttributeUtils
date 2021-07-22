@@ -40,7 +40,6 @@ class ObjectAnalyzer
         $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault), $props);
         $properties = array_filter($properties);
         $properties = array_filter($properties, static fn (object $prop) => !($prop->exclude ?? false));
-        //$fields = array_filter($fields, fn(Field $f): bool => !$f->skip);
         return $properties;
     }
 
