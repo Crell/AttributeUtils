@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer;
 
+use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
 use Crell\ObjectAnalyzer\Attributes\BasicClassReflectable;
-use Crell\ObjectAnalyzer\Attributes\Beep;
 use Crell\ObjectAnalyzer\Attributes\BasicClass;
+use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFields;
+use Crell\ObjectAnalyzer\Records\BasicWithDefaultFields;
 use Crell\ObjectAnalyzer\Records\NoProps;
 use Crell\ObjectAnalyzer\Records\NoPropsOverride;
 use Crell\ObjectAnalyzer\Records\Point;
@@ -62,6 +64,32 @@ class ObjectAnalyzerTest extends TestCase
             },
         ];
 
-    }
+        yield 'Fieldable with default properties' => [
+            'subject' => BasicWithDefaultFields::class,
+            'attribute' => BasicClassFielded::class,
+            'test' => static function(object $classDef) {
+                static::assertInstanceOf(BasicClassFielded::class, $classDef);
+                static::assertEquals('a', $classDef->fields['i']->a);
+                static::assertEquals('b', $classDef->fields['i']->b);
+                static::assertEquals('a', $classDef->fields['s']->a);
+                static::assertEquals('b', $classDef->fields['s']->b);
+                static::assertEquals('a', $classDef->fields['f']->a);
+                static::assertEquals('b', $classDef->fields['f']->b);
+            },
+        ];
 
+        yield 'Fieldable with customized properties' => [
+            'subject' => BasicWithCustomizedFields::class,
+            'attribute' => BasicClassFielded::class,
+            'test' => static function(object $classDef) {
+                static::assertInstanceOf(BasicClassFielded::class, $classDef);
+                static::assertEquals('a', $classDef->fields['i']->a);
+                static::assertEquals('b', $classDef->fields['i']->b);
+                static::assertEquals('A', $classDef->fields['s']->a);
+                static::assertEquals('b', $classDef->fields['s']->b);
+                static::assertEquals('a', $classDef->fields['f']->a);
+                static::assertEquals('B', $classDef->fields['f']->b);
+            },
+        ];
+    }
 }

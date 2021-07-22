@@ -14,6 +14,8 @@ class ObjectAnalyzer
             false => new \ReflectionObject($class),
         };
 
+        // @todo Catch an error/exception here and wrap it in a better one,
+        // if the attribute has required fields but isn't specified.
         $classDef = $this->getAttribute($subject, $attribute) ?? new $attribute;
 
         if ($classDef instanceof ReflectionPopulatable) {
@@ -30,15 +32,30 @@ class ObjectAnalyzer
 
     protected function getPropertyDefinitions(\ReflectionObject|\ReflectionClass $subject, string $propertyAttribute): array
     {
+        // @todo This needs a pipe.
         $rProperties = $subject->getProperties();
-        // @todo Convert to first-class-callables when those are merged.
-        $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute), $rProperties);
+        $props = $this->indexBy($rProperties, fn(\ReflectionProperty $r) => $r->getName());
+        $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute), $props);
         //$fields = array_filter($fields, fn(Field $f): bool => !$f->skip);
         return $properties;
     }
 
+    /**
+     * @todo Break this out to a utility function.
+     */
+    protected function indexBy(array $arr, callable $keyMaker): array
+    {
+        $ret = [];
+        foreach ($arr as $v) {
+            $ret[$keyMaker($v)] = $v;
+        }
+        return $ret;
+    }
+
     protected function getPropertyDefinition(\ReflectionProperty $property, string $propertyAttribute): object
     {
+        // @todo Catch an error/exception here and wrap it in a better one,
+        // if the attribute has required fields but isn't specified.
         $propDef = $this->getAttribute($property, $propertyAttribute) ?? new $propertyAttribute();
         if ($propDef instanceof ReflectionPopulatable) {
             $propDef->fromReflection($property);
