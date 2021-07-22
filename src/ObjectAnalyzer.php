@@ -18,7 +18,7 @@ class ObjectAnalyzer
         // if the attribute has required fields but isn't specified.
         $classDef = $this->getAttribute($subject, $attribute) ?? new $attribute;
 
-        if ($classDef instanceof ReflectionPopulatable) {
+        if ($classDef instanceof FromReflectionClass) {
             $classDef->fromReflection($subject);
         }
 
@@ -61,7 +61,7 @@ class ObjectAnalyzer
         // if the attribute has required fields but isn't specified.
         $propDef = $this->getAttribute($property, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
-        if ($propDef instanceof ReflectionPopulatable) {
+        if ($propDef instanceof FromReflectionProperty) {
             $propDef->fromReflection($property);
         }
 

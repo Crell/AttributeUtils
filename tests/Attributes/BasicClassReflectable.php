@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Crell\ObjectAnalyzer\Attributes;
 
 use Attribute;
-use Crell\ObjectAnalyzer\ReflectionPopulatable;
+use Crell\ObjectAnalyzer\FromReflectionClass;
 
 /**
  * The most basic class-level attribute. No fancy integration at all.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class BasicClassReflectable implements ReflectionPopulatable
+class BasicClassReflectable implements FromReflectionClass
 {
     public function __construct(
         public int $a = 0,
@@ -19,10 +19,7 @@ class BasicClassReflectable implements ReflectionPopulatable
         public ?string $name = null,
     ) {}
 
-    /**
-     * @param \ReflectionClass|\ReflectionObject $subject
-     */
-    public function fromReflection(\Reflector $subject): void
+    public function fromReflection(\ReflectionClass|\ReflectionObject $subject): void
     {
         $this->name ??= $subject->getShortName();
     }
