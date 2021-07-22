@@ -22,7 +22,7 @@ class ObjectAnalyzerTest extends TestCase
      * @test
      * @dataProvider attributeTestProvider()
      */
-    public function generic(string $subject, string $attribute, callable $test): void
+    public function analyze_classes(string $subject, string $attribute, callable $test): void
     {
         $analyzer = new ObjectAnalyzer();
 
@@ -31,6 +31,22 @@ class ObjectAnalyzerTest extends TestCase
         $test($classDef);
     }
 
+    /**
+     * @test
+     * @dataProvider attributeObjectTestProvider()
+     */
+    public function analyze_objects(object $subject, string $attribute, callable $test): void
+    {
+        $analyzer = new ObjectAnalyzer();
+
+        $classDef = $analyzer->analyze($subject, $attribute);
+
+        $test($classDef);
+    }
+
+    /**
+     * @see analyze_classes()
+     */
     public function attributeTestProvider(): iterable
     {
         yield 'Generic' => [
@@ -99,7 +115,20 @@ class ObjectAnalyzerTest extends TestCase
                 static::assertEquals('B', $classDef->fields['f']->b);
             },
         ];
+    }
 
+    /**
+     * @see analyze_objects()
+     */
+    public function attributeObjectTestProvider(): iterable
+    {
+        $tests = iterator_to_array($this->attributeTestProvider());
 
+        $new = [];
+        foreach ($tests as $name => $test) {
+            $test['subject'] = new $test['subject'];
+            $new[$name . ' (Object)'] = $test;
+        }
+        return $new;
     }
 }
