@@ -22,10 +22,12 @@ class ObjectAnalyzer
             $classDef->fromReflection($subject);
         }
 
-        if ($classDef instanceof Fieldable) {
+        if ($classDef instanceof ParseProperties) {
             $fields = $this->getPropertyDefinitions($subject, $classDef::propertyAttribute(), $classDef->includeByDefault());
-            $classDef->setFields($fields);
+            $classDef->setProperties($fields);
         }
+
+        // @todo Add support for parsing methods, maybe constants?
 
         return $classDef;
     }

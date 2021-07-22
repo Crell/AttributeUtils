@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer;
 
-interface Fieldable
+interface ParseProperties
 {
-    public function setFields(array $fields): void;
+    public function setProperties(array $properties): void;
 
     public function includeByDefault(): bool;
 

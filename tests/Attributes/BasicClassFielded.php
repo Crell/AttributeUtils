@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Crell\ObjectAnalyzer\Attributes;
 
 use Attribute;
-use Crell\ObjectAnalyzer\Fieldable;
+use Crell\ObjectAnalyzer\ParseProperties;
 
 /**
  * A simple class attribute that includes support for fields/properties.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class BasicClassFielded implements Fieldable
+class BasicClassFielded implements ParseProperties
 {
-    public array $fields = [];
+    public array $properties = [];
 
     public function __construct(
         public int $a = 0,
@@ -21,9 +21,9 @@ class BasicClassFielded implements Fieldable
         public bool $include = true,
     ) {}
 
-    public function setFields(array $fields): void
+    public function setProperties(array $properties): void
     {
-        $this->fields = $fields;
+        $this->properties = $properties;
     }
 
     public function includeByDefault(): bool
@@ -35,5 +35,4 @@ class BasicClassFielded implements Fieldable
     {
         return BasicProperty::class;
     }
-
 }

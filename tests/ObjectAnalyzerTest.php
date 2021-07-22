@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Crell\ObjectAnalyzer;
 
+use Crell\ObjectAnalyzer\Attributes\BasicClass;
 use Crell\ObjectAnalyzer\Attributes\BasicClassFielded;
 use Crell\ObjectAnalyzer\Attributes\BasicClassReflectable;
-use Crell\ObjectAnalyzer\Attributes\BasicClass;
 use Crell\ObjectAnalyzer\Attributes\BasicClassReflectableProperties;
-use Crell\ObjectAnalyzer\Attributes\BasicPropertyReflectable;
 use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFields;
 use Crell\ObjectAnalyzer\Records\BasicWithCustomizedFieldsExcludeByDefault;
 use Crell\ObjectAnalyzer\Records\BasicWithDefaultFields;
@@ -85,12 +84,12 @@ class ObjectAnalyzerTest extends TestCase
             'subject' => BasicWithDefaultFields::class,
             'attribute' => BasicClassFielded::class,
             'test' => static function(BasicClassFielded $classDef) {
-                static::assertEquals('a', $classDef->fields['i']->a);
-                static::assertEquals('b', $classDef->fields['i']->b);
-                static::assertEquals('a', $classDef->fields['s']->a);
-                static::assertEquals('b', $classDef->fields['s']->b);
-                static::assertEquals('a', $classDef->fields['f']->a);
-                static::assertEquals('b', $classDef->fields['f']->b);
+                static::assertEquals('a', $classDef->properties['i']->a);
+                static::assertEquals('b', $classDef->properties['i']->b);
+                static::assertEquals('a', $classDef->properties['s']->a);
+                static::assertEquals('b', $classDef->properties['s']->b);
+                static::assertEquals('a', $classDef->properties['f']->a);
+                static::assertEquals('b', $classDef->properties['f']->b);
             },
         ];
 
@@ -98,12 +97,12 @@ class ObjectAnalyzerTest extends TestCase
             'subject' => BasicWithCustomizedFields::class,
             'attribute' => BasicClassFielded::class,
             'test' => static function(BasicClassFielded $classDef) {
-                static::assertEquals('a', $classDef->fields['i']->a);
-                static::assertEquals('b', $classDef->fields['i']->b);
-                static::assertEquals('A', $classDef->fields['s']->a);
-                static::assertEquals('b', $classDef->fields['s']->b);
-                static::assertEquals('a', $classDef->fields['f']->a);
-                static::assertEquals('B', $classDef->fields['f']->b);
+                static::assertEquals('a', $classDef->properties['i']->a);
+                static::assertEquals('b', $classDef->properties['i']->b);
+                static::assertEquals('A', $classDef->properties['s']->a);
+                static::assertEquals('b', $classDef->properties['s']->b);
+                static::assertEquals('a', $classDef->properties['f']->a);
+                static::assertEquals('B', $classDef->properties['f']->b);
             },
         ];
 
@@ -111,11 +110,11 @@ class ObjectAnalyzerTest extends TestCase
             'subject' => BasicWithCustomizedFieldsExcludeByDefault::class,
             'attribute' => BasicClassFielded::class,
             'test' => static function(BasicClassFielded $classDef) {
-                static::assertArrayNotHasKey('i', $classDef->fields);
-                static::assertEquals('A', $classDef->fields['s']->a);
-                static::assertEquals('b', $classDef->fields['s']->b);
-                static::assertEquals('a', $classDef->fields['f']->a);
-                static::assertEquals('B', $classDef->fields['f']->b);
+                static::assertArrayNotHasKey('i', $classDef->properties);
+                static::assertEquals('A', $classDef->properties['s']->a);
+                static::assertEquals('b', $classDef->properties['s']->b);
+                static::assertEquals('a', $classDef->properties['f']->a);
+                static::assertEquals('B', $classDef->properties['f']->b);
             },
         ];
 
@@ -123,9 +122,9 @@ class ObjectAnalyzerTest extends TestCase
             'subject' => BasicWithReflectableProperties::class,
             'attribute' => BasicClassReflectableProperties::class,
             'test' => static function(BasicClassReflectableProperties $classDef) {
-                static::assertEquals('i', $classDef->fields['i']->name);
-                static::assertEquals('beep', $classDef->fields['s']->name);
-                static::assertEquals('f', $classDef->fields['f']->name);
+                static::assertEquals('i', $classDef->properties['i']->name);
+                static::assertEquals('beep', $classDef->properties['s']->name);
+                static::assertEquals('f', $classDef->properties['f']->name);
             },
         ];
 

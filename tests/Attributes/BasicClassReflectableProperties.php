@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Crell\ObjectAnalyzer\Attributes;
 
 use Attribute;
-use Crell\ObjectAnalyzer\Fieldable;
+use Crell\ObjectAnalyzer\ParseProperties;
 
 /**
  * Includes fields that are themselves reflectable.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class BasicClassReflectableProperties implements Fieldable
+class BasicClassReflectableProperties implements ParseProperties
 {
-    public array $fields = [];
+    public array $properties = [];
 
     public function __construct(
         public bool $include = true,
     ) {}
 
-    public function setFields(array $fields): void
+    public function setProperties(array $properties): void
     {
-        $this->fields = $fields;
+        $this->properties = $properties;
     }
 
     public function includeByDefault(): bool
