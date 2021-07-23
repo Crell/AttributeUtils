@@ -9,7 +9,10 @@ class Analyzer implements ClassAnalyzer
 
     public function analyze(string|object $class, string $attribute): object
     {
-        $subject = new \ReflectionClass(is_string($class) ? $class : $class::class);
+        $subject = match (is_string($class)) {
+            true => new \ReflectionClass($class),
+            false => new \ReflectionObject($class),
+        };
 
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
@@ -29,7 +32,7 @@ class Analyzer implements ClassAnalyzer
         return $classDef;
     }
 
-    protected function getPropertyDefinitions(\ReflectionObject|\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array
+    protected function getPropertyDefinitions(\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array
     {
         // @todo This needs a pipe.
         $rProperties = $subject->getProperties();
