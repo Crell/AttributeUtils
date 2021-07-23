@@ -16,7 +16,7 @@ class ClassWithReflection implements FromReflectionClass
         public ?string $name = null,
     ) {}
 
-    public function fromReflection(\ReflectionClass|\ReflectionObject $subject): void
+    public function fromReflection(\ReflectionClass $subject): void
     {
         $this->name ??= $subject->getShortName();
     }

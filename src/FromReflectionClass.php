@@ -6,5 +6,5 @@ namespace Crell\ObjectAnalyzer;
 
 interface FromReflectionClass
 {
-    public function fromReflection(\ReflectionClass|\ReflectionObject $subject): void;
+    public function fromReflection(\ReflectionClass $subject): void;
 }
