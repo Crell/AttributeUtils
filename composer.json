@@ -19,7 +19,7 @@
     "repositories": [
         {
             "type": "git",
-            "url": "git@github.com:Crell/fp.git"
+            "url": "https://github.com/Crell/fp.git"
         }
     ],
     "require": {
