@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use function Crell\fp\amap;
+use function Crell\fp\afilter;
+use function Crell\fp\indexBy;
+use function Crell\fp\pipe;
+
 class Analyzer implements ClassAnalyzer
 {
 
@@ -34,25 +39,13 @@ class Analyzer implements ClassAnalyzer
 
     protected function getPropertyDefinitions(\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array
     {
-        // @todo This needs a pipe.
-        $rProperties = $subject->getProperties();
-        $props = $this->indexBy($rProperties, fn (\ReflectionProperty $r) => $r->getName());
-        $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault), $props);
-        $properties = array_filter($properties);
-        $properties = array_filter($properties, static fn (object $prop):bool => !($prop->exclude ?? false));
-        return $properties;
-    }
-
-    /**
-     * @todo Break this out to a utility function.
-     */
-    protected function indexBy(array $arr, callable $keyMaker): array
-    {
-        $ret = [];
-        foreach ($arr as $v) {
-            $ret[$keyMaker($v)] = $v;
-        }
-        return $ret;
+        return pipe(
+            $subject->getProperties(),
+            indexBy(static fn (\ReflectionProperty $r): string => $r->getName()),
+            amap(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault)),
+            afilter(static fn($x) => (bool)$x),
+            afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
+        );
     }
 
     protected function getPropertyDefinition(\ReflectionProperty $property, string $propertyAttribute, bool $includeByDefault): ?object
@@ -85,6 +78,6 @@ class Analyzer implements ClassAnalyzer
     protected function getAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty $target, string $name): array
     {
         return array_map(static fn (\ReflectionAttribute $attrib)
-        => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
+            => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
     }
 }
