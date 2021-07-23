@@ -20,6 +20,7 @@
         "php": "~8.0"
     },
     "require-dev": {
+        "phpstan/phpstan": "^0.12.93",
         "phpunit/phpunit": "~9.0"
     },
     "autoload": {
@@ -29,8 +30,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Crell\\AttributeUtils\\": "tests",
-            "Crell\\AttributeUtils\\Benchmarks\\": "benchmarks"
+            "Crell\\AttributeUtils\\": "tests"
         }
     },
     "scripts": {

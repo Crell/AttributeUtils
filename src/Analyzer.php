@@ -39,7 +39,7 @@ class Analyzer implements ClassAnalyzer
         $props = $this->indexBy($rProperties, fn (\ReflectionProperty $r) => $r->getName());
         $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault), $props);
         $properties = array_filter($properties);
-        $properties = array_filter($properties, static fn (object $prop) => !($prop->exclude ?? false));
+        $properties = array_filter($properties, static fn (object $prop):bool => !($prop->exclude() ?? false));
         return $properties;
     }
 
@@ -68,12 +68,21 @@ class Analyzer implements ClassAnalyzer
         return $propDef;
     }
 
-    protected function getAttribute(\Reflector $target, string $name): ?object
+    /**
+     * Returns a single attribute of a given type from a target, or null if not found.
+     */
+    protected function getAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty $target, string $name): ?object
     {
         return $this->getAttributes($target, $name)[0] ?? null;
     }
 
-    protected function getAttributes(\Reflector $target, string $name): array
+    /**
+     * Get all attributes of a given type from a target.
+     *
+     * Unfortunately PHP has no common interface for "reflection objects that support attributes",
+     * so we have to enumerate them manually.
+     */
+    protected function getAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty $target, string $name): array
     {
         return array_map(static fn (\ReflectionAttribute $attrib)
         => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
