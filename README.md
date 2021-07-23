@@ -10,7 +10,7 @@
 Via Composer
 
 ``` bash
-$ composer require crell/objectanalyzer
+$ composer require crell/attributeutils
 ```
 
 ## Change log

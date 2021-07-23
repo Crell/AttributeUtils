@@ -1,9 +1,9 @@
 {
-    "name": "crell/objectanalyzer",
+    "name": "crell/attributeutils",
     "type": "library",
     "description": "WIP",
     "keywords": [
-        "AttributeUtils",
+        "Attributes",
         "Reflection"
     ],
     "homepage": "https://github.com/Crell/AttributeUtils",
