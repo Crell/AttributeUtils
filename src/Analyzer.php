@@ -39,7 +39,7 @@ class Analyzer implements ClassAnalyzer
         $props = $this->indexBy($rProperties, fn (\ReflectionProperty $r) => $r->getName());
         $properties = array_map(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault), $props);
         $properties = array_filter($properties);
-        $properties = array_filter($properties, static fn (object $prop):bool => !($prop->exclude() ?? false));
+        $properties = array_filter($properties, static fn (object $prop):bool => !($prop->exclude ?? false));
         return $properties;
     }
 
