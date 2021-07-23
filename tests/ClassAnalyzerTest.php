@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\ObjectAnalyzer;
 
 use Crell\ObjectAnalyzer\Attributes\BasicClass;
+use Crell\ObjectAnalyzer\Attributes\BasicProperty;
 use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
 use Crell\ObjectAnalyzer\Attributes\ClassWithReflection;
 use Crell\ObjectAnalyzer\Attributes\ClassWithReflectableProperties;
@@ -44,6 +45,24 @@ class ClassAnalyzerTest extends TestCase
         $classDef = $analyzer->analyze($subject, $attribute);
 
         $test($classDef);
+    }
+
+    /**
+     * @test
+     */
+    public function analyze_anonymous_objects(): void
+    {
+        $subject = new class {
+            #[BasicProperty]
+            public string $foo;
+        };
+
+        $analyzer = new Analyzer();
+
+        $classDef = $analyzer->analyze($subject, ClassWithProperties::class);
+
+        static::assertEquals('a', $classDef->properties['foo']->a);
+        static::assertEquals('b', $classDef->properties['foo']->b);
     }
 
     /**
