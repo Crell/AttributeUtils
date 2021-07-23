@@ -43,7 +43,7 @@ class Analyzer implements ClassAnalyzer
             $subject->getProperties(),
             indexBy(static fn (\ReflectionProperty $r): string => $r->getName()),
             amap(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault)),
-            afilter(static fn($x) => (bool)$x),
+            afilter(),
             afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
         );
     }
