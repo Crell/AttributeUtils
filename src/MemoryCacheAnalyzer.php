@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer;
+namespace Crell\AttributeUtils;
 
 /**
  * A simple in-memory result cache for ClassAnalyzers.

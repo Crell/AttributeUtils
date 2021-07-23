@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Attributes;
+namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
-use Crell\ObjectAnalyzer\FromReflectionClass;
+use Crell\AttributeUtils\FromReflectionClass;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class ClassWithReflection implements FromReflectionClass

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer;
+namespace Crell\AttributeUtils;
 
 class Analyzer implements ClassAnalyzer
 {

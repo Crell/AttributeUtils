@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Records;
+namespace Crell\AttributeUtils\Records;
 
-use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
-use Crell\ObjectAnalyzer\Attributes\BasicProperty;
+use Crell\AttributeUtils\Attributes\ClassWithProperties;
+use Crell\AttributeUtils\Attributes\BasicProperty;
 
 #[ClassWithProperties(include: false)]
 class ClassWithCustomizedPropertiesExcludeByDefault

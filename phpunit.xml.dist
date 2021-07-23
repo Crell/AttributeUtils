@@ -11,7 +11,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="ObjectAnalyzer Test Suite">
+    <testsuite name="AttributeUtils Test Suite">
       <directory>tests</directory>
     </testsuite>
   </testsuites>

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Attributes;
+namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
-use Crell\ObjectAnalyzer\ParseProperties;
+use Crell\AttributeUtils\ParseProperties;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class ClassWithProperties implements ParseProperties

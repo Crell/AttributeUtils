@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Records;
+namespace Crell\AttributeUtils\Records;
 
-use Crell\ObjectAnalyzer\Attributes\ClassWithReflectableProperties;
-use Crell\ObjectAnalyzer\Attributes\PropertyWithReflection;
+use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
+use Crell\AttributeUtils\Attributes\PropertyWithReflection;
 
 #[ClassWithReflectableProperties]
 class ClassWithPropertiesWithReflection

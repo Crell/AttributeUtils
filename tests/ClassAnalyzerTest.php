@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer;
+namespace Crell\AttributeUtils;
 
-use Crell\ObjectAnalyzer\Attributes\BasicClass;
-use Crell\ObjectAnalyzer\Attributes\BasicProperty;
-use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
-use Crell\ObjectAnalyzer\Attributes\ClassWithReflection;
-use Crell\ObjectAnalyzer\Attributes\ClassWithReflectableProperties;
-use Crell\ObjectAnalyzer\Records\ClassWithCustomizedFields;
-use Crell\ObjectAnalyzer\Records\ClassWithCustomizedPropertiesExcludeByDefault;
-use Crell\ObjectAnalyzer\Records\ClassWithDefaultFields;
-use Crell\ObjectAnalyzer\Records\ClassWithPropertiesWithReflection;
-use Crell\ObjectAnalyzer\Records\NoProps;
-use Crell\ObjectAnalyzer\Records\NoPropsOverride;
-use Crell\ObjectAnalyzer\Records\Point;
+use Crell\AttributeUtils\Attributes\BasicClass;
+use Crell\AttributeUtils\Attributes\BasicProperty;
+use Crell\AttributeUtils\Attributes\ClassWithProperties;
+use Crell\AttributeUtils\Attributes\ClassWithReflection;
+use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
+use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
+use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
+use Crell\AttributeUtils\Records\ClassWithDefaultFields;
+use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
+use Crell\AttributeUtils\Records\NoProps;
+use Crell\AttributeUtils\Records\NoPropsOverride;
+use Crell\AttributeUtils\Records\Point;
 use PHPUnit\Framework\TestCase;
 
 class ClassAnalyzerTest extends TestCase

@@ -3,10 +3,10 @@
     "type": "library",
     "description": "WIP",
     "keywords": [
-        "ObjectAnalyzer",
+        "AttributeUtils",
         "Reflection"
     ],
-    "homepage": "https://github.com/Crell/ObjectAnalyzer",
+    "homepage": "https://github.com/Crell/AttributeUtils",
     "license": "LGPL-3.0-or-later",
     "authors": [
         {
@@ -24,13 +24,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Crell\\ObjectAnalyzer\\": "src"
+            "Crell\\AttributeUtils\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Crell\\ObjectAnalyzer\\": "tests",
-            "Crell\\ObjectAnalyzer\\Benchmarks\\": "benchmarks"
+            "Crell\\AttributeUtils\\": "tests",
+            "Crell\\AttributeUtils\\Benchmarks\\": "benchmarks"
         }
     },
     "scripts": {

@@ -1,4 +1,4 @@
-# Object Analyzer
+# Attribute Utilities
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
@@ -40,13 +40,13 @@ If you discover any security related issues, please email larry at garfieldtech 
 
 The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/Crell/ObjectAnalyzer.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/Crell/AttributeUtils.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/License-LGPLv3-green.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/Crell/ObjectAnalyzer.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/Crell/AttributeUtils.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/Crell/ObjectAnalyzer
-[link-scrutinizer]: https://scrutinizer-ci.com/g/Crell/ObjectAnalyzer/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/Crell/ObjectAnalyzer
-[link-downloads]: https://packagist.org/packages/Crell/ObjectAnalyzer
+[link-packagist]: https://packagist.org/packages/Crell/AttributeUtils
+[link-scrutinizer]: https://scrutinizer-ci.com/g/Crell/AttributeUtils/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/Crell/AttributeUtils
+[link-downloads]: https://packagist.org/packages/Crell/AttributeUtils
 [link-author]: https://github.com/Crell
 [link-contributors]: ../../contributors

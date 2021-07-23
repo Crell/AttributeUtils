@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Records;
+namespace Crell\AttributeUtils\Records;
 
 class Point
 {

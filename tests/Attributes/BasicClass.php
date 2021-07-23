@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Attributes;
+namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
 

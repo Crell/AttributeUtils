@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer;
+namespace Crell\AttributeUtils;
 
-use Crell\ObjectAnalyzer\Attributes\ClassWithProperties;
-use Crell\ObjectAnalyzer\Records\ClassWithDefaultFields;
-use Crell\ObjectAnalyzer\Records\Point;
+use Crell\AttributeUtils\Attributes\ClassWithProperties;
+use Crell\AttributeUtils\Records\ClassWithDefaultFields;
+use Crell\AttributeUtils\Records\Point;
 use PHPUnit\Framework\TestCase;
 
 class MemoryCacheAnalyzerTest extends TestCase

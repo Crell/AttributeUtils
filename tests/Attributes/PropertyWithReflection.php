@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Crell\ObjectAnalyzer\Attributes;
+namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
-use Crell\ObjectAnalyzer\FromReflectionProperty;
+use Crell\AttributeUtils\FromReflectionProperty;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class PropertyWithReflection implements FromReflectionProperty
