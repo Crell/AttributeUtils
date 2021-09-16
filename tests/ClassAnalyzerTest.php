@@ -7,12 +7,14 @@ namespace Crell\AttributeUtils;
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
+use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
+use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
@@ -144,6 +146,18 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals('i', $classDef->properties['i']->name);
                 static::assertEquals('beep', $classDef->properties['s']->name);
                 static::assertEquals('f', $classDef->properties['f']->name);
+            },
+        ];
+
+        yield 'Fieldable with sub-attributes' => [
+            'subject' => ClassWithSubAttributes::class,
+            'attribute' => ClassWithPropertiesWithSubAttributes::class,
+            'test' => static function(ClassWithPropertiesWithSubAttributes $classDef) {
+                static::assertEquals('C', $classDef->c);
+                static::assertEquals('A', $classDef->properties['hasSub']->a);
+                static::assertEquals('B', $classDef->properties['hasSub']->b);
+                static::assertEquals('A', $classDef->properties['noSub']->a);
+                static::assertEquals('B', $classDef->properties['noSub']->b);
             },
         ];
 

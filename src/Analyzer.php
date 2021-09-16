@@ -28,6 +28,12 @@ class Analyzer implements ClassAnalyzer
             $classDef->fromReflection($subject);
         }
 
+        if ($classDef instanceof HasSubAttributes) {
+            foreach ($classDef->subAttributes() as $type => $callback) {
+                $classDef->$callback($this->getAttribute($subject, $type));
+            }
+        }
+
         if ($classDef instanceof ParseProperties) {
             $fields = $this->getPropertyDefinitions($subject, $classDef::propertyAttribute(), $classDef->includeByDefault());
             $classDef->setProperties($fields);
@@ -43,7 +49,7 @@ class Analyzer implements ClassAnalyzer
         return pipe(
             $subject->getProperties(),
             indexBy(static fn (\ReflectionProperty $r): string => $r->getName()),
-            amap(fn(\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault)),
+            amap(fn (\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault)),
             afilter(),
             afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
         );
@@ -57,6 +63,11 @@ class Analyzer implements ClassAnalyzer
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
         if ($propDef instanceof FromReflectionProperty) {
             $propDef->fromReflection($property);
+        }
+        if ($propDef instanceof HasSubAttributes) {
+            foreach ($propDef->subAttributes() as $type => $callback) {
+                $propDef->$callback($this->getAttribute($property, $type));
+            }
         }
 
         return $propDef;
