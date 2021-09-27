@@ -61,10 +61,9 @@ class Analyzer implements ClassAnalyzer
     protected function getClassInheritedAttribute(string $subject, string $attributeType): ?object
     {
         $classesToScan = [$subject];
-        // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
-        $attributeAncestors = [...class_parents($attributeType), ...class_implements($attributeType)];
-        if (isset($attributeAncestors[Inheritable::class]) ) {
-            $subjectAncestors = array_values([...class_parents($subject), ...class_implements($subject)]);
+        if ($this->classImplements($attributeType, Inheritable::class)) {
+            // @todo Remove the array_values() in PHP 8.1, or make it a single wrapping call.
+            $subjectAncestors = [...array_values(class_parents($subject)), ...array_values(class_implements($subject))];
             $classesToScan = [...$classesToScan, ...$subjectAncestors];
         }
 
@@ -157,6 +156,9 @@ class Analyzer implements ClassAnalyzer
     protected function classImplements(string $class, string $interface): bool
     {
         // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
-        return isset([...class_parents($class), ...class_implements($class)][$interface]);
+        return isset(class_parents($class)[$interface]) || isset(class_implements($class)[$interface]);
+
+        // PHP 8.1 version, which is nicer.
+        // return isset([...class_parents($class), ...class_implements($class)][$interface]);
     }
 }
