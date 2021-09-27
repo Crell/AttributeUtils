@@ -182,6 +182,7 @@ class ClassAnalyzerTest extends TestCase
             'test' => static function(TransitiveClassAttribute $classDef) {
                 static::assertEquals('boop', $classDef->properties['task']->beep);
                 static::assertEquals('burp', $classDef->properties['small']->beep);
+                static::assertEquals('boop', $classDef->properties['big']->beep);
             },
         ];
     }
