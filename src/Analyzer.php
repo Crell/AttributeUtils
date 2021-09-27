@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils;
 
 use function Crell\fp\amap;
 use function Crell\fp\afilter;
+use function Crell\fp\firstValue;
 use function Crell\fp\indexBy;
 use function Crell\fp\pipe;
 
@@ -15,22 +16,23 @@ class Analyzer implements ClassAnalyzer
 
     public function analyze(string|object $class, string $attribute): object
     {
-        $subject = match (is_string($class)) {
-            true => new \ReflectionClass($class),
-            false => new \ReflectionObject($class),
-        };
+        // Everything is easier if we normalize to a class first.
+        // Because anon classes have generated internal class names, they work, too.
+        $class = is_string($class) ? $class : $class::class;
+
+        $subject = new \ReflectionClass($class);
 
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $classDef = $this->getAttribute($subject, $attribute) ?? new $attribute;
+        $classDef = $this->getClassInheritedAttribute($class, $attribute) ?? new $attribute;
 
         if ($classDef instanceof FromReflectionClass) {
             $classDef->fromReflection($subject);
         }
 
         if ($classDef instanceof HasSubAttributes) {
-            foreach ($classDef->subAttributes() as $type => $callback) {
-                $classDef->$callback($this->getAttribute($subject, $type));
+            foreach ($classDef->subAttributes() as $subAttributeType => $callback) {
+                $classDef->$callback($this->getClassInheritedAttribute($class, $subAttributeType));
             }
         }
 
@@ -42,6 +44,21 @@ class Analyzer implements ClassAnalyzer
         // @todo Add support for parsing methods, maybe constants?
 
         return $classDef;
+    }
+
+    protected function getClassInheritedAttribute(string $subject, string $attributeType): ?object
+    {
+        $classesToScan = [$subject];
+        // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
+        $attributeAncestors = [...class_parents($attributeType), ...class_implements($attributeType)];
+        if (isset($attributeAncestors[Inheritable::class]) ) {
+            $subjectAncestors = array_values([...class_parents($subject), ...class_implements($subject)]);
+            $classesToScan = [...$classesToScan, ...$subjectAncestors];
+        }
+
+        return pipe($classesToScan,
+            firstValue(fn (string $c): ?object => $this->getAttribute(new \ReflectionClass($c), $attributeType)),
+        );
     }
 
     protected function getPropertyDefinitions(\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array

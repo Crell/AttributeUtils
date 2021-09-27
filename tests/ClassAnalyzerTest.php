@@ -10,6 +10,7 @@ use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
+use Crell\AttributeUtils\Attributes\InheritableClassSubAttributeMain;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
@@ -18,6 +19,7 @@ use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
+use Crell\AttributeUtils\Records\SubAttributesInheritChild;
 use PHPUnit\Framework\TestCase;
 
 class ClassAnalyzerTest extends TestCase
@@ -158,6 +160,14 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals('B', $classDef->properties['hasSub']->b);
                 static::assertEquals('A', $classDef->properties['noSub']->a);
                 static::assertEquals('B', $classDef->properties['noSub']->b);
+            },
+        ];
+
+        yield 'Class sub-attributes inherit' => [
+            'subject' => SubAttributesInheritChild::class,
+            'attribute' => InheritableClassSubAttributeMain::class,
+            'test' => static function(InheritableClassSubAttributeMain $classDef) {
+                static::assertEquals('baz', $classDef->sub->foo);
             },
         ];
 
