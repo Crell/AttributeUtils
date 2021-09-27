@@ -9,12 +9,10 @@ use Crell\AttributeUtils\HasSubAttributes;
 use Crell\AttributeUtils\Inheritable;
 use Crell\AttributeUtils\ParseProperties;
 
-#[Attribute(Attribute::TARGET_CLASS)]
-class InheritableClassAttributeMain implements HasSubAttributes, Inheritable, ParseProperties
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class InheritablePropertyAttributeMain implements HasSubAttributes, Inheritable
 {
     public ?InheritableClassSubAttribute $sub;
-
-    public array $properties = [];
 
     public function __construct(
         public int $a = 1,
@@ -30,18 +28,10 @@ class InheritableClassAttributeMain implements HasSubAttributes, Inheritable, Pa
         $this->sub = $attrib;
     }
 
-    public function setProperties(array $properties): void
-    {
-        $this->properties = $properties;
-    }
-
-    public function includeByDefault(): bool
-    {
-        return true;
-    }
-
     public static function propertyAttribute(): string
     {
         return InheritablePropertyAttributeMain::class;
     }
+
+
 }

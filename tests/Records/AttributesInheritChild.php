@@ -9,5 +9,5 @@ use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 
 class AttributesInheritChild extends AttributesInheritParent
 {
-    public string $a = 'A';
+    public string $test = 'things';
 }

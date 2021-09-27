@@ -86,7 +86,7 @@ class Analyzer implements ClassAnalyzer
     {
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $propDef = $this->getAttribute($property, $propertyAttribute)
+        $propDef = $this->getPropertyInheritedAttribute($property, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
         if ($propDef instanceof FromReflectionProperty) {
             $propDef->fromReflection($property);
@@ -98,5 +98,32 @@ class Analyzer implements ClassAnalyzer
         }
 
         return $propDef;
+    }
+
+    protected function getPropertyInheritedAttribute(\ReflectionProperty $rProperty, string $attributeType): ?object
+    {
+        $properties = function () use ($rProperty, $attributeType): \Generator {
+            yield $rProperty;
+
+            if (!$this->classImplements($attributeType, Inheritable::class)) {
+                return null;
+            }
+
+            // There is no point in scanning ancestor interfaces, as they cannot
+            // contain properties. (At least as of PHP 8.1)
+            foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
+                yield (new \ReflectionClass($class))->getProperty($rProperty->getName());
+            }
+        };
+
+        return pipe($properties(),
+            firstValue(fn(\ReflectionProperty $rProp): ?object => $this->getAttribute($rProp, $attributeType))
+        );
+    }
+
+    protected function classImplements(string $class, string $interface): bool
+    {
+        // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
+        return isset([...class_parents($class), ...class_implements($class)][$interface]);
     }
 }

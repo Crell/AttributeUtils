@@ -163,12 +163,13 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        yield 'Class attributes and sub-attributes inherit' => [
+        yield 'Attributes and sub-attributes inherit' => [
             'subject' => AttributesInheritChild::class,
             'attribute' => InheritableClassAttributeMain::class,
             'test' => static function(InheritableClassAttributeMain $classDef) {
                 static::assertEquals(2, $classDef->a);
                 static::assertEquals('baz', $classDef->sub->foo);
+                static::assertEquals(4, $classDef->properties['test']->a);
             },
         ];
 
