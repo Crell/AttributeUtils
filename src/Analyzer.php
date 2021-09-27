@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use Crell\Serde\IntersectionTypesNotSupported;
+use Crell\Serde\UnionTypesNotSupported;
 use function Crell\fp\amap;
 use function Crell\fp\afilter;
 use function Crell\fp\firstValue;
@@ -100,25 +102,56 @@ class Analyzer implements ClassAnalyzer
         return $propDef;
     }
 
+    /**
+     * Returns the class or interface a given property is typed for, or null if it's not so typed.
+     *
+     * @param \ReflectionProperty $rProperty
+     *   The property to check
+     * @return string|null
+     *   The class/interface name, or null.
+     */
+    protected function getPropertyClass(\ReflectionProperty $rProperty): ?string
+    {
+        $rType = $rProperty->getType();
+        if ($rType instanceof \ReflectionNamedType && (class_exists($rType->getName()) || interface_exists($rType->getName()))) {
+            return $rType->getName();
+        }
+        return null;
+    }
+
     protected function getPropertyInheritedAttribute(\ReflectionProperty $rProperty, string $attributeType): ?object
     {
         $properties = function () use ($rProperty, $attributeType): \Generator {
+            // Check the property iself, first.
             yield $rProperty;
 
-            if (!$this->classImplements($attributeType, Inheritable::class)) {
-                return null;
-            }
-
-            // There is no point in scanning ancestor interfaces, as they cannot
-            // contain properties. (At least as of PHP 8.1)
-            foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
-                yield (new \ReflectionClass($class))->getProperty($rProperty->getName());
+            // Then check the class's parents, if the attribute type is Inheritable.
+            if ($this->classImplements($attributeType, Inheritable::class)) {
+                // There is no point in scanning ancestor interfaces, as they cannot
+                // contain properties. (At least as of PHP 8.1)
+                foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
+                    yield (new \ReflectionClass($class))->getProperty($rProperty->getName());
+                }
             }
         };
 
-        return pipe($properties(),
+        $attribute = pipe($properties(),
             firstValue(fn(\ReflectionProperty $rProp): ?object => $this->getAttribute($rProp, $attributeType))
         );
+
+        if ($attribute) {
+            return $attribute;
+        }
+
+        // Then check the class pointed at by the property, if it exists and the attribute is transitive.
+        if ($this->classImplements($attributeType, TransitiveProperty::class)) {
+            if ($class = $this->getPropertyClass($rProperty)) {
+                return $this->getClassInheritedAttribute($class, $attributeType);
+            }
+        }
+
+        return null;
+
     }
 
     protected function classImplements(string $class, string $interface): bool
