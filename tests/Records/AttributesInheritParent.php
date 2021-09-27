@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Records;
 use Crell\AttributeUtils\Attributes\InheritableClassSubAttribute;
-use Crell\AttributeUtils\Attributes\InheritableClassSubAttributeMain;
+use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 
-#[InheritableClassSubAttributeMain]
+#[InheritableClassAttributeMain(a: 2)]
 #[InheritableClassSubAttribute(foo: 'baz')]
-class SubAttributesInheritParent
+class AttributesInheritParent
 {
 
 }

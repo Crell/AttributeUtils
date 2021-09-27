@@ -46,6 +46,16 @@ class Analyzer implements ClassAnalyzer
         return $classDef;
     }
 
+    /**
+     * Returns a single attribute of a given type from a target or its ancestors.
+     *
+     * @param string $subject
+     *   The class name for which we want an attribute.
+     * @param string $attributeType
+     *   The attribute type to retrieve.
+     * @return object|null
+     *   The attribute object if found on any ancestor, or null if not.
+     */
     protected function getClassInheritedAttribute(string $subject, string $attributeType): ?object
     {
         $classesToScan = [$subject];
