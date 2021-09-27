@@ -94,7 +94,7 @@ class Analyzer implements ClassAnalyzer
         }
         if ($propDef instanceof HasSubAttributes) {
             foreach ($propDef->subAttributes() as $type => $callback) {
-                $propDef->$callback($this->getAttribute($property, $type));
+                $propDef->$callback($this->getPropertyInheritedAttribute($property, $type));
             }
         }
 
@@ -121,7 +121,7 @@ class Analyzer implements ClassAnalyzer
     protected function getPropertyInheritedAttribute(\ReflectionProperty $rProperty, string $attributeType): ?object
     {
         $properties = function () use ($rProperty, $attributeType): \Generator {
-            // Check the property iself, first.
+            // Check the property itself, first.
             yield $rProperty;
 
             // Then check the class's parents, if the attribute type is Inheritable.

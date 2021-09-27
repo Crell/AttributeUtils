@@ -176,13 +176,17 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        yield 'Transitive fields inherit from the target class' => [
+//        yield 'Transitive fields inherit from the target class' => [
+        yield 'beep' => [
             'subject' => TransitiveFieldClass::class,
             'attribute' => TransitiveClassAttribute::class,
             'test' => static function(TransitiveClassAttribute $classDef) {
-                static::assertEquals('boop', $classDef->properties['task']->beep);
-                static::assertEquals('burp', $classDef->properties['small']->beep);
-                static::assertEquals('boop', $classDef->properties['big']->beep);
+                static::assertEquals('Task', $classDef->properties['task']->beep);
+                static::assertEquals('SmallTask', $classDef->properties['small']->beep);
+                static::assertEquals('Task', $classDef->properties['big']->beep);
+                static::assertEquals('biggie', $classDef->properties['big']->sub->title);
+                static::assertEquals('smallie', $classDef->properties['small']->sub->title);
+                static::assertNull($classDef->properties['task']->sub);
             },
         ];
     }
