@@ -8,11 +8,11 @@ use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
-use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
+use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\TransitiveClassAttribute;
-use Crell\AttributeUtils\Attributes\TransitivePropertyAttribute;
+use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
@@ -21,7 +21,6 @@ use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
-use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
 use PHPUnit\Framework\TestCase;
 
@@ -176,8 +175,7 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-//        yield 'Transitive fields inherit from the target class' => [
-        yield 'beep' => [
+        yield 'Transitive fields inherit from the target class' => [
             'subject' => TransitiveFieldClass::class,
             'attribute' => TransitiveClassAttribute::class,
             'test' => static function(TransitiveClassAttribute $classDef) {

@@ -7,7 +7,6 @@ namespace Crell\AttributeUtils\Attributes;
 use Attribute;
 use Crell\AttributeUtils\HasSubAttributes;
 use Crell\AttributeUtils\Inheritable;
-use Crell\AttributeUtils\ParseProperties;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class InheritablePropertyAttributeMain implements HasSubAttributes, Inheritable

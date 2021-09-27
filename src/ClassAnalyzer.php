@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+/**
+ * Analyzes a class based on a given attribute.
+ *
+ * The attribute may opt-in to additional processing by implementing
+ * one of a series of interfaces.
+ */
 interface ClassAnalyzer
 {
     /**
