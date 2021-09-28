@@ -177,6 +177,6 @@ class Analyzer implements ClassAnalyzer
     protected function classImplements(string $class, string $interface): bool
     {
         // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
-        return isset(class_parents($class)[$interface]) || isset(class_implements($class)[$interface]);
+        return $class === $interface || isset(class_parents($class)[$interface]) || isset(class_implements($class)[$interface]);
     }
 }
