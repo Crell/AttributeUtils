@@ -63,6 +63,7 @@ class Analyzer implements ClassAnalyzer
         // if the attribute has required fields but isn't specified.
         $propDef = $this->getPropertyInheritedAttribute($rProperty, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
+
         if ($propDef instanceof FromReflectionProperty) {
             $propDef->fromReflection($rProperty);
         }

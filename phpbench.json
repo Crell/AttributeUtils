@@ -1,0 +1,6 @@
+{
+    "runner.path": "benchmarks",
+    "$schema":"./vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.php_disable_ini": true
+}
