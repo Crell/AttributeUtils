@@ -172,6 +172,7 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals(2, $classDef->a);
                 static::assertEquals('baz', $classDef->sub->foo);
                 static::assertEquals(4, $classDef->properties['test']->a);
+                static::assertEquals(1, $classDef->properties['added']->a);
             },
         ];
 

@@ -8,4 +8,6 @@ namespace Crell\AttributeUtils\Records;
 class AttributesInheritChild extends AttributesInheritParent
 {
     public string $test = 'things';
+
+    public string $added = 'added';
 }

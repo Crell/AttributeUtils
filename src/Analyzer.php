@@ -126,7 +126,11 @@ class Analyzer implements ClassAnalyzer
                 // There is no point in scanning ancestor interfaces, as they cannot
                 // contain properties. (At least as of PHP 8.1)
                 foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
-                    yield (new \ReflectionClass($class))->getProperty($rProperty->getName());
+                    $rClass = new \ReflectionClass($class);
+                    $propName = $rProperty->getName();
+                    if ($rClass->hasProperty($propName)) {
+                        yield $rClass->getProperty($propName);
+                    }
                 }
             }
         };
