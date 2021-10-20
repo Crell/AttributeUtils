@@ -24,7 +24,7 @@ class ClassWithPropertiesWithSubAttributes implements ParseProperties, HasSubAtt
         $this->properties = $properties;
     }
 
-    public function includeByDefault(): bool
+    public function includePropertiesByDefault(): bool
     {
         return $this->include;
     }

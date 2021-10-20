@@ -35,7 +35,7 @@ class InheritableClassAttributeMain implements HasSubAttributes, Inheritable, Pa
         $this->properties = $properties;
     }
 
-    public function includeByDefault(): bool
+    public function includePropertiesByDefault(): bool
     {
         return true;
     }

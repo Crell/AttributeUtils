@@ -23,7 +23,7 @@ class ClassWithProperties implements ParseProperties
         $this->properties = $properties;
     }
 
-    public function includeByDefault(): bool
+    public function includePropertiesByDefault(): bool
     {
         return $this->include;
     }

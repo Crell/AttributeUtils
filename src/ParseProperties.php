@@ -24,7 +24,7 @@ interface ParseProperties
 {
     public function setProperties(array $properties): void;
 
-    public function includeByDefault(): bool;
+    public function includePropertiesByDefault(): bool;
 
     public static function propertyAttribute(): string;
 }
