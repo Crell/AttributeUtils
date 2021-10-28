@@ -117,25 +117,7 @@ class Analyzer implements ClassAnalyzer
      */
     protected function getPropertyInheritedAttribute(\ReflectionProperty $rProperty, string $attributeType): ?object
     {
-        $properties = function () use ($rProperty, $attributeType): \Generator {
-            // Check the property itself, first.
-            yield $rProperty;
-
-            // Then check the class's parents, if the attribute type is Inheritable.
-            if ($this->classImplements($attributeType, Inheritable::class)) {
-                // There is no point in scanning ancestor interfaces, as they cannot
-                // contain properties. (At least as of PHP 8.1)
-                foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
-                    $rClass = new \ReflectionClass($class);
-                    $propName = $rProperty->getName();
-                    if ($rClass->hasProperty($propName)) {
-                        yield $rClass->getProperty($propName);
-                    }
-                }
-            }
-        };
-
-        $attribute = pipe($properties(),
+        $attribute = pipe($this->propertyInheritanceTree($rProperty, $attributeType),
             firstValue(fn(\ReflectionProperty $rProp): ?object => $this->getAttribute($rProp, $attributeType))
         );
 
@@ -151,6 +133,33 @@ class Analyzer implements ClassAnalyzer
         }
 
         return null;
+    }
+
+    /**
+     * A generator to produce reflections of all the ancestors of a property.
+     *
+     * The property itself will be included first, and parents will only be
+     * scanned if the attribute implements the Inheritable interface.
+     *
+     * @see Inheritable
+     */
+    protected function propertyInheritanceTree(\ReflectionProperty $rProperty, string $attributeType): iterable
+    {
+        // Check the property itself, first.
+        yield $rProperty;
+
+        // Then check the class's parents, if the attribute type is Inheritable.
+        if ($this->classImplements($attributeType, Inheritable::class)) {
+            // There is no point in scanning ancestor interfaces, as they cannot
+            // contain properties. (At least as of PHP 8.1)
+            foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
+                $rClass = new \ReflectionClass($class);
+                $propName = $rProperty->getName();
+                if ($rClass->hasProperty($propName)) {
+                    yield $rClass->getProperty($propName);
+                }
+            }
+        }
     }
 
     /**
