@@ -40,7 +40,7 @@ class InheritableClassAttributeMain implements HasSubAttributes, Inheritable, Pa
         return true;
     }
 
-    public static function propertyAttribute(): string
+    public function propertyAttribute(): string
     {
         return InheritablePropertyAttributeMain::class;
     }

@@ -26,7 +26,7 @@ class ClassWithReflectableProperties implements ParseProperties
         return $this->include;
     }
 
-    public static function propertyAttribute(): string
+    public function propertyAttribute(): string
     {
         return PropertyWithReflection::class;
     }

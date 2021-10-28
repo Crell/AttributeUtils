@@ -28,7 +28,7 @@ class ClassWithProperties implements ParseProperties
         return $this->include;
     }
 
-    public static function propertyAttribute(): string
+    public function propertyAttribute(): string
     {
         return BasicProperty::class;
     }

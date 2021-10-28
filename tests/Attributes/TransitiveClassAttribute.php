@@ -24,7 +24,7 @@ class TransitiveClassAttribute implements ParseProperties
         return true;
     }
 
-    public static function propertyAttribute(): string
+    public function propertyAttribute(): string
     {
         return TransitivePropertyAttribute::class;
     }

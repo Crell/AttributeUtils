@@ -26,5 +26,5 @@ interface ParseProperties
 
     public function includePropertiesByDefault(): bool;
 
-    public static function propertyAttribute(): string;
+    public function propertyAttribute(): string;
 }

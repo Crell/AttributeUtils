@@ -29,7 +29,7 @@ class ClassWithPropertiesWithSubAttributes implements ParseProperties, HasSubAtt
         return $this->include;
     }
 
-    public static function propertyAttribute(): string
+    public function propertyAttribute(): string
     {
         return PropertyWithSubAttributes::class;
     }
