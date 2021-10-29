@@ -10,7 +10,7 @@ use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
-use Crell\AttributeUtils\Attributes\GenericPropertyHolder;
+use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\TransitiveClassAttribute;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
@@ -194,8 +194,8 @@ class ClassAnalyzerTest extends TestCase
         yield 'beep' => [
 //        yield 'Property with multiple matching subattributes' => [
             'subject' => PropertiesWithMultipleSubattributes::class,
-            'attribute' => GenericPropertyHolder::class,
-            'test' => static function(GenericPropertyHolder $classDef) {
+            'attribute' => GenericClass::class,
+            'test' => static function(GenericClass $classDef) {
                 static::assertEquals('Main', $classDef->properties['name']->name);
                 static::assertEquals('first', $classDef->properties['name']->subs[0]->name);
                 static::assertEquals('second', $classDef->properties['name']->subs[1]->name);
