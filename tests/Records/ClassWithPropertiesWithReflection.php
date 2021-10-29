@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Records;
 
-use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
+use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\PropertyWithReflection;
 
-#[ClassWithReflectableProperties]
+#[GenericClass(propertyAttribute: PropertyWithReflection::class)]
 class ClassWithPropertiesWithReflection
 {
     public int $i;

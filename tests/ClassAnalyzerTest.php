@@ -8,11 +8,9 @@ use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
-use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
-use Crell\AttributeUtils\Attributes\TransitiveClassAttribute;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
@@ -147,8 +145,8 @@ class ClassAnalyzerTest extends TestCase
 
         yield 'Fieldable reflectable fields' => [
             'subject' => ClassWithPropertiesWithReflection::class,
-            'attribute' => ClassWithReflectableProperties::class,
-            'test' => static function(ClassWithReflectableProperties $classDef) {
+            'attribute' => GenericClass::class,
+            'test' => static function(GenericClass $classDef) {
                 static::assertEquals('i', $classDef->properties['i']->name);
                 static::assertEquals('beep', $classDef->properties['s']->name);
                 static::assertEquals('f', $classDef->properties['f']->name);
@@ -180,8 +178,8 @@ class ClassAnalyzerTest extends TestCase
 
         yield 'Transitive fields inherit from the target class' => [
             'subject' => TransitiveFieldClass::class,
-            'attribute' => TransitiveClassAttribute::class,
-            'test' => static function(TransitiveClassAttribute $classDef) {
+            'attribute' => GenericClass::class,
+            'test' => static function(GenericClass $classDef) {
                 static::assertEquals('Task', $classDef->properties['task']->beep);
                 static::assertEquals('SmallTask', $classDef->properties['small']->beep);
                 static::assertEquals('Task', $classDef->properties['big']->beep);
