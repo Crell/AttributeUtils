@@ -10,6 +10,7 @@ use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
+use Crell\AttributeUtils\Attributes\GenericPropertyHolder;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\TransitiveClassAttribute;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
@@ -21,6 +22,7 @@ use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
+use Crell\AttributeUtils\Records\PropertiesWithMultipleSubattributes;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
 use PHPUnit\Framework\TestCase;
 
@@ -186,6 +188,17 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals('biggie', $classDef->properties['big']->sub->title);
                 static::assertEquals('smallie', $classDef->properties['small']->sub->title);
                 static::assertNull($classDef->properties['task']->sub);
+            },
+        ];
+
+        yield 'beep' => [
+//        yield 'Property with multiple matching subattributes' => [
+            'subject' => PropertiesWithMultipleSubattributes::class,
+            'attribute' => GenericPropertyHolder::class,
+            'test' => static function(GenericPropertyHolder $classDef) {
+                static::assertEquals('Main', $classDef->properties['name']->name);
+                static::assertEquals('first', $classDef->properties['name']->subs[0]->name);
+                static::assertEquals('second', $classDef->properties['name']->subs[1]->name);
             },
         ];
     }

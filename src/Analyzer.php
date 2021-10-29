@@ -69,11 +69,31 @@ class Analyzer implements ClassAnalyzer
         }
         if ($propDef instanceof HasSubAttributes) {
             foreach ($propDef->subAttributes() as $type => $callback) {
-                $propDef->$callback($this->getPropertyInheritedAttribute($rProperty, $type));
+                if ($this->isMultivalueAttribute($type)) {
+                    $propDef->$callback($this->getPropertyInheritedAttributes($rProperty, $type));
+                } else {
+                    $propDef->$callback($this->getPropertyInheritedAttribute($rProperty, $type));
+                }
             }
         }
 
         return $propDef;
+    }
+
+    /**
+     * Determines if a given attribute class allows repeating.
+     *
+     * If passed a non-attribute class, it will return false.
+     */
+    protected function isMultivalueAttribute(string $attributeType): bool
+    {
+        $rAttribs = (new \ReflectionClass($attributeType))
+            ->getAttributes(\Attribute::class);
+        if (!isset($rAttribs[0])) {
+            return false;
+        }
+
+        return (bool)($rAttribs[0]?->newInstance()?->flags & \Attribute::IS_REPEATABLE);
     }
 
     /**
