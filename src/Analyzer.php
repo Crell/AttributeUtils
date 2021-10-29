@@ -136,6 +136,41 @@ class Analyzer implements ClassAnalyzer
     }
 
     /**
+     * Retrieves multiple attributes from a property, including opt-in inheritance and transitiveness.
+     *
+     * If the attribute in question implements Inheritable, then parent classes
+     * will also be checked for the attribute.  If the property is typed for a class
+     * and implements TransitiveProperty, then the class pointed at by the property
+     * will also be checked. If it implements both interfaces, then parents of the class
+     * pointed to by the property will be checked as well.
+     *
+     * @param \ReflectionProperty $rProperty
+     *   The property from which to get an attribute.
+     * @param string $attributeType
+     * @return array
+     * @throws \ReflectionException
+     */
+    protected function getPropertyInheritedAttributes(\ReflectionProperty $rProperty, string $attributeType): array
+    {
+        $attribute = pipe($this->propertyInheritanceTree($rProperty, $attributeType),
+            firstValue(fn(\ReflectionProperty $rProp): array => $this->getAttributes($rProp, $attributeType))
+        );
+
+        if ($attribute) {
+            return $attribute;
+        }
+
+        // Then check the class pointed at by the property, if it exists and the attribute is transitive.
+        if ($this->classImplements($attributeType, TransitiveProperty::class)) {
+            if ($class = $this->getPropertyClass($rProperty)) {
+                return [$this->getClassInheritedAttribute($class, $attributeType)] ?? [];
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * A generator to produce reflections of all the ancestors of a property.
      *
      * The property itself will be included first, and parents will only be
