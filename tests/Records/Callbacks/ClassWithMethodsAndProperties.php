@@ -5,24 +5,25 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Records\Callbacks;
 
 use Crell\AttributeUtils\Attributes\MethodWithReflection;
+use Crell\AttributeUtils\Attributes\ParameterWithReflection;
 
 class ClassWithMethodsAndProperties
 {
-    public string $fullName;
+    protected string $c;
 
     public function __construct(
-        public string $first = '',
-        public string $last = '',
+        public string $a = '',
+        public string $b = '',
     ) {}
 
     #[MethodWithReflection(a: 'z', b: 'y', name: 'beep')]
-    private function methodOne(): void
+    private function methodOne(int $one, #[ParameterWithReflection(x: 3, y: 4, name: 'beep')] float $two): string
     {
-        $this->fullName = "$this->first $this->last";
+        return '';
     }
 
-    private function methodTwo(): void
+    private function methodTwo(#[ParameterWithReflection(x: 5, y: 6)] bool $three, string $four): static
     {
-        $this->fullName = "$this->first $this->last";
+        return $this;
     }
 }

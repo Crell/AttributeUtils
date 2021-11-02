@@ -206,6 +206,7 @@ class ClassAnalyzerTest extends TestCase
             'attribute' => ClassMethodsProperties::class,
             'test' => static function(ClassMethodsProperties $classDef) {
                 static::assertCount(3, $classDef->properties);
+
                 static::assertEquals('z', $classDef->methods['methodOne']->a);
                 static::assertEquals('y', $classDef->methods['methodOne']->b);
                 static::assertEquals('beep', $classDef->methods['methodOne']->name);
@@ -213,6 +214,18 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals('b', $classDef->methods['methodTwo']->b);
                 static::assertEquals('methodTwo', $classDef->methods['methodTwo']->name);
                 static::assertEquals('__construct', $classDef->methods['__construct']->name);
+
+                static::assertCount(2, $classDef->methods['methodOne']->parameters);
+                static::assertEquals(1, $classDef->methods['methodOne']->parameters['one']->x);
+                static::assertEquals('one', $classDef->methods['methodOne']->parameters['one']->name);
+                static::assertEquals(3, $classDef->methods['methodOne']->parameters['two']->x);
+                static::assertEquals('beep', $classDef->methods['methodOne']->parameters['two']->name);
+
+                static::assertCount(2, $classDef->methods['methodTwo']->parameters);
+                static::assertEquals(5, $classDef->methods['methodTwo']->parameters['three']->x);
+                static::assertEquals('three', $classDef->methods['methodTwo']->parameters['three']->name);
+                static::assertEquals(1, $classDef->methods['methodTwo']->parameters['four']->x);
+                static::assertEquals('four', $classDef->methods['methodTwo']->parameters['four']->name);
             },
         ];
     }

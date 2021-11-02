@@ -86,7 +86,46 @@ class Analyzer implements ClassAnalyzer
             }
         }
 
+        if ($methodDef instanceof ParseParameters) {
+            $parameters = $this->getParameterDefinitions($rMethod, $methodDef->parameterAttribute(), $methodDef->includeParametersByDefault());
+            $methodDef->setParameters($parameters);
+        }
+
         return $methodDef;
+    }
+
+    protected function getParameterDefinitions(\ReflectionMethod $subject, string $propertyAttribute, bool $includeByDefault): array
+    {
+        return pipe(
+            $subject->getParameters(),
+            indexBy(static fn (\ReflectionParameter $r): string => $r->getName()),
+            amap(fn (\ReflectionParameter $p) => $this->getParameterDefinition($p, $propertyAttribute, $includeByDefault)),
+            afilter(),
+            afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
+        );
+    }
+
+    protected function getParameterDefinition(\ReflectionParameter $rParameter, string $propertyAttribute, bool $includeByDefault): ?object
+    {
+        // @todo Catch an error/exception here and wrap it in a better one,
+        // if the attribute has required fields but isn't specified.
+        $paramDef = $this->parser->getInheritedAttribute($rParameter, $propertyAttribute)
+            ?? ($includeByDefault ?  new $propertyAttribute() : null);
+
+        if ($paramDef instanceof FromReflectionParameter) {
+            $paramDef->fromReflection($rParameter);
+        }
+        if ($paramDef instanceof HasSubAttributes) {
+            foreach ($paramDef->subAttributes() as $type => $callback) {
+                if ($this->isMultivalueAttribute($type)) {
+                    $paramDef->$callback($this->parser->getInheritedAttributes($rParameter, $type));
+                } else {
+                    $paramDef->$callback($this->parser->getInheritedAttribute($rParameter, $type));
+                }
+            }
+        }
+
+        return $paramDef;
     }
 
     protected function getPropertyDefinitions(\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array

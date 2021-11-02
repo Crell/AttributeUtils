@@ -11,7 +11,10 @@ use Crell\AttributeUtils\ParseProperties;
 #[Attribute(Attribute::TARGET_CLASS)]
 class ClassMethodsProperties implements ParseProperties, ParseMethods
 {
+    /** @var PropertyWithReflection[] */
     public readonly array $properties;
+
+    /** @var MethodWithReflection[] */
     public readonly array $methods;
 
     public function setMethods(array $methods): void
