@@ -41,8 +41,8 @@ class Analyzer implements ClassAnalyzer
         }
 
         if ($classDef instanceof ParseProperties) {
-            $fields = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
-            $classDef->setProperties($fields);
+            $properties = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
+            $classDef->setProperties($properties);
         }
 
         if ($classDef instanceof ParseMethods) {
