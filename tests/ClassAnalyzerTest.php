@@ -21,6 +21,7 @@ use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
+use Crell\AttributeUtils\Records\MissingPropertyAttributeArguments;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
@@ -42,6 +43,18 @@ class ClassAnalyzerTest extends TestCase
         $classDef = $analyzer->analyze($subject, $attribute);
 
         $test($classDef);
+    }
+
+    /**
+     * @test
+     */
+    public function missing_required_fields(): void
+    {
+        $this->expectException(RequiredAttributeArgumentsMissing::class);
+        $analyzer = new Analyzer();
+
+        $classDef = $analyzer->analyze(MissingPropertyAttributeArguments::class, GenericClass::class);
+
     }
 
     /**

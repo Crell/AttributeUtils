@@ -26,32 +26,34 @@ class Analyzer implements ClassAnalyzer
 
         $subject = new \ReflectionClass($class);
 
-        // @todo Catch an error/exception here and wrap it in a better one,
-        // if the attribute has required fields but isn't specified.
-        $classDef = $this->parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
+        try {
+            $classDef = $this->parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
 
-        if ($classDef instanceof FromReflectionClass) {
-            $classDef->fromReflection($subject);
+            if ($classDef instanceof FromReflectionClass) {
+                $classDef->fromReflection($subject);
+            }
+
+            $classDef = $this->loadSubAttributes($classDef, $subject);
+
+            if ($classDef instanceof ParseProperties) {
+                $properties = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
+                $classDef->setProperties($properties);
+            }
+
+            if ($classDef instanceof ParseMethods) {
+                $methods = $this->getMethodDefinitions($subject, $classDef->methodAttribute(), $classDef->includeMethodsByDefault());
+                $classDef->setMethods($methods);
+            }
+
+            if ($classDef instanceof ParseConstants) {
+                $methods = $this->getConstantDefinitions($subject, $classDef->constantAttribute(), $classDef->includeConstantsByDefault());
+                $classDef->setConstants($methods);
+            }
+
+            return $classDef;
+        } catch (\ArgumentCountError $e) {
+            $this->translateArgumentCountError($e);
         }
-
-        $classDef = $this->loadSubAttributes($classDef, $subject);
-
-        if ($classDef instanceof ParseProperties) {
-            $properties = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
-            $classDef->setProperties($properties);
-        }
-
-        if ($classDef instanceof ParseMethods) {
-            $methods = $this->getMethodDefinitions($subject, $classDef->methodAttribute(), $classDef->includeMethodsByDefault());
-            $classDef->setMethods($methods);
-        }
-
-        if ($classDef instanceof ParseConstants) {
-            $methods = $this->getConstantDefinitions($subject, $classDef->constantAttribute(), $classDef->includeConstantsByDefault());
-            $classDef->setConstants($methods);
-        }
-
-        return $classDef;
     }
 
     protected function getConstantDefinitions(\ReflectionClass $subject, string $methodAttribute, bool $includeByDefault): array
@@ -67,8 +69,6 @@ class Analyzer implements ClassAnalyzer
 
     protected function getConstantDefinition(\ReflectionClassConstant $rConstant, string $methodAttribute, bool $includeByDefault): ?object
     {
-        // @todo Catch an error/exception here and wrap it in a better one,
-        // if the attribute has required fields but isn't specified.
         $constDef = $this->parser->getInheritedAttribute($rConstant, $methodAttribute)
             ?? ($includeByDefault ?  new $methodAttribute() : null);
 
@@ -94,8 +94,6 @@ class Analyzer implements ClassAnalyzer
 
     protected function getMethodDefinition(\ReflectionMethod $rMethod, string $methodAttribute, bool $includeByDefault): ?object
     {
-        // @todo Catch an error/exception here and wrap it in a better one,
-        // if the attribute has required fields but isn't specified.
         $methodDef = $this->parser->getInheritedAttribute($rMethod, $methodAttribute)
             ?? ($includeByDefault ?  new $methodAttribute() : null);
 
@@ -126,8 +124,6 @@ class Analyzer implements ClassAnalyzer
 
     protected function getParameterDefinition(\ReflectionParameter $rParameter, string $propertyAttribute, bool $includeByDefault): ?object
     {
-        // @todo Catch an error/exception here and wrap it in a better one,
-        // if the attribute has required fields but isn't specified.
         $paramDef = $this->parser->getInheritedAttribute($rParameter, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
 
@@ -153,8 +149,6 @@ class Analyzer implements ClassAnalyzer
 
     protected function getPropertyDefinition(\ReflectionProperty $rProperty, string $propertyAttribute, bool $includeByDefault): ?object
     {
-        // @todo Catch an error/exception here and wrap it in a better one,
-        // if the attribute has required fields but isn't specified.
         $propDef = $this->parser->getInheritedAttribute($rProperty, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
 
@@ -196,5 +190,32 @@ class Analyzer implements ClassAnalyzer
         }
 
         return (bool)($rAttribs[0]?->newInstance()?->flags & \Attribute::IS_REPEATABLE);
+    }
+
+    /**
+     * Throws a domain-specific exception based on an ArgumentCountError.
+     *
+     * This is absolutely hideous, but this is what happens when your throwable
+     * puts all the useful information in the message text rather than as useful
+     * properties or methods or something.
+     *
+     * Conclusion: Write better, more debuggable exceptions than PHP does.
+     *
+     * @todo In PHP 8.1, the return type can be `never`.
+     */
+    protected function translateArgumentCountError(\ArgumentCountError $error): void
+    {
+        // This is absolutely hideous, but this is what happens when your throwable
+        // puts all the useful information in the message text rather than as useful
+        // properties or methods or something.
+        // Conclusion: Write better, more debuggable exceptions than PHP does.
+        $message = $error->getMessage();
+        [$classAndMethod, $passedCount, $file, $line, $expectedCount] = sscanf(
+            string: $message,
+            format: "Too few arguments to function %s::%s, %d passed in %s on line %d and exactly %d expected"
+        );
+        [$className, $methodName] = \explode('::', $classAndMethod);
+
+        throw RequiredAttributeArgumentsMissing::create($className, $error);
     }
 }
