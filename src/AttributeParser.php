@@ -7,12 +7,12 @@ namespace Crell\AttributeUtils;
 use function Crell\fp\firstValue;
 use function Crell\fp\pipe;
 
-trait GetAttribute
+class AttributeParser
 {
     /**
      * Returns a single attribute of a given type from a target, or null if not found.
      */
-    protected function getAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): ?object
+    public function getAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): ?object
     {
         return $this->getAttributes($target, $name)[0] ?? null;
     }
@@ -23,7 +23,7 @@ trait GetAttribute
      * Unfortunately PHP has no common interface for "reflection objects that support attributes",
      * so we have to enumerate them manually.
      */
-    protected function getAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): array
+    public function getAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): array
     {
         return array_map(static fn (\ReflectionAttribute $attrib)
         => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
@@ -34,7 +34,7 @@ trait GetAttribute
      *
      * @see getInheritedAttributes()
      */
-    protected function getInheritedAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): ?object{
+    public function getInheritedAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): ?object{
         return $this->getInheritedAttributes($target, $name)[0] ?? null;
     }
 
@@ -50,7 +50,7 @@ trait GetAttribute
      * @return object|null
      *   The attribute object if found on any ancestor, or null if not.
      */
-    protected function getClassInheritedAttribute(string $target, string $name): ?object
+    public function getClassInheritedAttribute(string $target, string $name): ?object
     {
         $classesToScan = [$target];
         if ($this->classImplements($name, Inheritable::class)) {
@@ -78,7 +78,7 @@ trait GetAttribute
      * @param string $name
      * @return array
      */
-    protected function getInheritedAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): array
+    public function getInheritedAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): array
     {
         $attributes = pipe($this->attributeInheritanceTree($target, $name),
             firstValue(fn ($r): array => $this->getAttributes($r, $name))
@@ -134,9 +134,42 @@ trait GetAttribute
      *
      * The class itself is not included in the list.
      */
-    protected function classAncestors(string $class): array
+    public function classAncestors(string $class): array
     {
         // These methods both return associative arrays, making + safe.
         return class_parents($class) + class_implements($class);
+    }
+
+
+    /**
+     * Determines if a class name extends or implements a given class/interface.
+     *
+     * @param string $class
+     *   The class name to check.
+     * @param string $interface
+     *   The class or interface to look for.
+     * @return bool
+     */
+    public function classImplements(string $class, string $interface): bool
+    {
+        // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
+        return $class === $interface || isset(class_parents($class)[$interface]) || isset(class_implements($class)[$interface]);
+    }
+
+    /**
+     * Returns the class or interface a given property is typed for, or null if it's not so typed.
+     *
+     * @param \ReflectionProperty $rProperty
+     *   The property to check
+     * @return string|null
+     *   The class/interface name, or null.
+     */
+    protected function getPropertyClass(\ReflectionProperty $rProperty): ?string
+    {
+        $rType = $rProperty->getType();
+        if ($rType instanceof \ReflectionNamedType && (class_exists($rType->getName()) || interface_exists($rType->getName()))) {
+            return $rType->getName();
+        }
+        return null;
     }
 }

@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
-use PhpBench\Reflection\ReflectionClass;
 use function Crell\fp\afilter;
 use function Crell\fp\amap;
-use function Crell\fp\firstValue;
 use function Crell\fp\indexBy;
 use function Crell\fp\pipe;
 
 class Analyzer implements ClassAnalyzer
 {
-    use GetAttribute;
+    protected AttributeParser $parser;
+
+    public function __construct()
+    {
+        $this->parser = new AttributeParser();
+    }
 
     public function analyze(string|object $class, string $attribute): object
     {
@@ -25,7 +28,7 @@ class Analyzer implements ClassAnalyzer
 
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $classDef = $this->getClassInheritedAttribute($class, $attribute) ?? new $attribute;
+        $classDef = $this->parser->getClassInheritedAttribute($class, $attribute) ?? new $attribute;
 
         if ($classDef instanceof FromReflectionClass) {
             $classDef->fromReflection($subject);
@@ -33,7 +36,7 @@ class Analyzer implements ClassAnalyzer
 
         if ($classDef instanceof HasSubAttributes) {
             foreach ($classDef->subAttributes() as $subAttributeType => $callback) {
-                $classDef->$callback($this->getClassInheritedAttribute($class, $subAttributeType));
+                $classDef->$callback($this->parser->getClassInheritedAttribute($class, $subAttributeType));
             }
         }
 
@@ -67,7 +70,7 @@ class Analyzer implements ClassAnalyzer
     {
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $methodDef = $this->getInheritedAttribute($rMethod, $methodAttribute)
+        $methodDef = $this->parser->getInheritedAttribute($rMethod, $methodAttribute)
             ?? ($includeByDefault ?  new $methodAttribute() : null);
 
         if ($methodDef instanceof FromReflectionMethod) {
@@ -76,9 +79,9 @@ class Analyzer implements ClassAnalyzer
         if ($methodDef instanceof HasSubAttributes) {
             foreach ($methodDef->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $methodDef->$callback($this->getInheritedAttributes($rMethod, $type));
+                    $methodDef->$callback($this->parser->getInheritedAttributes($rMethod, $type));
                 } else {
-                    $methodDef->$callback($this->getInheritedAttribute($rMethod, $type));
+                    $methodDef->$callback($this->parser->getInheritedAttribute($rMethod, $type));
                 }
             }
         }
@@ -101,7 +104,7 @@ class Analyzer implements ClassAnalyzer
     {
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $propDef = $this->getInheritedAttribute($rProperty, $propertyAttribute)
+        $propDef = $this->parser->getInheritedAttribute($rProperty, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
 
         if ($propDef instanceof FromReflectionProperty) {
@@ -110,9 +113,9 @@ class Analyzer implements ClassAnalyzer
         if ($propDef instanceof HasSubAttributes) {
             foreach ($propDef->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $propDef->$callback($this->getInheritedAttributes($rProperty, $type));
+                    $propDef->$callback($this->parser->getInheritedAttributes($rProperty, $type));
                 } else {
-                    $propDef->$callback($this->getInheritedAttribute($rProperty, $type));
+                    $propDef->$callback($this->parser->getInheritedAttribute($rProperty, $type));
                 }
             }
         }
@@ -134,38 +137,5 @@ class Analyzer implements ClassAnalyzer
         }
 
         return (bool)($rAttribs[0]?->newInstance()?->flags & \Attribute::IS_REPEATABLE);
-    }
-
-
-    /**
-     * Returns the class or interface a given property is typed for, or null if it's not so typed.
-     *
-     * @param \ReflectionProperty $rProperty
-     *   The property to check
-     * @return string|null
-     *   The class/interface name, or null.
-     */
-    protected function getPropertyClass(\ReflectionProperty $rProperty): ?string
-    {
-        $rType = $rProperty->getType();
-        if ($rType instanceof \ReflectionNamedType && (class_exists($rType->getName()) || interface_exists($rType->getName()))) {
-            return $rType->getName();
-        }
-        return null;
-    }
-
-    /**
-     * Determines if a class name extends or implements a given class/interface.
-     *
-     * @param string $class
-     *   The class name to check.
-     * @param string $interface
-     *   The class or interface to look for.
-     * @return bool
-     */
-    protected function classImplements(string $class, string $interface): bool
-    {
-        // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
-        return $class === $interface || isset(class_parents($class)[$interface]) || isset(class_implements($class)[$interface]);
     }
 }
