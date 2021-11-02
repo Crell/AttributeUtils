@@ -23,7 +23,7 @@ class AttributeParser
      * Unfortunately PHP has no common interface for "reflection objects that support attributes",
      * so we have to enumerate them manually.
      */
-    public function getAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter $target, string $name): array
+    public function getAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClassConstant $target, string $name): array
     {
         return array_map(static fn (\ReflectionAttribute $attrib)
         => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
@@ -34,7 +34,7 @@ class AttributeParser
      *
      * @see getInheritedAttributes()
      */
-    public function getInheritedAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter $target, string $name): ?object{
+    public function getInheritedAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClassConstant $target, string $name): ?object{
         return $this->getInheritedAttributes($target, $name)[0] ?? null;
     }
 
@@ -54,7 +54,7 @@ class AttributeParser
      * @param string $name
      * @return array
      */
-    public function getInheritedAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter $target, string $name): array
+    public function getInheritedAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClassConstant $target, string $name): array
     {
         $attributes = pipe($this->attributeInheritanceTree($target, $name),
             firstValue(fn ($r): array => $this->getAttributes($r, $name))
@@ -86,7 +86,7 @@ class AttributeParser
      *
      * @see Inheritable
      */
-    protected function attributeInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionObject $subject, string $attributeType): iterable
+    protected function attributeInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionObject|\ReflectionClassConstant $subject, string $attributeType): iterable
     {
         // Check the subject itself, first.
         yield $subject;
@@ -97,6 +97,7 @@ class AttributeParser
                 \ReflectionObject::class => $this->classInheritanceTree($subject, $attributeType),
                 \ReflectionProperty::class => $this->classElementInheritanceTree($subject, $attributeType),
                 \ReflectionMethod::class => $this->classElementInheritanceTree($subject, $attributeType),
+                \ReflectionClassConstant::class => $this->classElementInheritanceTree($subject, $attributeType),
                 \ReflectionParameter::class => $this->parameterInheritanceTree($subject, $attributeType),
             };
         }
@@ -130,13 +131,14 @@ class AttributeParser
         }
     }
 
-    protected function classElementInheritanceTree(\ReflectionProperty|\ReflectionMethod $subject, string $attributeType): iterable
+    protected function classElementInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject, string $attributeType): iterable
     {
         $subjectName = $subject->getName();
 
         [$hasMethod, $getMethod] = match(get_class($subject)) {
             \ReflectionProperty::class => ['hasProperty', 'getProperty'],
             \ReflectionMethod::class => ['hasMethod', 'getMethod'],
+            \ReflectionClassConstant::class => ['hasConstant', 'getReflectionConstant'],
         };
 
         foreach ($this->classAncestors($subject->getDeclaringClass()->name) as $class) {

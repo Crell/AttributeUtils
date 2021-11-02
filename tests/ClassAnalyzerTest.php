@@ -7,12 +7,14 @@ namespace Crell\AttributeUtils;
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassMethodsProperties;
+use Crell\AttributeUtils\Attributes\ClassWithConstants;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
+use Crell\AttributeUtils\Records\ClassWithConstantsChild;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
@@ -226,6 +228,18 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals('three', $classDef->methods['methodTwo']->parameters['three']->name);
                 static::assertEquals(1, $classDef->methods['methodTwo']->parameters['four']->x);
                 static::assertEquals('four', $classDef->methods['methodTwo']->parameters['four']->name);
+            },
+        ];
+
+        yield 'Class with constants' => [
+            'subject' => ClassWithConstantsChild::class,
+            'attribute' => ClassWithConstants::class,
+            'test' => static function(ClassWithConstants $classDef) {
+                static::assertCount(3, $classDef->constants);
+
+                static::assertEquals(1, $classDef->constants['CHILD_ONLY']->a);
+                static::assertEquals(1, $classDef->constants['PARENT_ONLY']->a);
+                static::assertEquals(5, $classDef->constants['INHERITED']->a);
             },
         ];
     }

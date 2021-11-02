@@ -46,9 +46,39 @@ class Analyzer implements ClassAnalyzer
             $classDef->setMethods($methods);
         }
 
-        // @todo Add support for parsing methods, maybe constants?
+        if ($classDef instanceof ParseConstants) {
+            $methods = $this->getConstantDefinitions($subject, $classDef->constantAttribute(), $classDef->includeConstantsByDefault());
+            $classDef->setConstants($methods);
+        }
 
         return $classDef;
+    }
+
+    protected function getConstantDefinitions(\ReflectionClass $subject, string $methodAttribute, bool $includeByDefault): array
+    {
+        return pipe(
+            $subject->getReflectionConstants(),
+            indexBy(static fn (\ReflectionClassConstant $r): string => $r->getName()),
+            amap(fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $methodAttribute, $includeByDefault)),
+            afilter(),
+            afilter(static fn (object $prop): bool => !($prop->exclude ?? false)),
+        );
+    }
+
+    protected function getConstantDefinition(\ReflectionClassConstant $rConstant, string $methodAttribute, bool $includeByDefault): ?object
+    {
+        // @todo Catch an error/exception here and wrap it in a better one,
+        // if the attribute has required fields but isn't specified.
+        $constDef = $this->parser->getInheritedAttribute($rConstant, $methodAttribute)
+            ?? ($includeByDefault ?  new $methodAttribute() : null);
+
+        if ($constDef instanceof FromReflectionConstant) {
+            $constDef->fromReflection($rConstant);
+        }
+
+        $constDef = $this->loadSubAttributes($constDef, $rConstant);
+
+        return $constDef;
     }
 
     protected function getMethodDefinitions(\ReflectionClass $subject, string $methodAttribute, bool $includeByDefault): array
@@ -137,7 +167,7 @@ class Analyzer implements ClassAnalyzer
         return $propDef;
     }
 
-    protected function loadSubAttributes(?object $attribute, \ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass $reflection): ?object
+    protected function loadSubAttributes(?object $attribute, \ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionClassConstant $reflection): ?object
     {
         if ($attribute instanceof HasSubAttributes) {
             foreach ($attribute->subAttributes() as $type => $callback) {
