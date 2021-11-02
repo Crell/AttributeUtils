@@ -11,11 +11,9 @@ use function Crell\fp\pipe;
 
 class Analyzer implements ClassAnalyzer
 {
-    protected AttributeParser $parser;
-
-    public function __construct()
+    public function __construct(protected ?AttributeParser $parser = null)
     {
-        $this->parser = new AttributeParser();
+        $this->parser ??= new AttributeParser();
     }
 
     public function analyze(string|object $class, string $attribute): object
