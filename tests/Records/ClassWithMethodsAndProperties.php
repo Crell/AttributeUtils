@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\AttributeUtils\Records\Callbacks;
+namespace Crell\AttributeUtils\Records;
 
 use Crell\AttributeUtils\Attributes\MethodWithReflection;
 use Crell\AttributeUtils\Attributes\ParameterWithReflection;
