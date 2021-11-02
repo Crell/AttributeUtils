@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use PhpBench\Reflection\ReflectionClass;
 use function Crell\fp\afilter;
 use function Crell\fp\amap;
 use function Crell\fp\firstValue;
@@ -66,7 +67,7 @@ class Analyzer implements ClassAnalyzer
     {
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $methodDef = $this->getMethodInheritedAttribute($rMethod, $methodAttribute)
+        $methodDef = $this->getInheritedAttribute($rMethod, $methodAttribute)
             ?? ($includeByDefault ?  new $methodAttribute() : null);
 
         if ($methodDef instanceof FromReflectionMethod) {
@@ -75,86 +76,14 @@ class Analyzer implements ClassAnalyzer
         if ($methodDef instanceof HasSubAttributes) {
             foreach ($methodDef->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $methodDef->$callback($this->getMethodInheritedAttributes($rMethod, $type));
+                    $methodDef->$callback($this->getInheritedAttributes($rMethod, $type));
                 } else {
-                    $methodDef->$callback($this->getMethodInheritedAttribute($rMethod, $type));
+                    $methodDef->$callback($this->getInheritedAttribute($rMethod, $type));
                 }
             }
         }
 
         return $methodDef;
-    }
-
-    /**
-     * Retrieves an attribute from a method, including opt-in inheritance.
-     *
-     * If the attribute in question implements Inheritable, then parent classes
-     * will also be checked for the attribute.
-     *
-     * @param \ReflectionMethod $rMethod
-     *   The property from which to get an attribute.
-     * @param string $attributeType
-     * @return object|null
-     * @throws \ReflectionException
-     */
-    protected function getMethodInheritedAttribute(\ReflectionMethod $rMethod, string $attributeType): ?object
-    {
-        return $this->getMethodInheritedAttributes($rMethod, $attributeType)[0] ?? null;
-    }
-
-    /**
-     * Retrieves multiple attributes from a method, including opt-in inheritance.
-     *
-     * If the attribute in question implements Inheritable, then parent classes
-     * will also be checked for the attribute.
-     *
-     * @param \ReflectionProperty $rMethod
-     *   The method from which to get an attribute.
-     * @param string $attributeType
-     * @return array
-     * @throws \ReflectionException
-     */
-    protected function getMethodInheritedAttributes(\ReflectionMethod $rMethod, string $attributeType): array
-    {
-        $attribute = pipe($this->methodInheritanceTree($rMethod, $attributeType),
-            firstValue(fn(\ReflectionMethod $rMethod): array => $this->getAttributes($rMethod, $attributeType))
-        );
-
-        if ($attribute) {
-            return $attribute;
-        }
-
-        // I don't think it makes sense to transitively inherit from a class
-        // for a method. What would that even be?  The return type?  If we ever
-        // add that it would go here, but probably not.
-
-        return [];
-    }
-
-    /**
-     * A generator to produce reflections of all the ancestors of a method.
-     *
-     * The method itself will be included first, and parents will only be
-     * scanned if the attribute implements the Inheritable interface.
-     *
-     * @see Inheritable
-     */
-    protected function methodInheritanceTree(\ReflectionMethod $rMethod, string $attributeType): iterable
-    {
-        // Check the method itself, first.
-        yield $rMethod;
-
-        // Then check the class's parents, if the method type is Inheritable.
-        if ($this->classImplements($attributeType, Inheritable::class)) {
-            // Scan parent classes first, then  parent interfaces.
-            foreach ($this->classAncestors($rMethod->getDeclaringClass()->name) as $class) {
-                $rClass = new \ReflectionClass($class);
-                $methodProp = $rMethod->getName();
-                if ($rClass->hasMethod($methodProp)) {
-                    yield $rClass->getMethod($methodProp);
-                }
-            }
-        }
     }
 
     /**
@@ -183,7 +112,7 @@ class Analyzer implements ClassAnalyzer
     {
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $propDef = $this->getPropertyInheritedAttribute($rProperty, $propertyAttribute)
+        $propDef = $this->getInheritedAttribute($rProperty, $propertyAttribute)
             ?? ($includeByDefault ?  new $propertyAttribute() : null);
 
         if ($propDef instanceof FromReflectionProperty) {
@@ -192,9 +121,9 @@ class Analyzer implements ClassAnalyzer
         if ($propDef instanceof HasSubAttributes) {
             foreach ($propDef->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $propDef->$callback($this->getPropertyInheritedAttributes($rProperty, $type));
+                    $propDef->$callback($this->getInheritedAttributes($rProperty, $type));
                 } else {
-                    $propDef->$callback($this->getPropertyInheritedAttribute($rProperty, $type));
+                    $propDef->$callback($this->getInheritedAttribute($rProperty, $type));
                 }
             }
         }
@@ -243,54 +172,43 @@ class Analyzer implements ClassAnalyzer
     }
 
     /**
-     * Retrieves an attribute from a property, including opt-in inheritance and transitiveness.
+     * Retrieves a single attribute from a class element, including opt-in inheritance and transitiveness.
      *
-     * If the attribute in question implements Inheritable, then parent classes
-     * will also be checked for the attribute.  If the property is typed for a class
-     * and implements TransitiveProperty, then the class pointed at by the property
-     * will also be checked. If it implements both interfaces, then parents of the class
-     * pointed to by the property will be checked as well.
-     *
-     * @param \ReflectionProperty $rProperty
-     *   The property from which to get an attribute.
-     * @param string $attributeType
-     * @return object|null
-     * @throws \ReflectionException
+     * @see getInheritedAttributes()
      */
-    protected function getPropertyInheritedAttribute(\ReflectionProperty $rProperty, string $attributeType): ?object
-    {
-        return $this->getPropertyInheritedAttributes($rProperty, $attributeType)[0] ?? null;
+    protected function getInheritedAttribute(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): ?object{
+        return $this->getInheritedAttributes($target, $name)[0] ?? null;
     }
 
     /**
-     * Retrieves multiple attributes from a property, including opt-in inheritance and transitiveness.
+     * Retrieves multiple attributes from a class element, including opt-in inheritance and transitiveness.
      *
      * If the attribute in question implements Inheritable, then parent classes
-     * will also be checked for the attribute.  If the property is typed for a class
-     * and implements TransitiveProperty, then the class pointed at by the property
+     * will also be checked for the attribute.  If the element is a property that is typed
+     * for a class and implements TransitiveProperty, then the class pointed at by the property
      * will also be checked. If it implements both interfaces, then parents of the class
      * pointed to by the property will be checked as well.
      *
-     * @param \ReflectionProperty $rProperty
+     * @param \ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target
      *   The property from which to get an attribute.
-     * @param string $attributeType
+     * @param string $name
      * @return array
-     * @throws \ReflectionException
      */
-    protected function getPropertyInheritedAttributes(\ReflectionProperty $rProperty, string $attributeType): array
+    protected function getInheritedAttributes(\ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target, string $name): array
     {
-        $attribute = pipe($this->propertyInheritanceTree($rProperty, $attributeType),
-            firstValue(fn(\ReflectionProperty $rProp): array => $this->getAttributes($rProp, $attributeType))
+        $attributes = pipe($this->attributeInheritanceTree($target, $name),
+            firstValue(fn ($r): array => $this->getAttributes($r, $name))
         );
 
-        if ($attribute) {
-            return $attribute;
+        if ($attributes) {
+            return $attributes;
         }
 
-        // Then check the class pointed at by the property, if it exists and the attribute is transitive.
-        if ($this->classImplements($attributeType, TransitiveProperty::class)) {
-            if ($class = $this->getPropertyClass($rProperty)) {
-                return [$this->getClassInheritedAttribute($class, $attributeType)] ?? [];
+        // Transitivity is only supported on properties at this time.
+        // It's not clear that it makes any sense on methods or constants.
+        if ($target instanceof \ReflectionProperty && $this->classImplements($name, TransitiveProperty::class)) {
+            if ($class = $this->getPropertyClass($target)) {
+                return [$this->getClassInheritedAttribute($class, $name)] ?? [];
             }
         }
 
@@ -298,27 +216,30 @@ class Analyzer implements ClassAnalyzer
     }
 
     /**
-     * A generator to produce reflections of all the ancestors of a property.
+     * A generator to produce reflections of all the ancestors of a reflectable.
      *
      * The property itself will be included first, and parents will only be
      * scanned if the attribute implements the Inheritable interface.
      *
      * @see Inheritable
      */
-    protected function propertyInheritanceTree(\ReflectionProperty $rProperty, string $attributeType): iterable
+    protected function attributeInheritanceTree(\ReflectionProperty|\ReflectionMethod $subject, string $attributeType): iterable
     {
-        // Check the property itself, first.
-        yield $rProperty;
+        // Check the subject itself, first.
+        yield $subject;
+
+        [$hasMethod, $getMethod] = match(get_class($subject)) {
+            \ReflectionProperty::class => ['hasProperty', 'getProperty'],
+            \ReflectionMethod::class => ['hasMethod', 'getMethod'],
+        };
 
         // Then check the class's parents, if the attribute type is Inheritable.
         if ($this->classImplements($attributeType, Inheritable::class)) {
-            // There is no point in scanning ancestor interfaces, as they cannot
-            // contain properties. (At least as of PHP 8.1)
-            foreach (class_parents($rProperty->getDeclaringClass()->name) as $class) {
+            foreach ($this->classAncestors($subject->getDeclaringClass()->name) as $class) {
                 $rClass = new \ReflectionClass($class);
-                $propName = $rProperty->getName();
-                if ($rClass->hasProperty($propName)) {
-                    yield $rClass->getProperty($propName);
+                $subjectName = $subject->getName();
+                if ($rClass->$hasMethod($subjectName)) {
+                    yield $rClass->$getMethod($subjectName);
                 }
             }
         }
