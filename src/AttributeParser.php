@@ -39,41 +39,17 @@ class AttributeParser
     }
 
     /**
-     * Returns a single attribute of a given type from a target or its ancestors.
-     *
-     * @todo Can this be folded into getInheritedAttribute, too?
-     *
-     * @param string $target
-     *   The class name for which we want an attribute.
-     * @param string $name
-     *   The attribute type to retrieve.
-     * @return object|null
-     *   The attribute object if found on any ancestor, or null if not.
-     */
-    public function getClassInheritedAttribute(string $target, string $name): ?object
-    {
-        $classesToScan = [$target];
-        if ($this->classImplements($name, Inheritable::class)) {
-            // @todo Remove the array_values() in PHP 8.1, or make it a single wrapping call.
-            $subjectAncestors = [...array_values(class_parents($target)), ...array_values(class_implements($target))];
-            $classesToScan = [...$classesToScan, ...$subjectAncestors];
-        }
-
-        return pipe($classesToScan,
-            firstValue(fn (string $c): ?object => $this->getAttribute(new \ReflectionClass($c), $name)),
-        );
-    }
-
-    /**
      * Retrieves multiple attributes from a class element, including opt-in inheritance and transitiveness.
      *
      * If the attribute in question implements Inheritable, then parent classes
-     * will also be checked for the attribute.  If the element is a property that is typed
-     * for a class and implements TransitiveProperty, then the class pointed at by the property
-     * will also be checked. If it implements both interfaces, then parents of the class
+     * will also be checked for the attribute.
+     *
+     * If the element is a property that is typed for a class and implements
+     * TransitiveProperty, then the class pointed at by the property will also be
+     * checked. If it implements both interfaces, then parents of the class
      * pointed to by the property will be checked as well.
      *
-     * @param \ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod $target
+     * @param \ReflectionObject|\ReflectionClass|\ReflectionProperty|\ReflectionMethod|\ReflectionParameter $target
      *   The property from which to get an attribute.
      * @param string $name
      * @return array
@@ -90,10 +66,13 @@ class AttributeParser
 
         // Transitivity is only supported on properties at this time.
         // It's not clear that it makes any sense on methods or constants.
-        if ($target instanceof \ReflectionProperty && $this->classImplements($name, TransitiveProperty::class)) {
-            if ($class = $this->getPropertyClass($target)) {
-                return [$this->getClassInheritedAttribute($class, $name)] ?? [];
-            }
+        if ($target instanceof \ReflectionProperty
+            && $this->classImplements($name,TransitiveProperty::class)
+            && $class = $this->getPropertyClass($target))
+        {
+            return pipe($this->classAncestors($class),
+                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name)),
+            ) ?? [];
         }
 
         return [];
@@ -107,13 +86,15 @@ class AttributeParser
      *
      * @see Inheritable
      */
-    protected function attributeInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionParameter $subject, string $attributeType): iterable
+    protected function attributeInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionObject $subject, string $attributeType): iterable
     {
         // Check the subject itself, first.
         yield $subject;
 
         if ($this->classImplements($attributeType, Inheritable::class)) {
             yield from match(get_class($subject)) {
+                \ReflectionClass::class => $this->classInheritanceTree($subject, $attributeType),
+                \ReflectionObject::class => $this->classInheritanceTree($subject, $attributeType),
                 \ReflectionProperty::class => $this->classElementInheritanceTree($subject, $attributeType),
                 \ReflectionMethod::class => $this->classElementInheritanceTree($subject, $attributeType),
                 \ReflectionParameter::class => $this->parameterInheritanceTree($subject, $attributeType),
@@ -121,6 +102,14 @@ class AttributeParser
         }
     }
 
+    protected function classInheritanceTree(\ReflectionClass $subject): iterable
+    {
+        $parent = $subject->getParentClass();
+        while ($parent) {
+            yield $parent;
+            $parent = $subject->getParentClass();
+        }
+    }
 
     protected function parameterInheritanceTree(\ReflectionParameter $subject, $attributeType): iterable
     {
@@ -161,12 +150,12 @@ class AttributeParser
     /**
      * Returns a list of all class and interface parents of a class.
      *
-     * The class itself is not included in the list.
+     * The class itself is included in the list as the first item.
      */
     public function classAncestors(string $class): array
     {
         // These methods both return associative arrays, making + safe.
-        return class_parents($class) + class_implements($class);
+        return [$class => $class] + class_parents($class) + class_implements($class);
     }
 
 
@@ -182,7 +171,7 @@ class AttributeParser
     public function classImplements(string $class, string $interface): bool
     {
         // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
-        return $class === $interface || isset(class_parents($class)[$interface]) || isset(class_implements($class)[$interface]);
+        return isset($this->classAncestors($class)[$interface]);
     }
 
     /**

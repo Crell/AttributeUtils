@@ -28,17 +28,13 @@ class Analyzer implements ClassAnalyzer
 
         // @todo Catch an error/exception here and wrap it in a better one,
         // if the attribute has required fields but isn't specified.
-        $classDef = $this->parser->getClassInheritedAttribute($class, $attribute) ?? new $attribute;
+        $classDef = $this->parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
 
         if ($classDef instanceof FromReflectionClass) {
             $classDef->fromReflection($subject);
         }
 
-        if ($classDef instanceof HasSubAttributes) {
-            foreach ($classDef->subAttributes() as $subAttributeType => $callback) {
-                $classDef->$callback($this->parser->getClassInheritedAttribute($class, $subAttributeType));
-            }
-        }
+        $classDef = $this->loadSubAttributes($classDef, $subject);
 
         if ($classDef instanceof ParseProperties) {
             $properties = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
@@ -76,15 +72,8 @@ class Analyzer implements ClassAnalyzer
         if ($methodDef instanceof FromReflectionMethod) {
             $methodDef->fromReflection($rMethod);
         }
-        if ($methodDef instanceof HasSubAttributes) {
-            foreach ($methodDef->subAttributes() as $type => $callback) {
-                if ($this->isMultivalueAttribute($type)) {
-                    $methodDef->$callback($this->parser->getInheritedAttributes($rMethod, $type));
-                } else {
-                    $methodDef->$callback($this->parser->getInheritedAttribute($rMethod, $type));
-                }
-            }
-        }
+
+        $methodDef = $this->loadSubAttributes($methodDef, $rMethod);
 
         if ($methodDef instanceof ParseParameters) {
             $parameters = $this->getParameterDefinitions($rMethod, $methodDef->parameterAttribute(), $methodDef->includeParametersByDefault());
@@ -115,15 +104,8 @@ class Analyzer implements ClassAnalyzer
         if ($paramDef instanceof FromReflectionParameter) {
             $paramDef->fromReflection($rParameter);
         }
-        if ($paramDef instanceof HasSubAttributes) {
-            foreach ($paramDef->subAttributes() as $type => $callback) {
-                if ($this->isMultivalueAttribute($type)) {
-                    $paramDef->$callback($this->parser->getInheritedAttributes($rParameter, $type));
-                } else {
-                    $paramDef->$callback($this->parser->getInheritedAttribute($rParameter, $type));
-                }
-            }
-        }
+
+        $paramDef = $this->loadSubAttributes($paramDef, $rParameter);
 
         return $paramDef;
     }
@@ -149,17 +131,25 @@ class Analyzer implements ClassAnalyzer
         if ($propDef instanceof FromReflectionProperty) {
             $propDef->fromReflection($rProperty);
         }
-        if ($propDef instanceof HasSubAttributes) {
-            foreach ($propDef->subAttributes() as $type => $callback) {
+
+        $propDef = $this->loadSubAttributes($propDef, $rProperty);
+
+        return $propDef;
+    }
+
+    protected function loadSubAttributes(?object $attribute, \ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass $reflection): ?object
+    {
+        if ($attribute instanceof HasSubAttributes) {
+            foreach ($attribute->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $propDef->$callback($this->parser->getInheritedAttributes($rProperty, $type));
+                    $attribute->$callback($this->parser->getInheritedAttributes($reflection, $type));
                 } else {
-                    $propDef->$callback($this->parser->getInheritedAttribute($rProperty, $type));
+                    $attribute->$callback($this->parser->getInheritedAttribute($reflection, $type));
                 }
             }
         }
 
-        return $propDef;
+        return $attribute;
     }
 
     /**
