@@ -99,19 +99,7 @@ class Analyzer implements ClassAnalyzer
      */
     protected function getMethodInheritedAttribute(\ReflectionMethod $rMethod, string $attributeType): ?object
     {
-        $attribute = pipe($this->MethodInheritanceTree($rMethod, $attributeType),
-            firstValue(fn(\ReflectionMethod $rMethod): ?object => $this->getAttribute($rMethod, $attributeType))
-        );
-
-        if ($attribute) {
-            return $attribute;
-        }
-
-        // I don't think it makes sense to transitively inherit from a class
-        // for a method. What would that even be?  The return type?  If we ever
-        // add that it would go here, but probably not.
-
-        return null;
+        return $this->getMethodInheritedAttributes($rMethod, $attributeType)[0] ?? null;
     }
 
     /**
@@ -271,22 +259,7 @@ class Analyzer implements ClassAnalyzer
      */
     protected function getPropertyInheritedAttribute(\ReflectionProperty $rProperty, string $attributeType): ?object
     {
-        $attribute = pipe($this->propertyInheritanceTree($rProperty, $attributeType),
-            firstValue(fn(\ReflectionProperty $rProp): ?object => $this->getAttribute($rProp, $attributeType))
-        );
-
-        if ($attribute) {
-            return $attribute;
-        }
-
-        // Then check the class pointed at by the property, if it exists and the attribute is transitive.
-        if ($this->classImplements($attributeType, TransitiveProperty::class)) {
-            if ($class = $this->getPropertyClass($rProperty)) {
-                return $this->getClassInheritedAttribute($class, $attributeType);
-            }
-        }
-
-        return null;
+        return $this->getPropertyInheritedAttributes($rProperty, $attributeType)[0] ?? null;
     }
 
     /**
