@@ -31,7 +31,7 @@ class Analyzer implements ClassAnalyzer
                 $classDef->fromReflection($subject);
             }
 
-            $classDef = $this->loadSubAttributes($classDef, $subject);
+            $this->loadSubAttributes($classDef, $subject);
 
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
@@ -74,7 +74,7 @@ class Analyzer implements ClassAnalyzer
             $constDef->fromReflection($rConstant);
         }
 
-        $constDef = $this->loadSubAttributes($constDef, $rConstant);
+        $this->loadSubAttributes($constDef, $rConstant);
 
         return $constDef;
     }
@@ -99,7 +99,7 @@ class Analyzer implements ClassAnalyzer
             $methodDef->fromReflection($rMethod);
         }
 
-        $methodDef = $this->loadSubAttributes($methodDef, $rMethod);
+        $this->loadSubAttributes($methodDef, $rMethod);
 
         if ($methodDef instanceof ParseParameters) {
             $parameters = $this->getParameterDefinitions($rMethod, $methodDef->parameterAttribute(), $methodDef->includeParametersByDefault());
@@ -129,7 +129,7 @@ class Analyzer implements ClassAnalyzer
             $paramDef->fromReflection($rParameter);
         }
 
-        $paramDef = $this->loadSubAttributes($paramDef, $rParameter);
+        $this->loadSubAttributes($paramDef, $rParameter);
 
         return $paramDef;
     }
@@ -154,12 +154,12 @@ class Analyzer implements ClassAnalyzer
             $propDef->fromReflection($rProperty);
         }
 
-        $propDef = $this->loadSubAttributes($propDef, $rProperty);
+        $this->loadSubAttributes($propDef, $rProperty);
 
         return $propDef;
     }
 
-    protected function loadSubAttributes(?object $attribute, \ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionClassConstant $reflection): ?object
+    protected function loadSubAttributes(?object $attribute, \ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionClassConstant $reflection): void
     {
         if ($attribute instanceof HasSubAttributes) {
             foreach ($attribute->subAttributes() as $type => $callback) {
@@ -170,8 +170,6 @@ class Analyzer implements ClassAnalyzer
                 }
             }
         }
-
-        return $attribute;
     }
 
     /**
