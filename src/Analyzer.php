@@ -61,7 +61,7 @@ class Analyzer implements ClassAnalyzer
             indexBy(static fn (\ReflectionClassConstant $r): string => $r->getName()),
             amap(fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $methodAttribute, $includeByDefault)),
             afilter(),
-            afilter(static fn (object $prop): bool => !($prop->exclude ?? false)),
+            afilter(static fn (object $attr): bool => !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
@@ -86,7 +86,7 @@ class Analyzer implements ClassAnalyzer
             indexBy(static fn (\ReflectionMethod $r): string => $r->getName()),
             amap(fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $methodAttribute, $includeByDefault)),
             afilter(),
-            afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
+            afilter(static fn (object $attr):bool => !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
@@ -116,7 +116,7 @@ class Analyzer implements ClassAnalyzer
             indexBy(static fn (\ReflectionParameter $r): string => $r->getName()),
             amap(fn (\ReflectionParameter $p) => $this->getParameterDefinition($p, $propertyAttribute, $includeByDefault)),
             afilter(),
-            afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
+            afilter(static fn (object $attr):bool => !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
@@ -141,7 +141,7 @@ class Analyzer implements ClassAnalyzer
             indexBy(static fn (\ReflectionProperty $r): string => $r->getName()),
             amap(fn (\ReflectionProperty $p) => $this->getPropertyDefinition($p, $propertyAttribute, $includeByDefault)),
             afilter(),
-            afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
+            afilter(static fn (object $attr):bool => !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 

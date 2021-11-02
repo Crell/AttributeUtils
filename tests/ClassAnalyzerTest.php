@@ -15,6 +15,7 @@ use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
+use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
@@ -253,6 +254,16 @@ class ClassAnalyzerTest extends TestCase
                 static::assertEquals(1, $classDef->constants['CHILD_ONLY']->a);
                 static::assertEquals(1, $classDef->constants['PARENT_ONLY']->a);
                 static::assertEquals(5, $classDef->constants['INHERITED']->a);
+            },
+        ];
+
+        yield 'Class with excluded properties' => [
+            'subject' => ClassWithExcludedProperties::class,
+            'attribute' => GenericClass::class,
+            'test' => static function(GenericClass $classDef) {
+                static::assertCount(1, $classDef->properties);
+
+                static::assertArrayHasKey('b', $classDef->properties);
             },
         ];
     }
