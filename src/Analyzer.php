@@ -41,9 +41,143 @@ class Analyzer implements ClassAnalyzer
             $classDef->setProperties($fields);
         }
 
+        if ($classDef instanceof ParseMethods) {
+            $methods = $this->getMethodDefinitions($subject, $classDef->methodAttribute(), $classDef->includeMethodsByDefault());
+            $classDef->setMethods($methods);
+        }
+
         // @todo Add support for parsing methods, maybe constants?
 
         return $classDef;
+    }
+
+    protected function getMethodDefinitions(\ReflectionClass $subject, string $methodAttribute, bool $includeByDefault): array
+    {
+        return pipe(
+            $subject->getMethods(),
+            indexBy(static fn (\ReflectionMethod $r): string => $r->getName()),
+            amap(fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $methodAttribute, $includeByDefault)),
+            afilter(),
+            afilter(static fn (object $prop):bool => !($prop->exclude ?? false)),
+        );
+    }
+
+    protected function getMethodDefinition(\ReflectionMethod $rMethod, string $methodAttribute, bool $includeByDefault): ?object
+    {
+        // @todo Catch an error/exception here and wrap it in a better one,
+        // if the attribute has required fields but isn't specified.
+        $methodDef = $this->getMethodInheritedAttribute($rMethod, $methodAttribute)
+            ?? ($includeByDefault ?  new $methodAttribute() : null);
+
+        if ($methodDef instanceof FromReflectionMethod) {
+            $methodDef->fromReflection($rMethod);
+        }
+        if ($methodDef instanceof HasSubAttributes) {
+            foreach ($methodDef->subAttributes() as $type => $callback) {
+                if ($this->isMultivalueAttribute($type)) {
+                    $methodDef->$callback($this->getMethodInheritedAttributes($rMethod, $type));
+                } else {
+                    $methodDef->$callback($this->getMethodInheritedAttribute($rMethod, $type));
+                }
+            }
+        }
+
+        return $methodDef;
+    }
+
+    /**
+     * Retrieves an attribute from a method, including opt-in inheritance.
+     *
+     * If the attribute in question implements Inheritable, then parent classes
+     * will also be checked for the attribute.
+     *
+     * @param \ReflectionMethod $rMethod
+     *   The property from which to get an attribute.
+     * @param string $attributeType
+     * @return object|null
+     * @throws \ReflectionException
+     */
+    protected function getMethodInheritedAttribute(\ReflectionMethod $rMethod, string $attributeType): ?object
+    {
+        $attribute = pipe($this->MethodInheritanceTree($rMethod, $attributeType),
+            firstValue(fn(\ReflectionMethod $rMethod): ?object => $this->getAttribute($rMethod, $attributeType))
+        );
+
+        if ($attribute) {
+            return $attribute;
+        }
+
+        // I don't think it makes sense to transitively inherit from a class
+        // for a method. What would that even be?  The return type?  If we ever
+        // add that it would go here, but probably not.
+
+        return null;
+    }
+
+    /**
+     * Retrieves multiple attributes from a method, including opt-in inheritance.
+     *
+     * If the attribute in question implements Inheritable, then parent classes
+     * will also be checked for the attribute.
+     *
+     * @param \ReflectionProperty $rMethod
+     *   The method from which to get an attribute.
+     * @param string $attributeType
+     * @return array
+     * @throws \ReflectionException
+     */
+    protected function getMethodInheritedAttributes(\ReflectionMethod $rMethod, string $attributeType): array
+    {
+        $attribute = pipe($this->methodInheritanceTree($rMethod, $attributeType),
+            firstValue(fn(\ReflectionMethod $rMethod): array => $this->getAttributes($rMethod, $attributeType))
+        );
+
+        if ($attribute) {
+            return $attribute;
+        }
+
+        // I don't think it makes sense to transitively inherit from a class
+        // for a method. What would that even be?  The return type?  If we ever
+        // add that it would go here, but probably not.
+
+        return [];
+    }
+
+    /**
+     * A generator to produce reflections of all the ancestors of a method.
+     *
+     * The method itself will be included first, and parents will only be
+     * scanned if the attribute implements the Inheritable interface.
+     *
+     * @see Inheritable
+     */
+    protected function methodInheritanceTree(\ReflectionMethod $rMethod, string $attributeType): iterable
+    {
+        // Check the method itself, first.
+        yield $rMethod;
+
+        // Then check the class's parents, if the method type is Inheritable.
+        if ($this->classImplements($attributeType, Inheritable::class)) {
+            // Scan parent classes first, then  parent interfaces.
+            foreach ($this->classAncestors($rMethod->getDeclaringClass()->name) as $class) {
+                $rClass = new \ReflectionClass($class);
+                $methodProp = $rMethod->getName();
+                if ($rClass->hasMethod($methodProp)) {
+                    yield $rClass->getMethod($methodProp);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a list of all class and interface parents of a class.
+     *
+     * The class itself is not included in the list.
+     */
+    protected function classAncestors(string $class): array
+    {
+        // These methods both return associative arrays, making + safe.
+        return class_parents($class) + class_implements($class);
     }
 
     protected function getPropertyDefinitions(\ReflectionClass $subject, string $propertyAttribute, bool $includeByDefault): array

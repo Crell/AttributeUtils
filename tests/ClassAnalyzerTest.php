@@ -6,12 +6,14 @@ namespace Crell\AttributeUtils;
 
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
+use Crell\AttributeUtils\Attributes\ClassMethodsProperties;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
+use Crell\AttributeUtils\Records\Callbacks\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
@@ -189,14 +191,28 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        yield 'beep' => [
-//        yield 'Property with multiple matching subattributes' => [
+        yield 'Property with multiple matching subattributes' => [
             'subject' => PropertiesWithMultipleSubattributes::class,
             'attribute' => GenericClass::class,
             'test' => static function(GenericClass $classDef) {
                 static::assertEquals('Main', $classDef->properties['name']->name);
                 static::assertEquals('first', $classDef->properties['name']->subs[0]->name);
                 static::assertEquals('second', $classDef->properties['name']->subs[1]->name);
+            },
+        ];
+
+        yield 'Class with methods and properties' => [
+            'subject' => ClassWithMethodsAndProperties::class,
+            'attribute' => ClassMethodsProperties::class,
+            'test' => static function(ClassMethodsProperties $classDef) {
+                static::assertCount(3, $classDef->properties);
+                static::assertEquals('z', $classDef->methods['methodOne']->a);
+                static::assertEquals('y', $classDef->methods['methodOne']->b);
+                static::assertEquals('beep', $classDef->methods['methodOne']->name);
+                static::assertEquals('a', $classDef->methods['methodTwo']->a);
+                static::assertEquals('b', $classDef->methods['methodTwo']->b);
+                static::assertEquals('methodTwo', $classDef->methods['methodTwo']->name);
+                static::assertEquals('__construct', $classDef->methods['__construct']->name);
             },
         ];
     }

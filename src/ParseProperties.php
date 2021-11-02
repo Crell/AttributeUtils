@@ -17,7 +17,7 @@ namespace Crell\AttributeUtils;
  * the class attribute to save and then use however it wishes.
  *
  * Note that it is an error if the property attribute has required
- * arguments, includeByDefault() is true, and any property is missing
+ * arguments, includePropertiesByDefault() is true, and any property is missing
  * an attribute.
  */
 interface ParseProperties
