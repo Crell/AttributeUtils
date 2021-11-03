@@ -69,7 +69,7 @@ class AttributeParser
         // Transitivity is only supported on properties at this time.
         // It's not clear that it makes any sense on methods or constants.
         if ($target instanceof \ReflectionProperty
-            && $this->classImplements($name,TransitiveProperty::class)
+            && is_a($name, TransitiveProperty::class, true)
             && $class = $this->getPropertyClass($target))
         {
             return pipe($this->classAncestors($class),
@@ -93,7 +93,7 @@ class AttributeParser
         // Check the subject itself, first.
         yield $subject;
 
-        if ($this->classImplements($attributeType, Inheritable::class)) {
+        if (is_a($attributeType, Inheritable::class, true)) {
             yield from match(get_class($subject)) {
                 \ReflectionClass::class => $this->classInheritanceTree($subject),
                 \ReflectionObject::class => $this->classInheritanceTree($subject),
@@ -161,22 +161,6 @@ class AttributeParser
             ? [$class => $class] + $ancestors
             : $ancestors
         ;
-    }
-
-
-    /**
-     * Determines if a class name extends or implements a given class/interface.
-     *
-     * @param string $class
-     *   The class name to check.
-     * @param string $interface
-     *   The class or interface to look for.
-     * @return bool
-     */
-    public function classImplements(string $class, string $interface): bool
-    {
-        // class_parents() and class_implements() return a parallel k/v array. The key lookup is faster.
-        return isset($this->classAncestors($class)[$interface]);
     }
 
     /**
