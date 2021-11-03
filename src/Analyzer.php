@@ -43,7 +43,7 @@ class Analyzer implements ClassAnalyzer
                 $classDef->setMethods($methods);
             }
 
-            if ($classDef instanceof ParseConstants) {
+            if ($classDef instanceof ParseClassConstants) {
                 $methods = $this->getConstantDefinitions($subject, $classDef->constantAttribute(), $classDef->includeConstantsByDefault());
                 $classDef->setConstants($methods);
             }
@@ -70,7 +70,7 @@ class Analyzer implements ClassAnalyzer
         $constDef = $this->parser->getInheritedAttribute($rConstant, $methodAttribute)
             ?? ($includeByDefault ?  new $methodAttribute() : null);
 
-        if ($constDef instanceof FromReflectionConstant) {
+        if ($constDef instanceof FromReflectionClassConstant) {
             $constDef->fromReflection($rConstant);
         }
 

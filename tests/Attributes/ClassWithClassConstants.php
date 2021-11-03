@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
-use Crell\AttributeUtils\ParseConstants;
+use Crell\AttributeUtils\ParseClassConstants;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-class ClassWithConstants implements ParseConstants
+class ClassWithClassConstants implements ParseClassConstants
 {
     public array $constants;
 

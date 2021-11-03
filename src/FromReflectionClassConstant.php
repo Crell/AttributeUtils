@@ -15,7 +15,7 @@ namespace Crell\AttributeUtils;
  * Note that the attribute MUST NOT save the reflection object itself. That
  * would make the attribute object unserializable, and thus uncacheable.
  */
-interface FromReflectionConstant
+interface FromReflectionClassConstant
 {
     public function fromReflection(\ReflectionClassConstant $subject): void;
 }

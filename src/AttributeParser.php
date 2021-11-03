@@ -27,7 +27,7 @@ class AttributeParser
     public function getAttributes(\Reflector $target, string $name): array
     {
         return array_map(static fn (\ReflectionAttribute $attrib)
-        => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
+           => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
     }
 
     /**

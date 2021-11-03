@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
-interface ParseConstants
+interface ParseClassConstants
 {
     public function setConstants(array $constants): void;
 

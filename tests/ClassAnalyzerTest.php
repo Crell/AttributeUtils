@@ -7,7 +7,7 @@ namespace Crell\AttributeUtils;
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassMethodsProperties;
-use Crell\AttributeUtils\Attributes\ClassWithConstants;
+use Crell\AttributeUtils\Attributes\ClassWithClassConstants;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
@@ -247,8 +247,8 @@ class ClassAnalyzerTest extends TestCase
 
         yield 'Class with constants' => [
             'subject' => ClassWithConstantsChild::class,
-            'attribute' => ClassWithConstants::class,
-            'test' => static function(ClassWithConstants $classDef) {
+            'attribute' => ClassWithClassConstants::class,
+            'test' => static function(ClassWithClassConstants $classDef) {
                 static::assertCount(3, $classDef->constants);
 
                 static::assertEquals(1, $classDef->constants['CHILD_ONLY']->a);
