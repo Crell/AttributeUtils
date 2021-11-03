@@ -34,18 +34,27 @@ class Analyzer implements ClassAnalyzer
             $this->loadSubAttributes($classDef, $subject);
 
             if ($classDef instanceof ParseProperties) {
-                $properties = $this->getPropertyDefinitions($subject, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault());
+                $properties = $this->getDefinitions(
+                    $subject->getProperties(),
+                    fn (\ReflectionProperty $r) => $this->getPropertyDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault())
+                );
                 $classDef->setProperties($properties);
             }
 
             if ($classDef instanceof ParseMethods) {
-                $methods = $this->getMethodDefinitions($subject, $classDef->methodAttribute(), $classDef->includeMethodsByDefault());
+                $methods = $this->getDefinitions(
+                    $subject->getMethods(),
+                    fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
+                );
                 $classDef->setMethods($methods);
             }
 
             if ($classDef instanceof ParseClassConstants) {
-                $methods = $this->getConstantDefinitions($subject, $classDef->constantAttribute(), $classDef->includeConstantsByDefault());
-                $classDef->setConstants($methods);
+                $constants = $this->getDefinitions(
+                    $subject->getReflectionConstants(),
+                    fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault()),
+                );
+                $classDef->setConstants($constants);
             }
 
             return $classDef;
@@ -54,12 +63,24 @@ class Analyzer implements ClassAnalyzer
         }
     }
 
-    protected function getConstantDefinitions(\ReflectionClass $subject, string $attributeType, bool $includeByDefault): array
+    /**
+     * Gets all applicable attribute definitions of a given class element type.
+     *
+     * Eg, gets all property attributes, or all method attributes.
+     *
+     * @param \Reflector[] $reflections
+     *   The reflection objects to turn into attributes.
+     * @param callable $deriver
+     *   Callback for turning a reflection object into the corresponding attribute.
+     *   It must already have closed over the attribute type to retrieve.
+     * @return array
+     *   An array of attributes across all items of the applicable type.
+     */
+    protected function getDefinitions(array $reflections, callable $deriver): array
     {
-        return pipe(
-            $subject->getReflectionConstants(),
-            indexBy(static fn (\ReflectionClassConstant $r): string => $r->getName()),
-            amap(fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $attributeType, $includeByDefault)),
+        return pipe($reflections,
+            indexBy(static fn (\Reflector $r): string => $r->getName()),
+            amap($deriver),
             afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );
     }
@@ -78,16 +99,6 @@ class Analyzer implements ClassAnalyzer
         return $constDef;
     }
 
-    protected function getMethodDefinitions(\ReflectionClass $subject, string $attributeType, bool $includeByDefault): array
-    {
-        return pipe(
-            $subject->getMethods(),
-            indexBy(static fn (\ReflectionMethod $r): string => $r->getName()),
-            amap(fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $attributeType, $includeByDefault)),
-            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
-        );
-    }
-
     protected function getMethodDefinition(\ReflectionMethod $rMethod, string $attributeType, bool $includeByDefault): ?object
     {
         $methodDef = $this->parser->getInheritedAttribute($rMethod, $attributeType)
@@ -100,21 +111,14 @@ class Analyzer implements ClassAnalyzer
         $this->loadSubAttributes($methodDef, $rMethod);
 
         if ($methodDef instanceof ParseParameters) {
-            $parameters = $this->getParameterDefinitions($rMethod, $methodDef->parameterAttribute(), $methodDef->includeParametersByDefault());
+            $parameters = $this->getDefinitions(
+                $rMethod->getParameters(),
+                fn (\ReflectionParameter $p) => $this->getParameterDefinition($p, $methodDef->parameterAttribute(), $methodDef->includeParametersByDefault())
+            );
             $methodDef->setParameters($parameters);
         }
 
         return $methodDef;
-    }
-
-    protected function getParameterDefinitions(\ReflectionMethod $subject, string $attributeType, bool $includeByDefault): array
-    {
-        return pipe(
-            $subject->getParameters(),
-            indexBy(static fn (\ReflectionParameter $r): string => $r->getName()),
-            amap(fn (\ReflectionParameter $p) => $this->getParameterDefinition($p, $attributeType, $includeByDefault)),
-            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
-        );
     }
 
     protected function getParameterDefinition(\ReflectionParameter $rParameter, string $attributeType, bool $includeByDefault): ?object
@@ -129,16 +133,6 @@ class Analyzer implements ClassAnalyzer
         $this->loadSubAttributes($paramDef, $rParameter);
 
         return $paramDef;
-    }
-
-    protected function getPropertyDefinitions(\ReflectionClass $subject, string $attributeType, bool $includeByDefault): array
-    {
-        return pipe(
-            $subject->getProperties(),
-            indexBy(static fn (\ReflectionProperty $r): string => $r->getName()),
-            amap(fn (\ReflectionProperty $p) => $this->getPropertyDefinition($p, $attributeType, $includeByDefault)),
-            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
-        );
     }
 
     protected function getPropertyDefinition(\ReflectionProperty $rProperty, string $attributeType, bool $includeByDefault): ?object
