@@ -60,8 +60,7 @@ class Analyzer implements ClassAnalyzer
             $subject->getReflectionConstants(),
             indexBy(static fn (\ReflectionClassConstant $r): string => $r->getName()),
             amap(fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $attributeType, $includeByDefault)),
-            afilter(),
-            afilter(static fn (object $attr): bool => !($attr instanceof Excludable && $attr->exclude())),
+            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
@@ -85,8 +84,7 @@ class Analyzer implements ClassAnalyzer
             $subject->getMethods(),
             indexBy(static fn (\ReflectionMethod $r): string => $r->getName()),
             amap(fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $attributeType, $includeByDefault)),
-            afilter(),
-            afilter(static fn (object $attr):bool => !($attr instanceof Excludable && $attr->exclude())),
+            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
@@ -115,8 +113,7 @@ class Analyzer implements ClassAnalyzer
             $subject->getParameters(),
             indexBy(static fn (\ReflectionParameter $r): string => $r->getName()),
             amap(fn (\ReflectionParameter $p) => $this->getParameterDefinition($p, $attributeType, $includeByDefault)),
-            afilter(),
-            afilter(static fn (object $attr):bool => !($attr instanceof Excludable && $attr->exclude())),
+            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
@@ -140,8 +137,7 @@ class Analyzer implements ClassAnalyzer
             $subject->getProperties(),
             indexBy(static fn (\ReflectionProperty $r): string => $r->getName()),
             amap(fn (\ReflectionProperty $p) => $this->getPropertyDefinition($p, $attributeType, $includeByDefault)),
-            afilter(),
-            afilter(static fn (object $attr):bool => !($attr instanceof Excludable && $attr->exclude())),
+            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );
     }
 
