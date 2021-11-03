@@ -16,6 +16,21 @@ class Analyzer implements ClassAnalyzer
         $this->parser ??= new AttributeParser();
     }
 
+    /**
+     * Analyzes a class with respect to a given attribute.
+     *
+     * How much of the class is analyzed depends on what interfaces the attribute
+     * class implements.
+     *
+     * @param string|object $class
+     *   The class or object to analyze. If an object is passed, its
+     *   class will be analyzed.
+     * @param string $attribute
+     *   The class-level attribute that will drive the analysis.
+     * @return object
+     *   An instance of $attribute.
+     * @throws \ReflectionException
+     */
     public function analyze(string|object $class, string $attribute): object
     {
         // Everything is easier if we normalize to a class first.
@@ -85,6 +100,9 @@ class Analyzer implements ClassAnalyzer
         );
     }
 
+    /**
+     * Returns the attribute definition for a class constant.
+     */
     protected function getConstantDefinition(\ReflectionClassConstant $rConstant, string $attributeType, bool $includeByDefault): ?object
     {
         $constDef = $this->parser->getInheritedAttribute($rConstant, $attributeType)
@@ -99,6 +117,9 @@ class Analyzer implements ClassAnalyzer
         return $constDef;
     }
 
+    /**
+     * Returns the attribute definition for a method.
+     */
     protected function getMethodDefinition(\ReflectionMethod $rMethod, string $attributeType, bool $includeByDefault): ?object
     {
         $methodDef = $this->parser->getInheritedAttribute($rMethod, $attributeType)
@@ -121,6 +142,9 @@ class Analyzer implements ClassAnalyzer
         return $methodDef;
     }
 
+    /**
+     * Returns the attribute definition for a method parameter.
+     */
     protected function getParameterDefinition(\ReflectionParameter $rParameter, string $attributeType, bool $includeByDefault): ?object
     {
         $paramDef = $this->parser->getInheritedAttribute($rParameter, $attributeType)
@@ -135,6 +159,9 @@ class Analyzer implements ClassAnalyzer
         return $paramDef;
     }
 
+    /**
+     * Returns the attribute definition for a class property.
+     */
     protected function getPropertyDefinition(\ReflectionProperty $rProperty, string $attributeType, bool $includeByDefault): ?object
     {
         $propDef = $this->parser->getInheritedAttribute($rProperty, $attributeType)
@@ -149,7 +176,10 @@ class Analyzer implements ClassAnalyzer
         return $propDef;
     }
 
-    protected function loadSubAttributes(?object $attribute, \ReflectionProperty|\ReflectionMethod|\ReflectionParameter|\ReflectionClass|\ReflectionClassConstant $reflection): void
+    /**
+     * Loads sub-attributes onto an attribute, if appropriate.
+     */
+    protected function loadSubAttributes(?object $attribute, \Reflector $reflection): void
     {
         if ($attribute instanceof HasSubAttributes) {
             foreach ($attribute->subAttributes() as $type => $callback) {
@@ -191,10 +221,6 @@ class Analyzer implements ClassAnalyzer
      */
     protected function translateArgumentCountError(\ArgumentCountError $error): void
     {
-        // This is absolutely hideous, but this is what happens when your throwable
-        // puts all the useful information in the message text rather than as useful
-        // properties or methods or something.
-        // Conclusion: Write better, more debuggable exceptions than PHP does.
         $message = $error->getMessage();
         [$classAndMethod, $passedCount, $file, $line, $expectedCount] = sscanf(
             string: $message,
