@@ -107,10 +107,9 @@ class AttributeParser
 
     protected function classInheritanceTree(\ReflectionClass $subject): iterable
     {
-        $parent = $subject->getParentClass();
-        while ($parent) {
-            yield $parent;
-            $parent = $subject->getParentClass();
+        $ancestors = $this->classAncestors($subject->getName(), false);
+        foreach ($ancestors as $ancestor) {
+            yield new \ReflectionClass($ancestor);
         }
     }
 
@@ -153,13 +152,15 @@ class AttributeParser
 
     /**
      * Returns a list of all class and interface parents of a class.
-     *
-     * The class itself is included in the list as the first item.
      */
-    public function classAncestors(string $class): array
+    public function classAncestors(string $class, bool $includeClass = true): array
     {
         // These methods both return associative arrays, making + safe.
-        return [$class => $class] + class_parents($class) + class_implements($class);
+        $ancestors = class_parents($class) + class_implements($class);
+        return $includeClass
+            ? [$class => $class] + $ancestors
+            : $ancestors
+        ;
     }
 
 

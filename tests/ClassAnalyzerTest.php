@@ -16,6 +16,7 @@ use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
 use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
+use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
@@ -264,6 +265,15 @@ class ClassAnalyzerTest extends TestCase
                 static::assertCount(1, $classDef->properties);
 
                 static::assertArrayHasKey('b', $classDef->properties);
+            },
+        ];
+
+        yield 'Class inheriting from interface' => [
+            'subject' => ClassWithInterface::class,
+            'attribute' => BasicClass::class,
+            'test' => static function(BasicClass $classDef) {
+                static::assertEquals(5, $classDef->a);
+                static::assertEquals(10, $classDef->b);
             },
         ];
     }
