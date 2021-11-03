@@ -6,7 +6,6 @@ namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
 use Crell\AttributeUtils\FromReflectionParameter;
-use Crell\AttributeUtils\FromReflectionProperty;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class ParameterWithReflection implements FromReflectionParameter
