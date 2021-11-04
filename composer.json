@@ -28,7 +28,7 @@
     },
     "require-dev": {
         "phpbench/phpbench": "^1.1",
-        "phpstan/phpstan": "^0.12.93",
+        "phpstan/phpstan": "^1.0",
         "phpunit/phpunit": "~9.0"
     },
     "autoload": {

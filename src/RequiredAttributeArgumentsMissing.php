@@ -16,7 +16,7 @@ then it must not be omitted as you must provide the required arguments.
 END;
         $message = sprintf($format, $attributeType);
 
-        $new = new static($message, $previous->getCode(), $previous);
+        $new = new self($message, $previous->getCode(), $previous);
 
         $new->attributeType = $attributeType;
 

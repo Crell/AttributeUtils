@@ -75,6 +75,10 @@ class Analyzer implements ClassAnalyzer
             return $classDef;
         } catch (\ArgumentCountError $e) {
             $this->translateArgumentCountError($e);
+            // This line is unreachable. It's here only to make phpstan
+            // happy that this method always returns an object.
+            // There is probably a much better way.
+            return new \stdClass();
         }
     }
 
@@ -222,7 +226,10 @@ class Analyzer implements ClassAnalyzer
     protected function translateArgumentCountError(\ArgumentCountError $error): void
     {
         $message = $error->getMessage();
+        // PHPStan doesn't undestand this syntax style of sscanf(), so skip it.
+        // @phpstan-ignore-next-line
         [$classAndMethod, $passedCount, $file, $line, $expectedCount] = sscanf(
+            // @phpstan-ignore-next-line
             string: $message,
             format: "Too few arguments to function %s::%s, %d passed in %s on line %d and exactly %d expected"
         );
