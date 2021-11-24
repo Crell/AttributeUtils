@@ -19,6 +19,7 @@ use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
+use Crell\AttributeUtils\Records\ClassWithExtraAnalysisSource;
 use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
@@ -274,6 +275,14 @@ class ClassAnalyzerTest extends TestCase
             'test' => static function(BasicClass $classDef) {
                 static::assertEquals(5, $classDef->a);
                 static::assertEquals(10, $classDef->b);
+            },
+        ];
+
+        yield 'Class with field with extra processing' => [
+            'subject' => ClassWithExtraAnalysisSource::class,
+            'attribute' => GenericClass::class,
+            'test' => static function(GenericClass $classDef) {
+                self::assertEquals('a', $classDef->properties['target']->targetDef->properties['a']->a);
             },
         ];
     }

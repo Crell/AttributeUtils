@@ -72,6 +72,10 @@ class Analyzer implements ClassAnalyzer
                 $classDef->setConstants($constants);
             }
 
+            if ($classDef instanceof CustomAnalysis) {
+                $classDef->customAnalysis($this);
+            }
+
             return $classDef;
         } catch (\ArgumentCountError $e) {
             $this->translateArgumentCountError($e);
@@ -118,6 +122,10 @@ class Analyzer implements ClassAnalyzer
 
         $this->loadSubAttributes($constDef, $rConstant);
 
+        if ($constDef instanceof CustomAnalysis) {
+            $constDef->customAnalysis($this);
+        }
+
         return $constDef;
     }
 
@@ -143,6 +151,10 @@ class Analyzer implements ClassAnalyzer
             $methodDef->setParameters($parameters);
         }
 
+        if ($methodDef instanceof CustomAnalysis) {
+            $methodDef->customAnalysis($this);
+        }
+
         return $methodDef;
     }
 
@@ -160,6 +172,10 @@ class Analyzer implements ClassAnalyzer
 
         $this->loadSubAttributes($paramDef, $rParameter);
 
+        if ($paramDef instanceof CustomAnalysis) {
+            $paramDef->customAnalysis($this);
+        }
+
         return $paramDef;
     }
 
@@ -176,6 +192,10 @@ class Analyzer implements ClassAnalyzer
         }
 
         $this->loadSubAttributes($propDef, $rProperty);
+
+        if ($propDef instanceof CustomAnalysis) {
+            $propDef->customAnalysis($this);
+        }
 
         return $propDef;
     }
