@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use PhpBench\Reflection\ReflectionClass;
 use function Crell\fp\firstValue;
 use function Crell\fp\pipe;
 
@@ -105,6 +106,16 @@ class AttributeParser
         }
     }
 
+    /**
+     * Returns all the ReflectionClasses in a subject's inheritance tree.
+     *
+     * This includes both classes and interfaces.
+     *
+     * @param \ReflectionClass $subject
+     *   The reflection of the class for which we want the ancestors.
+     * @return ReflectionClass[]
+     * @throws \ReflectionException
+     */
     protected function classInheritanceTree(\ReflectionClass $subject): iterable
     {
         $ancestors = $this->classAncestors($subject->getName(), false);
@@ -113,6 +124,17 @@ class AttributeParser
         }
     }
 
+    /**
+     * Returns all of the ReflectionParameters in a subject's inheritance tree.
+     *
+     * That is, it returns the reflection of the parent class's copy of a
+     * parameter on the same method, if defined.
+     *
+     * @param \ReflectionParameter $subject
+     *   The reflection of the Parameter for which we want the ancestors.
+     * @return \ReflectionParameter[]
+     * @throws \ReflectionException
+     */
     protected function parameterInheritanceTree(\ReflectionParameter $subject): iterable
     {
         $parameterName = $subject->getName();
@@ -132,6 +154,18 @@ class AttributeParser
         }
     }
 
+    /**
+     * Returns all of the reflections in a subject's inheritance tree.
+     *
+     * This method works for the "basic" class elements: Properties, methods, and constants.
+     *
+     * For other types, see their respective methods.
+     *
+     * @param \ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject
+     *   The reflection of the component for which we want the ancestors.
+     * @return iterable
+     * @throws \ReflectionException
+     */
     protected function classElementInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject): iterable
     {
         $subjectName = $subject->getName();
