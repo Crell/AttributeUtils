@@ -16,15 +16,9 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://github.com/Crell/fp.git"
-        }
-    ],
     "require": {
         "php": "~8.0",
-        "crell/fp": ">=0.1.1"
+        "crell/fp": ">=0.2.8"
     },
     "require-dev": {
         "phpbench/phpbench": "^1.1",
