@@ -16,21 +16,6 @@ class Analyzer implements ClassAnalyzer
         $this->parser ??= new AttributeParser();
     }
 
-    /**
-     * Analyzes a class with respect to a given attribute.
-     *
-     * How much of the class is analyzed depends on what interfaces the attribute
-     * class implements.
-     *
-     * @param string|object $class
-     *   The class or object to analyze. If an object is passed, its
-     *   class will be analyzed.
-     * @param string $attribute
-     *   The class-level attribute that will drive the analysis.
-     * @return object
-     *   An instance of $attribute.
-     * @throws \ReflectionException
-     */
     public function analyze(string|object $class, string $attribute): object
     {
         // Everything is easier if we normalize to a class first.

@@ -15,12 +15,12 @@ interface ClassAnalyzer
     /**
      * Analyzes a class or object for the specified attribute.
      *
+     * @template T
      * @param class-string|object $class
      *   Either a fully qualified class name or an object to analyze.
-     *   Note that if an object is provided, the results may not be cached.
-     * @param class-string $attribute
+     * @param class-string<T> $attribute
      *   The fully qualified class name of the class attribute to analyze.
-     * @return object
+     * @return T
      *   The class attribute requested, including dependent data as appropriate.
      */
     public function analyze(string|object $class, string $attribute): object;
