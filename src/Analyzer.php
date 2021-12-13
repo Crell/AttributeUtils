@@ -231,7 +231,7 @@ class Analyzer implements ClassAnalyzer
     protected function translateArgumentCountError(\ArgumentCountError $error): void
     {
         $message = $error->getMessage();
-        // PHPStan doesn't undestand this syntax style of sscanf(), so skip it.
+        // PHPStan doesn't understand this syntax style of sscanf(), so skip it.
         // @phpstan-ignore-next-line
         [$classAndMethod, $passedCount, $file, $line, $expectedCount] = sscanf(
             // @phpstan-ignore-next-line
