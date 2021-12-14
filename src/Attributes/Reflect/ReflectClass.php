@@ -81,7 +81,7 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties
             $subject->isInterface() => StructType::Interface,
             $subject->isTrait() => StructType::Trait,
             $subject->isAnonymous() => StructType::AnonymousClass,
-            default => StructType::Class,
+            default => StructType::NormalClass,
         };
 
         // @todo getFileName, getStartLine, getEndLine - Needed or no? Should they go in a separate struct?

@@ -20,12 +20,19 @@ class ReflectClassConstant implements FromReflectionClassConstant
      */
     public int|string|array $value;
 
+    /**
+     * True if this is a final constant, false otherwise.
+     */
+    public bool $isFinal;
+
     public function fromReflection(\ReflectionClassConstant $subject): void
     {
         $this->phpName = $subject->getName();
         $this->value = $subject->getValue();
 
         $this->parseVisibility($subject);
+
+        $this->isFinal = $subject->isFinal();
 
         // @todo Do we include doc comment, or the declaring class?
     }

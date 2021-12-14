@@ -11,7 +11,7 @@ namespace Crell\AttributeUtils\Attributes\Reflect;
  */
 enum StructType
 {
-    case Class;
+    case NormalClass;
     case Interface;
     case Trait;
     case AnonymousClass;
