@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Attributes\Reflect;
 
 use Crell\AttributeUtils\FromReflectionParameter;
+use Crell\AttributeUtils\TypeDef;
 
 class ReflectParameter implements FromReflectionParameter
 {
@@ -33,6 +34,13 @@ class ReflectParameter implements FromReflectionParameter
      */
     public bool $isVariadic;
 
+    /**
+     * The type of this parameter.
+     *
+     * A missing type declaration will be treated as "mixed".
+     */
+    public TypeDef $type;
+
     public function fromReflection(\ReflectionParameter $subject): void
     {
         $this->phpName = $subject->getName();
@@ -41,7 +49,7 @@ class ReflectParameter implements FromReflectionParameter
         $this->isOptional = $subject->isOptional();
         $this->isVariadic = $subject->isVariadic();
 
-        // @todo All the type shenanigans.
+        $this->type = new TypeDef($subject->getType());
     }
 
 }

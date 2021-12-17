@@ -46,10 +46,15 @@ class TypeDef
         return $this->complexity === TypeComplexity::Simple;
     }
 
-    // @todo What should this do if it's not a simple type?
-    public function getSimpleType(): string
+    /**
+     * Returns the simple type for this definition, or null if it's not simple.
+     *
+     * @return string|null
+     *   The simple type as a string, or null if it's not a simple type.
+     */
+    public function getSimpleType(): ?string
     {
-        return $this->type[0][0];
+        return $this->isSimple() ? $this->type[0][0] : null;
     }
 
     /**

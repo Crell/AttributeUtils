@@ -63,12 +63,17 @@ class ReflectTest extends TestCase
                 static::assertInstanceOf(ReflectProperty::class, $classDef->properties['public']);
                 static::assertEquals('public', $classDef->properties['public']->phpName);
                 static::assertEquals(Visibility::Public, $classDef->properties['public']->visibility);
+                static::assertEquals('int', $classDef->properties['public']->type->getSimpleType());
 
                 static::assertTrue($classDef->properties['promoted']->isPromoted);
+                static::assertEquals('string', $classDef->properties['promoted']->type->getSimpleType());
 
                 static::assertEquals(MethodType::Constructor, $classDef->methods['__construct']->methodType);
                 static::assertEquals(MethodType::Destructor, $classDef->methods['__destruct']->methodType);
                 static::assertEquals(MethodType::Normal, $classDef->methods['privateMethod']->methodType);
+
+                static::assertEquals('string', $classDef->methods['publicMethod']->returnType->getSimpleType());
+                static::assertEquals('mixed', $classDef->methods['variadic']->returnType->getSimpleType());
 
                 static::assertTrue($classDef->methods['variadic']->isVariadic);
                 static::assertTrue($classDef->methods['generator']->isGenerator);
@@ -76,6 +81,8 @@ class ReflectTest extends TestCase
                 static::assertCount(4, $classDef->methods['methodWithArgs']->parameters);
                 static::assertEquals('int', $classDef->methods['methodWithArgs']->parameters['int']->phpName);
                 static::assertFalse($classDef->methods['methodWithArgs']->parameters['int']->isVariadic);
+                static::assertEquals('string', $classDef->methods['methodWithArgs']->parameters['string']->type->getSimpleType());
+                static::assertEquals('mixed', $classDef->methods['methodWithArgs']->parameters['untyped']->type->getSimpleType());
 
                 static::assertEquals('PublicConst', $classDef->constants['PublicConst']->phpName);
                 static::assertEquals(1, $classDef->constants['PublicConst']->value);

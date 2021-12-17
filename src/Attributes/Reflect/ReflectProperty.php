@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Attributes\Reflect;
 
 use Crell\AttributeUtils\FromReflectionProperty;
+use Crell\AttributeUtils\TypeDef;
 
 class ReflectProperty implements FromReflectionProperty
 {
@@ -32,6 +33,13 @@ class ReflectProperty implements FromReflectionProperty
      */
     public bool $isPromoted;
 
+    /**
+     * The type of this property.
+     *
+     * A missing type declaration will be treated as "mixed".
+     */
+    public TypeDef $type;
+
     public function fromReflection(\ReflectionProperty $subject): void
     {
         $this->phpName = $subject->getName();
@@ -51,7 +59,6 @@ class ReflectProperty implements FromReflectionProperty
 
         // @todo Do we want the default value and such?
 
-        // @todo All the fun type bits.  Oy.
-
+        $this->type = new TypeDef($subject->getType());
     }
 }

@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils\Attributes\Reflect;
 
 use Crell\AttributeUtils\FromReflectionMethod;
 use Crell\AttributeUtils\ParseParameters;
+use Crell\AttributeUtils\TypeDef;
 
 class ReflectMethod implements FromReflectionMethod, ParseParameters
 {
@@ -41,8 +42,6 @@ class ReflectMethod implements FromReflectionMethod, ParseParameters
 
     /**
      * True if there is an explicit return type defined, false otherwise.
-     *
-     * @todo This may be unnecessary once we start parsing the return type.
      */
     public bool $hasReturnType;
 
@@ -62,6 +61,16 @@ class ReflectMethod implements FromReflectionMethod, ParseParameters
     public bool $isStatic;
 
     public MethodType $methodType;
+
+    /**
+     * The return type of this method.
+     *
+     * A missing type declaration will be treated as "mixed".
+     *
+     * If you need to know whether a return type was specified at all,
+     * check the $hasReturnType property.
+     */
+    public TypeDef $returnType;
 
     public function fromReflection(\ReflectionMethod $subject): void
     {
@@ -91,7 +100,7 @@ class ReflectMethod implements FromReflectionMethod, ParseParameters
 
         // @todo getNumberOfParameters and getNumberOfRequiredParameters seem redundant with having the parameters available.
 
-        // @todo Return type handling.  Oy.
+        $this->returnType = new TypeDef($subject->getReturnType());
     }
 
     public function setParameters(array $parameters): void
