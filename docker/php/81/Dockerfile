@@ -1,4 +1,4 @@
-FROM php:8.1.0RC3-cli
+FROM php:8.1.0-cli
 WORKDIR /usr/src/myapp
 CMD [ "vendor/bin/phpunit" ]
 
