@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
-use function Crell\fp\amap;
+use function Crell\fp\all;
 use function Crell\fp\any;
 
 class TypeDef
@@ -43,6 +43,32 @@ class TypeDef
     public function getSimpleType(): string
     {
         return $this->type[0][0];
+    }
+
+    /**
+     * Determines if this type definition will accept a value of the specified type.
+     *
+     * @todo Not sure what to do with static, self, etc.
+     *
+     * @param string $type
+     *   A simple string type, like "int", "float", "SomeClass", etc.
+     *   Classes should include their full namespace.
+     * @return bool
+     */
+    public function accepts(string $type): bool
+    {
+        if ($type === 'null') {
+            return $this->allowsNull;
+        }
+
+        $typeAccepts = fn ($matchType): bool
+            => (class_exists($matchType) || interface_exists($matchType))
+                ? is_a($type, $matchType, true)
+                : $type === $matchType;
+
+        $intersectionAccepts = fn (array $segment): bool  => all($typeAccepts)($segment);
+
+        return any($intersectionAccepts)($this->type);
     }
 
     protected function parseUnionType(\ReflectionUnionType $type): array
