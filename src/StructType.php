@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\AttributeUtils\Attributes\Reflect;
+namespace Crell\AttributeUtils;
 
 /**
  * List of PHP's class-esque types.

@@ -8,6 +8,7 @@ use Crell\AttributeUtils\FromReflectionClass;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
+use Crell\AttributeUtils\StructType;
 
 class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties, ParseClassConstants
 {

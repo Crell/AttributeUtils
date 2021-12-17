@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Attributes\Reflect;
 
+use Crell\AttributeUtils\Visibility;
+
 trait HasVisibility
 {
     /**
