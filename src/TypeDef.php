@@ -61,10 +61,11 @@ class TypeDef
             return $this->allowsNull;
         }
 
-        $typeAccepts = fn ($matchType): bool
-            => (class_exists($matchType) || interface_exists($matchType))
-                ? is_a($type, $matchType, true)
-                : $type === $matchType;
+        $typeAccepts = fn ($defType): bool => match(true) {
+                $defType === 'mixed' => true,
+                class_exists($defType) || interface_exists($defType) => is_a($type, $defType, true),
+                default => $type === $defType,
+            };
 
         $intersectionAccepts = fn (array $segment): bool  => all($typeAccepts)($segment);
 

@@ -176,6 +176,19 @@ class TypeDefTest extends TestCase
                 static::assertFalse($typeDef->accepts(OtherClass::class));
             },
         ];
+
+        yield 'mixedReturn' => [
+            'subject' => 'mixedReturn',
+            'test' => static function (TypeDef $typeDef) {
+                static::assertTrue($typeDef->allowsNull);
+                static::assertTrue($typeDef->isSimple());
+                static::assertEquals(TypeComplexity::Simple, $typeDef->complexity);
+                static::assertTrue($typeDef->accepts('string'));
+                static::assertTrue($typeDef->accepts(Implementer::class));
+                static::assertTrue($typeDef->accepts(IncompleteImplementer::class));
+                static::assertTrue($typeDef->accepts(OtherClass::class));
+            },
+        ];
     }
 }
 
@@ -216,6 +229,8 @@ class TypeExamples
     public function intersection(): SomeClass&OtherClass {}
 
     public function interfaceIntersection(): I1&I2 {}
+
+    public function mixedReturn(): mixed {}
 }
 
 class SomeClass {}
