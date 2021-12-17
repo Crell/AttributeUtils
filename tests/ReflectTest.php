@@ -17,7 +17,7 @@ use Crell\AttributeUtils\Records\Reflect\SampleTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @requires PHP >- 8.1.0
+ * @requires PHP >= 8.1.0
  */
 class ReflectTest extends TestCase
 {
