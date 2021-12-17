@@ -19,10 +19,17 @@ class TypeDef
     /**
      * @todo Unclear if self and static should resolve to their actual classes. Right now they do not.
      *
-     * @param \ReflectionType $type
+     * @param ?\ReflectionType $type
      */
-    public function __construct(\ReflectionType $type)
+    public function __construct(?\ReflectionType $type)
     {
+        if (is_null($type)) {
+            $this->allowsNull = true;
+            $this->type = [['mixed']];
+            $this->complexity = TypeComplexity::Simple;
+            return;
+        }
+
         $this->allowsNull = $type->allowsNull();
 
         $this->type = match ($type::class) {
