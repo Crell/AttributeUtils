@@ -1,6 +1,9 @@
 parameters:
-	level: 2
-	paths:
-		- src
+    level: 3
+    paths:
+        - src
+    ignoreErrors:
+        - '#Match expression does not handle remaining value#'
+
 # Tests include an absurd number of classes that are by design not tricked-out, so don't
 # bother checking those.
