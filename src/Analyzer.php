@@ -67,6 +67,7 @@ class Analyzer implements ClassAnalyzer
             // This line is unreachable. It's here only to make phpstan
             // happy that this method always returns an object.
             // There is probably a much better way.
+            // @phpstan-ignore-next-line
             return new \stdClass();
         }
     }
@@ -217,7 +218,7 @@ class Analyzer implements ClassAnalyzer
             return false;
         }
 
-        return (bool)($rAttribs[0]?->newInstance()?->flags & \Attribute::IS_REPEATABLE);
+        return (bool)($rAttribs[0]->newInstance()->flags & \Attribute::IS_REPEATABLE);
     }
 
     /**

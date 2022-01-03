@@ -8,7 +8,7 @@ class RequiredAttributeArgumentsMissing extends \LogicException
 {
     public string $attributeType;
 
-    public static function create(string $attributeType, \Throwable $previous): static
+    public static function create(string $attributeType, \Throwable $previous): self
     {
         $format = <<<END
 The attribute %s has required arguments. If the attribute is set to be included by default,

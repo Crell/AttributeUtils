@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
-use PhpBench\Reflection\ReflectionClass;
 use function Crell\fp\firstValue;
 use function Crell\fp\pipe;
 
@@ -28,8 +27,8 @@ class AttributeParser
     public function getAttributes(\Reflector $target, string $name): array
     {
         return array_map(static fn (\ReflectionAttribute $attrib)
-        // @phpstan-ignore-next-line
-        => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
+            // @phpstan-ignore-next-line
+            => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
     }
 
     /**
@@ -114,7 +113,7 @@ class AttributeParser
      *
      * @param \ReflectionClass $subject
      *   The reflection of the class for which we want the ancestors.
-     * @return ReflectionClass[]
+     * @return iterable<\ReflectionClass>
      * @throws \ReflectionException
      */
     protected function classInheritanceTree(\ReflectionClass $subject): iterable
