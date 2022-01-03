@@ -7,6 +7,7 @@ namespace Crell\AttributeUtils;
 use function Crell\fp\afilter;
 use function Crell\fp\amap;
 use function Crell\fp\indexBy;
+use function Crell\fp\method;
 use function Crell\fp\pipe;
 
 class Analyzer implements ClassAnalyzer
@@ -91,7 +92,7 @@ class Analyzer implements ClassAnalyzer
             // The Reflector interface is insufficient, but getName() is defined
             // on all types we care about. This is a reflection API limitation.
             // @phpstan-ignore-next-line
-            indexBy(static fn (\Reflector $r): string => $r->getName()),
+            indexBy(method('getName')),
             amap($deriver),
             afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils;
 
 use function Crell\fp\firstValue;
+use function Crell\fp\method;
 use function Crell\fp\pipe;
 
 class AttributeParser
@@ -26,9 +27,8 @@ class AttributeParser
      */
     public function getAttributes(\Reflector $target, string $name): array
     {
-        return array_map(static fn (\ReflectionAttribute $attrib)
-            // @phpstan-ignore-next-line
-            => $attrib->newInstance(), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
+        // @phpstan-ignore-next-line.
+        return array_map(method('newInstance'), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
     }
 
     /**

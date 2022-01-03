@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils;
 
 use function Crell\fp\all;
 use function Crell\fp\any;
+use function Crell\fp\method;
 
 class TypeDef
 {
@@ -96,8 +97,7 @@ class TypeDef
 
     protected function parseIntersectionType(\ReflectionIntersectionType $type): array
     {
-        $translate = static fn (\ReflectionNamedType $innerType): string => $innerType->getName();
-        return array_map($translate, $type->getTypes());
+        return array_map(method('getName'), $type->getTypes());
     }
 
 
