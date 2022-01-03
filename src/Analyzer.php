@@ -87,6 +87,9 @@ class Analyzer implements ClassAnalyzer
     protected function getDefinitions(array $reflections, callable $deriver): array
     {
         return pipe($reflections,
+            // The Reflector interface is insufficient, but getName() is defined
+            // on all types we care about. This is a reflection API limitation.
+            // @phpstan-ignore-next-line
             indexBy(static fn (\Reflector $r): string => $r->getName()),
             amap($deriver),
             afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),

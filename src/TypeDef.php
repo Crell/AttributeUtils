@@ -89,7 +89,7 @@ class TypeDef
         $translate = static fn (\ReflectionType $innerType): array => match($innerType::class) {
             \ReflectionNamedType::class => [$innerType->getName()],
             // This technically cannot happen until 8.2, assuming we get DNF types, but planning ahead...
-            \ReflectionIntersectionType::class => $this->parseIntersectionType($innerType),
+            //\ReflectionIntersectionType::class => $this->parseIntersectionType($innerType),
         };
         return array_map($translate, $type->getTypes());
     }

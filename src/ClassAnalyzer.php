@@ -15,7 +15,7 @@ interface ClassAnalyzer
     /**
      * Analyzes a class or object for the specified attribute.
      *
-     * @template T
+     * @template T of object
      * @param class-string|object $class
      *   Either a fully qualified class name or an object to analyze.
      * @param class-string<T> $attribute

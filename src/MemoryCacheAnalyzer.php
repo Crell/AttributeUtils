@@ -10,7 +10,7 @@ namespace Crell\AttributeUtils;
 class MemoryCacheAnalyzer implements ClassAnalyzer
 {
     /**
-     * @var array<string, <string, object>>>
+     * @var array<string, array<string, object>>
      */
     private array $cache = [];
 
