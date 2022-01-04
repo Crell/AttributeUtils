@@ -17,7 +17,7 @@ class TypeDefTest extends TestCase
      */
     public function typedefs(string $methodName, callable $test): void
     {
-        $rType = (new \ReflectionClass(TypeExamples::class))
+        $rType = (new \ReflectionClass(TypeDef\TypeExamples::class))
             ->getMethod($methodName)
             ->getReturnType();
 
@@ -205,48 +205,9 @@ class TypeDefTest extends TestCase
     }
 }
 
-class ParentClass
-{
-    public function returnsSelfParent(): self {}
-
-    public function returnsStatic(): static {}
-}
-
-class TypeExamples
-{
-    public function simpleInt(): int {}
-
-    public function simpleString(): string {}
-
-    public function simpleStringNullable(): ?string {}
-
-    public function simpleStringNullableUnion(): string|null {}
-
-    public function simpleArray(): array {}
-
-    public function simpleClass(): OtherClass {}
-
-    public function simpleVoid(): void {}
-
-    public function simpleNever(): never {}
-
-    public function returnsSelfChild(): self {}
-
-    public function returnsStatic(): static {}
-
-    public function scalarUnion(): int|string {}
-
-    public function mixedUnion(): SomeClass|string {}
-
-    // Curiously, PHP lets us define this type but it is impossible.
-    public function intersection(): SomeClass&OtherClass {}
-
-    public function interfaceIntersection(): I1&I2 {}
-
-    public function mixedReturn(): mixed {}
-
-    public function noReturnType() {}
-}
+// These can stay here as they are syntax compatible with all supported PHP versions.
+// The other test classes parse error on 8.0 and earlier, so need to be in separate
+// files, even if this test class is skipped.
 
 class SomeClass {}
 
