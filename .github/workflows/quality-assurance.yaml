@@ -13,6 +13,11 @@ jobs:
                 php: [ '8.0', '8.1' ]
                 composer-flags: [ '' ]
                 phpunit-flags: [ '--coverage-text' ]
+                include:
+                    - php: '8.0'
+                      # Some tests work only on PHP 8.1, so don't check for coverage
+                      # on 8.0, since that will syntax error.
+                      phpunit-flags: '--no-coverage'
         steps:
             - uses: actions/checkout@v2
             - uses: shivammathur/setup-php@v2
