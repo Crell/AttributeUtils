@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Attributes\Reflect;
 
-use Crell\AttributeUtils\FromReflectionClass;
 use Crell\AttributeUtils\FromReflectionEnum;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseEnumCases;
 use Crell\AttributeUtils\ParseMethods;
-use Crell\AttributeUtils\ParseProperties;
-use Crell\AttributeUtils\ClassType;
 
 class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseClassConstants, ParseEnumCases
 {

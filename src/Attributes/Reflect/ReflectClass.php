@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Attributes\Reflect;
 
+use Crell\AttributeUtils\ClassType;
 use Crell\AttributeUtils\FromReflectionClass;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
-use Crell\AttributeUtils\ClassType;
 
 class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties, ParseClassConstants
 {

@@ -65,6 +65,4 @@ class Complete
     {
         yield 1;
     }
-
-
 }

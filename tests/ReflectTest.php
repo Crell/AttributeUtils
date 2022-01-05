@@ -8,13 +8,13 @@ use Crell\AttributeUtils\Attributes\Reflect\MethodType;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectClass;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectEnum;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectProperty;
-use Crell\AttributeUtils\TypeDef\BackedSuit;
-use Crell\AttributeUtils\TypeDef\Suit;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\Reflect\AnInterface;
 use Crell\AttributeUtils\Records\Reflect\ClassUsesTrait;
 use Crell\AttributeUtils\Records\Reflect\Complete;
 use Crell\AttributeUtils\Records\Reflect\SampleTrait;
+use Crell\AttributeUtils\TypeDef\BackedSuit;
+use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\TestCase;
 
 /**
