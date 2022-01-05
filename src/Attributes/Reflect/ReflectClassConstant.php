@@ -18,7 +18,7 @@ class ReflectClassConstant implements FromReflectionClassConstant
     /**
      * The value of the constant.
      */
-    public int|string|array $value;
+    public int|string|array|object $value;
 
     /**
      * True if this is a final constant, false otherwise.

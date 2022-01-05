@@ -10,4 +10,6 @@ enum Suit
     case Clubs;
     case Diamonds;
     case Hearts;
+
+    public const Joker = Suit::Spades;
 }

@@ -6,9 +6,10 @@ namespace Crell\AttributeUtils;
 
 use Crell\AttributeUtils\Attributes\Reflect\MethodType;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectClass;
+use Crell\AttributeUtils\Attributes\Reflect\ReflectEnum;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectProperty;
-use Crell\AttributeUtils\ClassType;
-use Crell\AttributeUtils\Visibility;
+use Crell\AttributeUtils\TypeDef\BackedSuit;
+use Crell\AttributeUtils\TypeDef\Suit;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\Reflect\AnInterface;
 use Crell\AttributeUtils\Records\Reflect\ClassUsesTrait;
@@ -23,7 +24,7 @@ class ReflectTest extends TestCase
 {
     /**
      * @test
-     * @dataProvider attributeTestProvider()
+     * @dataProvider classAttributeExamples()
      */
     public function analyze_classes(string $subject, callable $test): void
     {
@@ -33,8 +34,57 @@ class ReflectTest extends TestCase
 
         $test($classDef);
     }
+    /**
+     * @test
+     * @dataProvider enumAttributeExamples()
+     */
+    public function analyze_enums(string $subject, callable $test): void
+    {
+        $analyzer = new Analyzer();
 
-    public function attributeTestProvider(): iterable
+        $classDef = $analyzer->analyze($subject, ReflectEnum::class);
+
+        $test($classDef);
+    }
+
+    public function enumAttributeExamples(): iterable
+    {
+        yield Suit::class => [
+            'subject' => Suit::class,
+            'test' => static function (ReflectEnum $enumDef) {
+                static::assertEquals(Suit::class, $enumDef->phpName);
+                // The one method is the cases() method.
+                static::assertCount(1, $enumDef->methods);
+                static::assertCount(1, $enumDef->constants);
+                static::assertCount(4, $enumDef->cases);
+                static::assertFalse($enumDef->isInternal);
+                static::assertFalse($enumDef->isIterable);
+                static::assertFalse($enumDef->isBacked);
+                static::assertFalse($enumDef->cases['Spades']->isBacked);
+                static::assertEquals(Suit::Spades,$enumDef->constants['Joker']->value);
+            },
+        ];
+
+        yield BackedSuit::class => [
+            'subject' => BackedSuit::class,
+            'test' => static function (ReflectEnum $enumDef) {
+                static::assertEquals(BackedSuit::class, $enumDef->phpName);
+                // The built in cases(), from(), and tryFrom().
+                static::assertCount(3, $enumDef->methods);
+                static::assertCount(1, $enumDef->constants);
+                static::assertCount(4, $enumDef->cases);
+                static::assertFalse($enumDef->isInternal);
+                static::assertFalse($enumDef->isIterable);
+                static::assertTrue($enumDef->isBacked);
+                static::assertTrue($enumDef->cases['Spades']->isBacked);
+                static::assertEquals('string', $enumDef->backingType);
+                static::assertEquals('S', $enumDef->cases['Spades']->value);
+                static::assertEquals(BackedSuit::Spades,$enumDef->constants['Joker']->value);
+            },
+        ];
+    }
+
+    public function classAttributeExamples(): iterable
     {
         yield NoProps::class => [
             'subject' => NoProps::class,

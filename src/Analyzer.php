@@ -23,20 +23,30 @@ class Analyzer implements ClassAnalyzer
         // Because anon classes have generated internal class names, they work, too.
         $class = is_string($class) ? $class : $class::class;
 
-        $rClass = new \ReflectionClass($class);
+        // I don't love this special casing, but it's the only way to handle
+        // enums themselves being special cases.
+        if (function_exists('enum_exists') && enum_exists($class)) {
+            $subject = new \ReflectionEnum($class);
+        } else {
+            $subject = new \ReflectionClass($class);
+        }
 
         try {
-            $classDef = $this->parser->getInheritedAttribute($rClass, $attribute) ?? new $attribute;
+            $classDef = $this->parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
 
             if ($classDef instanceof FromReflectionClass) {
-                $classDef->fromReflection($rClass);
+                $classDef->fromReflection($subject);
             }
 
-            $this->loadSubAttributes($classDef, $rClass);
+            if ($classDef instanceof FromReflectionEnum) {
+                $classDef->fromReflection($subject);
+            }
+
+            $this->loadSubAttributes($classDef, $subject);
 
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getDefinitions(
-                    $rClass->getProperties(),
+                    $subject->getProperties(),
                     fn (\ReflectionProperty $r) => $this->getPropertyDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault())
                 );
                 $classDef->setProperties($properties);
@@ -44,15 +54,27 @@ class Analyzer implements ClassAnalyzer
 
             if ($classDef instanceof ParseMethods) {
                 $methods = $this->getDefinitions(
-                    $rClass->getMethods(),
+                    $subject->getMethods(),
                     fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
                 );
                 $classDef->setMethods($methods);
             }
 
+            // Enum cases have to come before constants, because
+            // constants will include enums cases.  It's up to the
+            // implementing attribute class to filter out the enums
+            // from the constants.  Sadly, there is no better API for it.
+            if ($classDef instanceof ParseEnumCases) {
+                $cases = $this->getDefinitions(
+                    $subject->getCases(),
+                    fn (\ReflectionEnumUnitCase $r) => $this->getCaseDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault()),
+                );
+                $classDef->setCases($cases);
+            }
+
             if ($classDef instanceof ParseClassConstants) {
                 $constants = $this->getDefinitions(
-                    $rClass->getReflectionConstants(),
+                    $subject->getReflectionConstants(),
                     fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault()),
                 );
                 $classDef->setConstants($constants);
@@ -96,6 +118,27 @@ class Analyzer implements ClassAnalyzer
             amap($deriver),
             afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
         );
+    }
+
+    /**
+     * Returns the attribute definition for an enum case.
+     */
+    protected function getCaseDefinition(\ReflectionEnumUnitCase $rCase, string $attributeType, bool $includeByDefault): ?object
+    {
+        $caseDef = $this->parser->getInheritedAttribute($rCase, $attributeType)
+            ?? ($includeByDefault ?  new $attributeType() : null);
+
+        if ($caseDef instanceof FromReflectionEnumCase) {
+            $caseDef->fromReflection($rCase);
+        }
+
+        $this->loadSubAttributes($caseDef, $rCase);
+
+        if ($caseDef instanceof CustomAnalysis) {
+            $caseDef->customAnalysis($this);
+        }
+
+        return $caseDef;
     }
 
     /**
