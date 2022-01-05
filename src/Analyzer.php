@@ -47,7 +47,8 @@ class Analyzer implements ClassAnalyzer
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getDefinitions(
                     $subject->getProperties(),
-                    fn (\ReflectionProperty $r) => $this->getPropertyDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault())
+                    fn (\ReflectionProperty $r)
+                        => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
                 );
                 $classDef->setProperties($properties);
             }
@@ -55,7 +56,8 @@ class Analyzer implements ClassAnalyzer
             if ($classDef instanceof ParseMethods) {
                 $methods = $this->getDefinitions(
                     $subject->getMethods(),
-                    fn (\ReflectionMethod $r) => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
+                    fn (\ReflectionMethod $r)
+                        => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
                 );
                 $classDef->setMethods($methods);
             }
@@ -67,7 +69,8 @@ class Analyzer implements ClassAnalyzer
             if ($classDef instanceof ParseEnumCases) {
                 $cases = $this->getDefinitions(
                     $subject->getCases(),
-                    fn (\ReflectionEnumUnitCase $r) => $this->getCaseDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault()),
+                    fn (\ReflectionEnumUnitCase $r)
+                        => $this->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class),
                 );
                 $classDef->setCases($cases);
             }
@@ -75,7 +78,8 @@ class Analyzer implements ClassAnalyzer
             if ($classDef instanceof ParseClassConstants) {
                 $constants = $this->getDefinitions(
                     $subject->getReflectionConstants(),
-                    fn (\ReflectionClassConstant $r) => $this->getConstantDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault()),
+                    fn (\ReflectionClassConstant $r)
+                        => $this->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class),
                 );
                 $classDef->setConstants($constants);
             }
@@ -121,35 +125,14 @@ class Analyzer implements ClassAnalyzer
     }
 
     /**
-     * Returns the attribute definition for an enum case.
+     * Returns the attribute definition for a class component.
      */
-    protected function getCaseDefinition(\ReflectionEnumUnitCase $reflection, string $attributeType, bool $includeByDefault): ?object
+    protected function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface): ?object
     {
         $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
             ?? ($includeByDefault ?  new $attributeType() : null);
 
-        if ($def instanceof FromReflectionEnumCase) {
-            $def->fromReflection($reflection);
-        }
-
-        $this->loadSubAttributes($def, $reflection);
-
-        if ($def instanceof CustomAnalysis) {
-            $def->customAnalysis($this);
-        }
-
-        return $def;
-    }
-
-    /**
-     * Returns the attribute definition for a class constant.
-     */
-    protected function getConstantDefinition(\ReflectionClassConstant $reflection, string $attributeType, bool $includeByDefault): ?object
-    {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
-            ?? ($includeByDefault ?  new $attributeType() : null);
-
-        if ($def instanceof FromReflectionClassConstant) {
+        if ($def instanceof $reflectionInterface) {
             $def->fromReflection($reflection);
         }
 
@@ -164,6 +147,9 @@ class Analyzer implements ClassAnalyzer
 
     /**
      * Returns the attribute definition for a method.
+     *
+     * Methods can't just reuse getComponentDefinition() because they
+     * also have parameters of their own to parse.
      */
     protected function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault): ?object
     {
@@ -179,52 +165,11 @@ class Analyzer implements ClassAnalyzer
         if ($def instanceof ParseParameters) {
             $parameters = $this->getDefinitions(
                 $reflection->getParameters(),
-                fn (\ReflectionParameter $p) => $this->getParameterDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault())
+                fn (\ReflectionParameter $p)
+                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class)
             );
             $def->setParameters($parameters);
         }
-
-        if ($def instanceof CustomAnalysis) {
-            $def->customAnalysis($this);
-        }
-
-        return $def;
-    }
-
-    /**
-     * Returns the attribute definition for a method parameter.
-     */
-    protected function getParameterDefinition(\ReflectionParameter $reflection, string $attributeType, bool $includeByDefault): ?object
-    {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
-            ?? ($includeByDefault ?  new $attributeType() : null);
-
-        if ($def instanceof FromReflectionParameter) {
-            $def->fromReflection($reflection);
-        }
-
-        $this->loadSubAttributes($def, $reflection);
-
-        if ($def instanceof CustomAnalysis) {
-            $def->customAnalysis($this);
-        }
-
-        return $def;
-    }
-
-    /**
-     * Returns the attribute definition for a class property.
-     */
-    protected function getPropertyDefinition(\ReflectionProperty $reflection, string $attributeType, bool $includeByDefault): ?object
-    {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
-            ?? ($includeByDefault ?  new $attributeType() : null);
-
-        if ($def instanceof FromReflectionProperty) {
-            $def->fromReflection($reflection);
-        }
-
-        $this->loadSubAttributes($def, $reflection);
 
         if ($def instanceof CustomAnalysis) {
             $def->customAnalysis($this);
