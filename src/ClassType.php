@@ -9,7 +9,7 @@ namespace Crell\AttributeUtils;
  *
  * All of these use ReflectionClass, but are still somewhat different.
  */
-enum StructType
+enum ClassType
 {
     case NormalClass;
     case Interface;

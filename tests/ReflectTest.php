@@ -7,7 +7,7 @@ namespace Crell\AttributeUtils;
 use Crell\AttributeUtils\Attributes\Reflect\MethodType;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectClass;
 use Crell\AttributeUtils\Attributes\Reflect\ReflectProperty;
-use Crell\AttributeUtils\StructType;
+use Crell\AttributeUtils\ClassType;
 use Crell\AttributeUtils\Visibility;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\Reflect\AnInterface;
@@ -54,7 +54,7 @@ class ReflectTest extends TestCase
                 static::assertFalse($classDef->isFinal);
                 static::assertTrue($classDef->isInstantiable);
                 static::assertTrue($classDef->isCloneable);
-                static::assertEquals(StructType::NormalClass, $classDef->structType);
+                static::assertEquals(ClassType::NormalClass, $classDef->structType);
 
                 static::assertCount(10, $classDef->properties);
                 static::assertCount(8, $classDef->methods);
@@ -96,7 +96,7 @@ class ReflectTest extends TestCase
             'subject' => SampleTrait::class,
             'test' => static function (ReflectClass $classDef) {
                 static::assertEquals(SampleTrait::class, $classDef->phpName);
-                static::assertEquals(StructType::Trait, $classDef->structType);
+                static::assertEquals(ClassType::Trait, $classDef->structType);
                 static::assertCount(1, $classDef->methods);
                 static::assertEquals('traitMethod', $classDef->methods['traitMethod']->phpName);
                 static::assertEquals('val', $classDef->properties['val']->phpName);
@@ -118,7 +118,7 @@ class ReflectTest extends TestCase
             'subject' => AnInterface::class,
             'test' => static function (ReflectClass $classDef) {
                 static::assertEquals(AnInterface::class, $classDef->phpName);
-                static::assertEquals(StructType::Interface, $classDef->structType);
+                static::assertEquals(ClassType::Interface, $classDef->structType);
                 static::assertCount(1, $classDef->methods);
                 static::assertEquals('interfaceMethod', $classDef->methods['interfaceMethod']->phpName);
             },

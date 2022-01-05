@@ -8,7 +8,7 @@ use Crell\AttributeUtils\FromReflectionClass;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
-use Crell\AttributeUtils\StructType;
+use Crell\AttributeUtils\ClassType;
 
 class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties, ParseClassConstants
 {
@@ -66,7 +66,7 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties
     /**
      * The type of struct-y type this is.
      */
-    public StructType $structType;
+    public ClassType $structType;
 
     public function fromReflection(\ReflectionClass $subject): void
     {
@@ -79,10 +79,10 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties
         $this->isCloneable = $subject->isCloneable();
 
         $this->structType = match (true) {
-            $subject->isInterface() => StructType::Interface,
-            $subject->isTrait() => StructType::Trait,
-            $subject->isAnonymous() => StructType::AnonymousClass,
-            default => StructType::NormalClass,
+            $subject->isInterface() => ClassType::Interface,
+            $subject->isTrait() => ClassType::Trait,
+            $subject->isAnonymous() => ClassType::AnonymousClass,
+            default => ClassType::NormalClass,
         };
 
         // @todo getFileName, getStartLine, getEndLine - Needed or no? Should they go in a separate struct?
