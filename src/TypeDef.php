@@ -100,7 +100,6 @@ class TypeDef
         return array_map(method('getName'), $type->getTypes());
     }
 
-
     protected function deriveComplexity(array $type): TypeComplexity
     {
         if (count($type) === 1 && count($type[0]) === 1) {

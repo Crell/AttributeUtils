@@ -75,4 +75,8 @@ class TypeExamples
     public function noReturnType()
     {
     }
+
+    public function returnsEnum(): Suit
+    {
+    }
 }

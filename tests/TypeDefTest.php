@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -200,6 +201,17 @@ class TypeDefTest extends TestCase
                 static::assertTrue($typeDef->accepts(Implementer::class));
                 static::assertTrue($typeDef->accepts(IncompleteImplementer::class));
                 static::assertTrue($typeDef->accepts(OtherClass::class));
+            },
+        ];
+
+        yield 'returnsEnum' => [
+            'subject' => 'returnsEnum',
+            'test' => static function (TypeDef $typeDef) {
+                static::assertFalse($typeDef->allowsNull);
+                static::assertTrue($typeDef->isSimple());
+                static::assertEquals(TypeComplexity::Simple, $typeDef->complexity);
+                static::assertTrue($typeDef->accepts(Suit::class));
+                static::assertFalse($typeDef->accepts('spades'));
             },
         ];
     }
