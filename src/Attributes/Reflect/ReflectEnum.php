@@ -15,48 +15,48 @@ use Crell\AttributeUtils\ClassType;
 class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseClassConstants, ParseEnumCases
 {
     /** @var ReflectMethod[] */
-    public array $methods;
+    public readonly array $methods;
 
     /** @var ReflectClassConstant[] */
-    public array $constants;
+    public readonly array $constants;
 
     /** @var ReflectEnumCase[] */
-    public array $cases;
+    public readonly array $cases;
 
     /**
      * The full of the enum, including namespace.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * The short name of the enum, without namespace.
      */
-    public string $shortName;
+    public readonly string $shortName;
 
     /**
      * The namespace of the enum.
      */
-    public string $namespace;
+    public readonly string $namespace;
 
     /**
      * True if this enum is defined by an extension, false if in userspace PHP code.
      */
-    public bool $isInternal;
+    public readonly bool $isInternal;
 
     /**
      * True if this enum can be iterated (is Traversable), false otherwise.
      */
-    public bool $isIterable;
+    public readonly bool $isIterable;
 
     /**
      * True if this is a backed enum, false otherwise.
      */
-    public bool $isBacked;
+    public readonly bool $isBacked;
 
     /**
      * The type of backing value, int or string. null if not a Backed Enum.
      */
-    public ?string $backingType;
+    public readonly ?string $backingType;
 
     public function fromReflection(\ReflectionEnum $subject): void
     {

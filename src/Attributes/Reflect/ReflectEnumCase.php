@@ -11,17 +11,17 @@ class ReflectEnumCase implements FromReflectionEnumCase
     /**
      * The name of the enum, as PHP defines it.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * The value of the enum, if it is a backed enum.
      */
-    public int|string $value;
+    public readonly int|string $value;
 
     /**
      * True if this is a backed enum, false otherwise.
      */
-    public bool $isBacked;
+    public readonly bool $isBacked;
 
     public function fromReflection(\ReflectionEnumUnitCase $subject): void
     {

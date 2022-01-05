@@ -13,60 +13,60 @@ use Crell\AttributeUtils\ClassType;
 class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties, ParseClassConstants
 {
     /** @var ReflectProperty[] */
-    public array $properties;
+    public readonly array $properties;
 
     /** @var ReflectMethod[] */
-    public array $methods;
+    public readonly array $methods;
 
     /** @var ReflectClassConstant[] */
-    public array $constants;
+    public readonly array $constants;
 
     /**
      * The full of the class, including namespace.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * The short name of the class, without namespace.
      */
-    public string $shortName;
+    public readonly string $shortName;
 
     /**
      * The namespace of the class.
      */
-    public string $namespace;
+    public readonly string $namespace;
 
     /**
      * True if this class is defined by an extension, false if in userspace PHP code.
      */
-    public bool $isInternal;
+    public readonly bool $isInternal;
 
     /**
      * True if the class can be instantiated, false otherwise.
      *
      * @todo Not sure if this is worth capturing.
      */
-    public bool $isInstantiable;
+    public readonly bool $isInstantiable;
 
     /**
      * True if this class may be cloned, false otherwise.
      */
-    public bool $isCloneable;
+    public readonly bool $isCloneable;
 
     /**
      * True if this class can be iterated (is Traversable), false otherwise.
      */
-    public bool $isIterable;
+    public readonly bool $isIterable;
 
     /**
      * True for a final class, false otherwise.
      */
-    public bool $isFinal;
+    public readonly bool $isFinal;
 
     /**
      * The type of struct-y type this is.
      */
-    public ClassType $structType;
+    public readonly ClassType $structType;
 
     public function fromReflection(\ReflectionClass $subject): void
     {

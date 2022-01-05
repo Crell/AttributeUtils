@@ -13,54 +13,54 @@ class ReflectMethod implements FromReflectionMethod, ParseParameters
     use HasVisibility;
 
     /** @var ReflectParameter[] */
-    public array $parameters;
+    public readonly array $parameters;
 
     /**
      * The name of the method, as PHP defines it.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * True if this method is defined by an extension, false if in userspace PHP code.
      */
-    public bool $isInternal;
+    public readonly bool $isInternal;
 
     /**
      * True if this method is a generator (contains yield), false otherwise.
      */
-    public bool $isGenerator;
+    public readonly bool $isGenerator;
 
     /**
      * True if this method has an explicit variadic parameter, false otherwise.
      */
-    public bool $isVariadic;
+    public readonly bool $isVariadic;
 
     /**
      * True if this method returns a value by reference, false otherwise.
      */
-    public bool $returnsReference;
+    public readonly bool $returnsReference;
 
     /**
      * True if there is an explicit return type defined, false otherwise.
      */
-    public bool $hasReturnType;
+    public readonly bool $hasReturnType;
 
     /**
      * True if this is an abstract method, false otherwise.
      */
-    public bool $isAbstract;
+    public readonly bool $isAbstract;
 
     /**
      * True if this is a final method, false otherwise.
      */
-    public bool $isFinal;
+    public readonly bool $isFinal;
 
     /**
      * True if this is a static method, false otherwise.
      */
-    public bool $isStatic;
+    public readonly bool $isStatic;
 
-    public MethodType $methodType;
+    public readonly MethodType $methodType;
 
     /**
      * The return type of this method.

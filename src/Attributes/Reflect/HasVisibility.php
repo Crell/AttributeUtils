@@ -11,7 +11,7 @@ trait HasVisibility
     /**
      * The visibility of the property.
      */
-    public Visibility $visibility;
+    public readonly Visibility $visibility;
 
     protected function parseVisibility(\Reflector $subject)
     {

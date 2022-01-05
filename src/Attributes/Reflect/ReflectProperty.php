@@ -14,31 +14,31 @@ class ReflectProperty implements FromReflectionProperty
     /**
      * The name of the property, as PHP defines it.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * True if this is a static property, false otherwise.
      *
      * @todo Urk, do we want to break static properties and methods out to their own type??
      */
-    public bool $isStatic;
+    public readonly bool $isStatic;
 
     /**
      * True if this is a dynamic property. False if it was declared in the source code.
      */
-    public bool $isDynamic;
+    public readonly bool $isDynamic;
 
     /**
      * True if this property was declared via constructor promotion, false otherwise.
      */
-    public bool $isPromoted;
+    public readonly bool $isPromoted;
 
     /**
      * The type of this property.
      *
      * A missing type declaration will be treated as "mixed".
      */
-    public TypeDef $type;
+    public readonly TypeDef $type;
 
     public function fromReflection(\ReflectionProperty $subject): void
     {

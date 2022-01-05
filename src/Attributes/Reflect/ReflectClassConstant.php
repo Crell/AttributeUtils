@@ -13,17 +13,17 @@ class ReflectClassConstant implements FromReflectionClassConstant
     /**
      * The name of the constant, as PHP defines it.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * The value of the constant.
      */
-    public int|string|array|object $value;
+    public readonly int|string|array|object $value;
 
     /**
      * True if this is a final constant, false otherwise.
      */
-    public bool $isFinal;
+    public readonly bool $isFinal;
 
     public function fromReflection(\ReflectionClassConstant $subject): void
     {

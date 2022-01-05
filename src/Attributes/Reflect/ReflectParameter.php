@@ -12,34 +12,34 @@ class ReflectParameter implements FromReflectionParameter
     /**
      * The name of the parameter, as PHP defines it.
      */
-    public string $phpName;
+    public readonly string $phpName;
 
     /**
      * True if this parameter is passed by reference, false if not.
      */
-    public bool $isPassByReference;
+    public readonly bool $isPassByReference;
 
     /**
      * The position of the parameter, 0-based.
      */
-    public int $position;
+    public readonly int $position;
 
     /**
      * True if this parameter is optional, false otherwise.
      */
-    public bool $isOptional;
+    public readonly bool $isOptional;
 
     /**
      * True if this parameter is variadic, false otherwise.
      */
-    public bool $isVariadic;
+    public readonly bool $isVariadic;
 
     /**
      * The type of this parameter.
      *
      * A missing type declaration will be treated as "mixed".
      */
-    public TypeDef $type;
+    public readonly TypeDef $type;
 
     public function fromReflection(\ReflectionParameter $subject): void
     {
