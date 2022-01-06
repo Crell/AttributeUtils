@@ -7,6 +7,8 @@ We accept contributions via Pull Requests on [Github](https://github.com/Crell/A
 
 ## Pull Requests
 
+- **Talk first** - Before filing a Pull Request with a new feature, open an issue to discuss it first.  Not all feature requests are appropriate, and we really hate rejecting a PR after someone has done spec work on it.  Make sure the idea fits with the intent of the library first before trying to file a PR.  (We may be able to suggest a better way of doing it.)
+
 - **[PSR-2 Coding Standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)** - Check the code style with ``$ composer check-style`` and fix it with ``$ composer fix-style``.
 
 - **Add tests!** - Your patch won't be accepted if it doesn't have tests.
@@ -21,6 +23,7 @@ We accept contributions via Pull Requests on [Github](https://github.com/Crell/A
 
 - **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please [squash them](http://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages) before submitting.
 
+- **Be functional** - This library leverages [`Crell/fp`](https://www.github.com/Crell/fp) for easier functional-programming-style code.  Please be consistent and do the same whenever possible.  For instance, don't use a `foreach()` loop when a map or filter would be clearer at communicating intent.
 
 ## Running Tests
 
