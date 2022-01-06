@@ -439,6 +439,28 @@ The Analyzer is designed to be usable on its own without any setup.  However, if
 
 An appropriate cache wrapper should also be included in the DI configuration.
 
+## The Reflect library
+
+One of the many uses for `Analyzer` is to extract reflection information from a class.  Sometimes you only need some of it, but there's no reason you can't grab all of it.  The result is an attribute that can carry all the same information as reflection, but can be cached if desired while reflection objects cannot be.
+
+A complete set of such attributes is provided in the [`Attributes/Reflect`](src/Attributes/Reflect) directory.  They cover all components of a class.  As none of them have any arguments, there is no need to put them on any class.  The default "empty" version of each will get used, which will then self-populate using the `FromReflection*` interfaces.
+
+The net result is that a full reflection summary of any arbitrary class may be obtained by calling:
+
+```php
+use Crell\AttributeUtls\Attributes\Reflect\ReflectClass;
+
+$reflect = $analyzer->analyze($someClass, ReflectClass::class);
+```
+
+`$reflect` now contains a complete copy of the class, properties, constants, methods, and parameters reflection information, in well-defined, easily cacheable objects.  See each class's docblocks for a complete list of all available information.
+
+To analyze an Enum, use `ReflectEnum::class` instead.
+
+Even if you do not need to use the entire Reflect tree, it's worth studying as an example of how to really leverage the Analyzer.  Additionally, if you are saving any reflection values as-is onto your attribute you are encouraged to use the same naming conventions as those classes, for consistency.
+
+The Reflect tree requires PHP 8.1, as it makes extensive use of both Enums and `readonly` properties.
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
