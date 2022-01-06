@@ -347,6 +347,22 @@ In this case, any number of `Knows` attributes may be included, but if included 
 
 Note that if a multi-value sub-attribute is `Inheritable`, ancestor classes will only be checked if there are no local sub-attributes.  If there is at least one, it will take precedence and the ancestors will be ignored.
 
+### Caching
+
+The main `Analyzer` class does no caching whatsoever.  However, it implements a `ClassAnalyzer` interface which allows it to be easily wrapped in other implementations that provide a caching layer.
+
+For example, the [`MemoryCacheAnalyzer`](src/MemoryCacheAnalyzer.php) class provides a simple wrapper that caches results in a static variable in memory.  You should almost always use this wrapper for performance.
+
+```php
+$analyzer = new MemoryCacheAnalyzer(new Analyzer());
+```
+
+Other cache wrappers may also be implemented, and PSR-6 and PSR-16 wrappers are on the roadmap.  (PRs welcome in the meantime.)  Wrappers may also compose each other, so the following would be an entirely valid and probably good approach:
+
+```php
+$analyzer = new MemoryCacheAnalyzer(new Psr6CacheAnalyzer(new Analyzer()));
+```
+
 ## Advanced features
 
 There are a couple of other advanced features also available.  These are rarely useful, but if useful they can be very helpful.
@@ -416,6 +432,12 @@ Both main attributes and sub-attributes may be declared `Transitive`.
 ### Custom analysis
 
 As a last resort, an attribute may also implement the [`CustomAnalysis`](src/CustomAnalysis.php) interface.  If it does so, the analyzer itself will be passed to the `customAnalysis()` method of the attribute, which may then take whatever actions it wishes.  This feature is intended as a last resort only, and it's possible to create unpleasant infinite loops if you are not careful.  99% of the time you should use some other, any other mechanism.  But it's there if you need it.
+
+### Dependency Injection
+
+The Analyzer is designed to be usable on its own without any setup.  However, if configuring it as a service in a Dependency Injection framework it is strongly recommended that you make the `AttributeParser` its own service and inject it directly.  That ensures that only a single instance of that service will be created.  As it is stateless, there is no need to ever have more than one instance of it.
+
+An appropriate cache wrapper should also be included in the DI configuration.
 
 ## Change log
 
