@@ -8,6 +8,7 @@ use Crell\AttributeUtils\FromReflectionMethod;
 use Crell\AttributeUtils\ParseParameters;
 use Crell\AttributeUtils\TypeDef;
 
+#[\Attribute(\Attribute::TARGET_METHOD)]
 class ReflectMethod implements FromReflectionMethod, ParseParameters
 {
     use HasVisibility;

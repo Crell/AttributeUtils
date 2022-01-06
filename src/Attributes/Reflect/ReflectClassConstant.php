@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils\Attributes\Reflect;
 
 use Crell\AttributeUtils\FromReflectionClassConstant;
 
+#[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
 class ReflectClassConstant implements FromReflectionClassConstant
 {
     use HasVisibility;

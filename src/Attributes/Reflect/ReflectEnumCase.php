@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils\Attributes\Reflect;
 
 use Crell\AttributeUtils\FromReflectionEnumCase;
 
+#[\Attribute(\Attribute::TARGET_CLASS_CONSTANT)]
 class ReflectEnumCase implements FromReflectionEnumCase
 {
     /**

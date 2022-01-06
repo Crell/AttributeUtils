@@ -10,6 +10,7 @@ use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
 
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties, ParseClassConstants
 {
     /** @var ReflectProperty[] */

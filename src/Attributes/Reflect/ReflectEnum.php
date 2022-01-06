@@ -9,6 +9,7 @@ use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseEnumCases;
 use Crell\AttributeUtils\ParseMethods;
 
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseClassConstants, ParseEnumCases
 {
     /** @var ReflectMethod[] */

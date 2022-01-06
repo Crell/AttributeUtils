@@ -7,6 +7,7 @@ namespace Crell\AttributeUtils\Attributes\Reflect;
 use Crell\AttributeUtils\FromReflectionProperty;
 use Crell\AttributeUtils\TypeDef;
 
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 class ReflectProperty implements FromReflectionProperty
 {
     use HasVisibility;
