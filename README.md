@@ -83,7 +83,7 @@ There are similarly [`FromReflectionProperty`](src/FromReflectionProperty.php), 
 
 ### Additional class components
 
-The class attribute may also opt-in to analyzing various portions of the the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [`ParseMethods`](src/ParseMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
+The class attribute may also opt-in to analyzing various portions of the the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [ParseStaticProperties](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
 
 An example is the easiest way to explain it:
 
@@ -139,46 +139,13 @@ Note: The array that is passed to `setProperties` is indexed by the name of the 
 
 The property-targeting attribute (`MyProperty`) may also implement `FromReflectionProperty` to get the corresponding `ReflectionProperty` passed to it, just as the class attribute can.
 
-Be aware that reflection does not automatically differentiate between static and object properties.  By default, you will get both.  If you want to get only object properties (or only static), you can extract that value from reflection and then filter accordingly.  For example, like so:
-
-```php
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
-class MyProperty implements FromReflectionProperty
-{
-    public readonly bool $isStatic;
-
-    public function __construct(
-        public readonly string $column = '',
-    ) {}
-    
-    public function fromReflection(\ReflectionProperty $subject): void
-    {
-        $this->isStatic = $subject->isStatic();
-    }
-}
-
-#[\Attribute(\Attribute::TARGET_CLASS)]
-class MyClass implements ParseProperties
-{
-    public readonly array $objectProperties;
-    
-    public readonly array $staticProperties;
-
-    public function setProperties(array $properties): void
-    {
-        $this->objectProperties = array_filter(fn(MyProperty $p):bool => !$p->isStatic, $properties);
-        $this->staticProperties = array_filter(fn(MyProperty $p):bool => $p->isStatic, $properties);
-    }
-    
-    // ...
-}
-```
+The Analyzer includes only object level properties in `ParseProperties`.  If you want static properties, use the `ParseStaticProperties` interface, which works the exact same way.  Both interfaces may be implemented at the same time.
 
 The `ParseClassConstant` interface works the same way as `ParseProperties`.
 
 ### Methods
 
-`ParseMethods` works the same way as `ParseProperties` (including the caveat about static vs object methods).  However, a method-targeting attribute may also itself implement [`ParseParameters`](src/ParseParameters.php) in order to examine parameters on that method.  `ParseParameters` repeats the same pattern as `ParseProperties` above, with the methods suitably renamed.
+`ParseMethods` works the same way as `ParseProperties` (and also has a corresponding `ParseStaticMethods` interface for static methods).  However, a method-targeting attribute may also itself implement [`ParseParameters`](src/ParseParameters.php) in order to examine parameters on that method.  `ParseParameters` repeats the same pattern as `ParseProperties` above, with the methods suitably renamed.
 
 ### Excluding values
 
@@ -343,7 +310,7 @@ class A {}
 class B {}
 ```
 
-In this case, any number of `Knows` attributes may be included, but if included the `$name` argument is required.  The `fromKnows()` method will be called with a (possibly empty, in the case of `B`) array of `Knows` objects, and can do what it likes with it.  In this example the objects are saved in their entirety, but they could also be mushed into a single array or used to set some other value if desired.
+In this case, any number of `Knows` attributes may be included, including zero, but if included the `$name` argument is required.  The `fromKnows()` method will be called with a (possibly empty, in the case of `B`) array of `Knows` objects, and can do what it likes with it.  In this example the objects are saved in their entirety, but they could also be mushed into a single array or used to set some other value if desired.
 
 Note that if a multi-value sub-attribute is `Inheritable`, ancestor classes will only be checked if there are no local sub-attributes.  If there is at least one, it will take precedence and the ancestors will be ignored.
 
@@ -458,6 +425,8 @@ $reflect = $analyzer->analyze($someClass, ReflectClass::class);
 To analyze an Enum, use `ReflectEnum::class` instead.
 
 Even if you do not need to use the entire Reflect tree, it's worth studying as an example of how to really leverage the Analyzer.  Additionally, if you are saving any reflection values as-is onto your attribute you are encouraged to use the same naming conventions as those classes, for consistency.
+
+A number of traits are included as well that handle the common case of collecting all of a given class component.  Feel free to use them in your own classes if you wish.
 
 The Reflect tree requires PHP 8.1, as it makes extensive use of both Enums and `readonly` properties.
 
