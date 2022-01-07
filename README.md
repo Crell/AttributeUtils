@@ -461,6 +461,212 @@ Even if you do not need to use the entire Reflect tree, it's worth studying as a
 
 The Reflect tree requires PHP 8.1, as it makes extensive use of both Enums and `readonly` properties.
 
+## Advanced tricks
+
+The following are a collection of advanced and fancy uses of the Analyzer, mostly to help demonstrate just how powerful it can be when used appropriately.
+
+### Multi-value attributes
+
+As noted, the Analyzer supports only a single main attribute on each component.  However, sub-attributes may be multi-value, and an omitted attribute can be filled in with a default "empty" attribute.  That leads to the following way to simulate multi-value attributes.  It works on any component, although for simplicity we'll show it on classes.
+
+```php
+#[\Attribute(Attribute::TARGET_CLASS)]
+class Names implements HasSubAttributes, IteratorAggregate, ArrayAccess
+{
+    protected readonly array $names;
+
+    public function subAttributes(): array
+    {
+        return [Alias::class => 'fromAliases'];
+    }
+
+    public function fromAliases(array $aliases): void
+    {
+        $this->names = $aliases;
+    }
+
+    public function getIterator(): \ArrayIterator
+    {
+        return new ArrayIterator($this->names);
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return array_key_exists($offset, $this->names);
+    }
+
+    public function offsetGet(mixed $offset): Alias
+    {
+        return $this->names[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        throw new InvalidArgumentException();
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        throw new InvalidArgumentException();
+    }
+}
+
+#[\Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+class Alias
+{
+    public function __construct(
+        public readonly string $first,
+        public readonly string $last,
+    ) {}
+
+    public function fullName(): string
+    {
+        return "$this->first $this->last";
+    }
+}
+
+#[Alias(first: 'Bruce', last: 'Wayne')]
+#[Alias(first: 'Bat', last: 'Man')]
+class Something
+{
+}
+
+$names = $analyzer->analyze(Something::class, Names::class);
+
+foreach ($names as $name) {
+    print $name->fullName() . PHP_EOL;
+}
+
+// Output:
+Bruce Wayne
+Bat Man
+```
+
+The `IteratorAggregate` and `ArrayAccess` interfaces are optional; I include them here just to show that you can do it if you want.  Here, the `Names` attribute is never put on a class directly.  However, by analyzing a class "with respect to" `Names`, you can collect all of the multi-value sub-attributes that it has, giving the impression of a multi-value attribute.
+
+## Interface attributes
+
+Normally, attributes do not inherit.  That means an attribute on an interface has no bearing on classes that implement that interface.  However, attributes may opt-in to inheriting via the Analzyer.
+
+A good use for that is sub-attributes, which may also be specified as an interface.  For example, consider this modified version of the example above:
+
+```php
+
+#[\Attribute(Attribute::TARGET_CLASS)]
+class Names implements HasSubAttributes, IteratorAggregate, ArrayAccess
+{
+    protected readonly array $names;
+
+    public function subAttributes(): array
+    {
+        return [Name::class => 'fromNames'];
+    }
+
+    public function fromNames(array $names): void
+    {
+        $this->names = $names;
+    }
+
+    // The same ArrayAccess and IteratorAggregate code as above.
+}
+
+#[\Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+interface Name
+{
+    public function fullName(): string;
+}
+
+#[\Attribute(Attribute::TARGET_CLASS)]
+class RealName implements Name
+{
+    public function __construct(
+        public readonly string $first,
+        public readonly string $last,
+    ) {}
+
+    public function fullName(): string
+    {
+        return "$this->first $this->last";
+    }
+}
+
+#[\Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+class Alias implements Name
+{
+    public function __construct(public readonly string $name) {}
+
+    public function fullName(): string
+    {
+        return $this->name;
+    }
+}
+
+#[RealName(first: 'Bruce', last: 'Wayne')]
+#[Alias('Batman')]
+#[Alias('The Dark Knight')]
+#[Alias('The Caped Crusader')]
+class Something
+{
+}
+```
+
+The interface needs to be marked as an attribute and repeatable so that `Analyzer` can recognize that it should allow multiple values.  However, you can now mix and match `RealName` and `Alias` on the same class.  Only one `RealName` is allowed, but any number of `Alias` attributes are allowed.  All are `Name` according to the `Names` main attribute, and so all will get picked up and made available.
+
+### One of many options
+
+In a similar vein, it's possible to use sub-attributes to declare that a component may be marked with one of a few attributes, but only one of them.
+
+```php
+#[\Attribute(Attribute::TARGET_CLASS)]
+interface DisplayType
+{
+}
+
+#[\Attribute(Attribute::TARGET_CLASS)]
+class Screen implements DisplayType
+{
+    public function __construct(public readonly string $color) {}
+}
+
+#[\Attribute(Attribute::TARGET_CLASS)]
+class Audio implements DisplayType
+{
+    public function __construct(public readonly int $volume) {}
+}
+
+#[\Attribute(Attribute::TARGET_CLASS)]
+class DisplayInfo implements HasSubAttributes
+{
+    public readonly ?DisplayType $type;
+
+    public function subAttributes(): array
+    {
+        return [DisplayType::class => 'fromDisplayType'];
+    }
+
+    public function fromDisplayType(?DisplayType $type): void
+    {
+        $this->type = $type;
+    }
+}
+
+#[Screen('#00AA00')]
+class A {}
+
+#[Audio(10)]
+class B {}
+
+class C {}
+
+$displayInfoA = $analyzer->analzyer(A::class, DisplayInfo::class);
+$displayInfoB = $analyzer->analzyer(B::class, DisplayInfo::class);
+$displayInfoC = $analyzer->analzyer(C::class, DisplayInfo::class);
+```
+
+In this case, a class may be marked with either `Screen` or `Audio`, but no both.  If both are specified, only the first one listed will be used; the others will be ignored.
+
+In this example, `$displayInfoA->type` will be an instance of `Screen`, `$displayInfoB->type` will be an instance of `Audio`, and `$displayInfoC->type` will be `null`.
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
