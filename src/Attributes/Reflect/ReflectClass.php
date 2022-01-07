@@ -15,20 +15,11 @@ use Crell\AttributeUtils\ParseStaticProperties;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class ReflectClass implements FromReflectionClass, ParseMethods, ParseStaticMethods, ParseProperties, ParseStaticProperties, ParseClassConstants
 {
-    /** @var ReflectProperty[] */
-    public readonly array $properties;
-
-    /** @var ReflectProperty[] */
-    public readonly array $staticProperties;
-
-    /** @var ReflectMethod[] */
-    public readonly array $methods;
-
-    /** @var ReflectMethod[] */
-    public readonly array $staticMethods;
-
-    /** @var ReflectClassConstant[] */
-    public readonly array $constants;
+    use CollectProperties;
+    use CollectStaticProperties;
+    use CollectMethods;
+    use CollectStaticMethods;
+    use CollectClassConstants;
 
     /**
      * The full of the class, including namespace.
@@ -108,29 +99,9 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseStaticMeth
         // @todo We're ignoring extension information for now.
     }
 
-    public function setConstants(array $constants): void
-    {
-        $this->constants = $constants;
-    }
-
-    public function includeConstantsByDefault(): bool
-    {
-        return true;
-    }
-
     public function constantAttribute(): string
     {
         return ReflectClassConstant::class;
-    }
-
-    public function setMethods(array $methods): void
-    {
-        $this->methods = $methods;
-    }
-
-    public function includeMethodsByDefault(): bool
-    {
-        return true;
     }
 
     public function methodAttribute(): string
@@ -138,30 +109,9 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseStaticMeth
         return ReflectMethod::class;
     }
 
-    public function setStaticMethods(array $methods): void
-    {
-        $this->staticMethods = $methods;
-    }
-
-    public function includeStaticMethodsByDefault(): bool
-    {
-        return true;
-    }
-
     public function staticMethodAttribute(): string
     {
         return ReflectMethod::class;
-    }
-
-
-    public function setProperties(array $properties): void
-    {
-        $this->properties = $properties;
-    }
-
-    public function includePropertiesByDefault(): bool
-    {
-        return true;
     }
 
     public function propertyAttribute(): string
@@ -169,20 +119,8 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseStaticMeth
         return ReflectProperty::class;
     }
 
-    public function setStaticProperties(array $properties): void
-    {
-        $this->staticProperties = $properties;
-    }
-
-    public function includeStaticPropertiesByDefault(): bool
-    {
-        return true;
-    }
-
     public function staticPropertyAttribute(): string
     {
         return ReflectProperty::class;
     }
-
-
 }

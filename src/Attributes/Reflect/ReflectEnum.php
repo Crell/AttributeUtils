@@ -13,17 +13,10 @@ use Crell\AttributeUtils\ParseStaticMethods;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseStaticMethods, ParseClassConstants, ParseEnumCases
 {
-    /** @var ReflectMethod[] */
-    public readonly array $methods;
-
-    /** @var ReflectMethod[] */
-    public readonly array $staticMethods;
-
-    /** @var ReflectClassConstant[] */
-    public readonly array $constants;
-
-    /** @var ReflectEnumCase[] */
-    public readonly array $cases;
+    use CollectClassConstants;
+    use CollectMethods;
+    use CollectStaticMethods;
+    use CollectEnumCases;
 
     /**
      * The full of the enum, including namespace.
@@ -89,24 +82,9 @@ class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseStaticMethod
         $this->constants = array_diff_key($constants, $this->cases);
     }
 
-    public function includeConstantsByDefault(): bool
-    {
-        return true;
-    }
-
     public function constantAttribute(): string
     {
         return ReflectClassConstant::class;
-    }
-
-    public function setMethods(array $methods): void
-    {
-        $this->methods = $methods;
-    }
-
-    public function includeMethodsByDefault(): bool
-    {
-        return true;
     }
 
     public function methodAttribute(): string
@@ -114,34 +92,13 @@ class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseStaticMethod
         return ReflectMethod::class;
     }
 
-    public function setStaticMethods(array $methods): void
-    {
-        $this->staticMethods = $methods;
-    }
-
-    public function includeStaticMethodsByDefault(): bool
-    {
-        return true;
-    }
-
     public function staticMethodAttribute(): string
     {
         return ReflectMethod::class;
-    }
-
-    public function setCases(array $cases): void
-    {
-        $this->cases = $cases;
-    }
-
-    public function includeCasesByDefault(): bool
-    {
-        return true;
     }
 
     public function caseAttribute(): string
     {
         return ReflectEnumCase::class;
     }
-
 }
