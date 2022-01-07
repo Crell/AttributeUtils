@@ -46,6 +46,7 @@ class Analyzer implements ClassAnalyzer
 
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getDefinitions(
+                    // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
                         => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
@@ -55,7 +56,7 @@ class Analyzer implements ClassAnalyzer
 
             if ($classDef instanceof ParseStaticProperties) {
                 $properties = $this->getDefinitions(
-                    array_filter($subject->getProperties(), method('isStatic')),
+                    $subject->getProperties(\ReflectionProperty::IS_STATIC),
                     fn (\ReflectionProperty $r)
                         => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
                 );
@@ -64,11 +65,21 @@ class Analyzer implements ClassAnalyzer
 
             if ($classDef instanceof ParseMethods) {
                 $methods = $this->getDefinitions(
-                    $subject->getMethods(),
+                    // Reflection can get only static, but not only non-static. Because of course.
+                    array_filter($subject->getMethods(), static fn (\ReflectionMethod $r) => !$r->isStatic()),
                     fn (\ReflectionMethod $r)
                         => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
                 );
                 $classDef->setMethods($methods);
+            }
+
+            if ($classDef instanceof ParseStaticMethods) {
+                $methods = $this->getDefinitions(
+                    $subject->getMethods(\ReflectionMethod::IS_STATIC),
+                    fn (\ReflectionMethod $r)
+                        => $this->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault()),
+                );
+                $classDef->setStaticMethods($methods);
             }
 
             // Enum cases have to come before constants, because

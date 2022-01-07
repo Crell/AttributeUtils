@@ -12,4 +12,12 @@ enum BackedSuit: string
     case Hearts = 'H';
 
     public const Joker = BackedSuit::Spades;
+
+    public function color(): string
+    {
+        return match($this) {
+            self::Spades, self::Clubs => 'black',
+            default => 'red',
+        };
+    }
 }

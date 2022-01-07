@@ -8,12 +8,16 @@ use Crell\AttributeUtils\FromReflectionEnum;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseEnumCases;
 use Crell\AttributeUtils\ParseMethods;
+use Crell\AttributeUtils\ParseStaticMethods;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseClassConstants, ParseEnumCases
+class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseStaticMethods, ParseClassConstants, ParseEnumCases
 {
     /** @var ReflectMethod[] */
     public readonly array $methods;
+
+    /** @var ReflectMethod[] */
+    public readonly array $staticMethods;
 
     /** @var ReflectClassConstant[] */
     public readonly array $constants;
@@ -106,6 +110,21 @@ class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseClassConstan
     }
 
     public function methodAttribute(): string
+    {
+        return ReflectMethod::class;
+    }
+
+    public function setStaticMethods(array $methods): void
+    {
+        $this->staticMethods = $methods;
+    }
+
+    public function includeStaticMethodsByDefault(): bool
+    {
+        return true;
+    }
+
+    public function staticMethodAttribute(): string
     {
         return ReflectMethod::class;
     }

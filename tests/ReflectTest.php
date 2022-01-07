@@ -54,6 +54,7 @@ class ReflectTest extends TestCase
             'test' => static function (ReflectEnum $enumDef) {
                 static::assertEquals(Suit::class, $enumDef->phpName);
                 // The one method is the cases() method.
+                static::assertCount(1, $enumDef->staticMethods);
                 static::assertCount(1, $enumDef->methods);
                 static::assertCount(1, $enumDef->constants);
                 static::assertCount(4, $enumDef->cases);
@@ -70,7 +71,8 @@ class ReflectTest extends TestCase
             'test' => static function (ReflectEnum $enumDef) {
                 static::assertEquals(BackedSuit::class, $enumDef->phpName);
                 // The built in cases(), from(), and tryFrom().
-                static::assertCount(3, $enumDef->methods);
+                static::assertCount(3, $enumDef->staticMethods);
+                static::assertCount(1, $enumDef->methods);
                 static::assertCount(1, $enumDef->constants);
                 static::assertCount(4, $enumDef->cases);
                 static::assertFalse($enumDef->isInternal);

@@ -9,10 +9,11 @@ use Crell\AttributeUtils\FromReflectionClass;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
+use Crell\AttributeUtils\ParseStaticMethods;
 use Crell\AttributeUtils\ParseStaticProperties;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties, ParseStaticProperties, ParseClassConstants
+class ReflectClass implements FromReflectionClass, ParseMethods, ParseStaticMethods, ParseProperties, ParseStaticProperties, ParseClassConstants
 {
     /** @var ReflectProperty[] */
     public readonly array $properties;
@@ -22,6 +23,9 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties
 
     /** @var ReflectMethod[] */
     public readonly array $methods;
+
+    /** @var ReflectMethod[] */
+    public readonly array $staticMethods;
 
     /** @var ReflectClassConstant[] */
     public readonly array $constants;
@@ -133,6 +137,22 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseProperties
     {
         return ReflectMethod::class;
     }
+
+    public function setStaticMethods(array $methods): void
+    {
+        $this->staticMethods = $methods;
+    }
+
+    public function includeStaticMethodsByDefault(): bool
+    {
+        return true;
+    }
+
+    public function staticMethodAttribute(): string
+    {
+        return ReflectMethod::class;
+    }
+
 
     public function setProperties(array $properties): void
     {
