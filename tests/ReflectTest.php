@@ -106,11 +106,13 @@ class ReflectTest extends TestCase
                 static::assertTrue($classDef->isCloneable);
                 static::assertEquals(ClassType::NormalClass, $classDef->structType);
 
-                static::assertCount(10, $classDef->properties);
+                static::assertCount(7, $classDef->properties);
+                static::assertCount(3, $classDef->staticProperties);
                 static::assertCount(8, $classDef->methods);
                 static::assertCount(4, $classDef->constants);
 
                 static::assertInstanceOf(ReflectProperty::class, $classDef->properties['public']);
+                static::assertInstanceOf(ReflectProperty::class, $classDef->staticProperties['publicStatic']);
                 static::assertEquals('public', $classDef->properties['public']->phpName);
                 static::assertEquals(Visibility::Public, $classDef->properties['public']->visibility);
                 static::assertEquals('int', $classDef->properties['public']->type->getSimpleType());

@@ -46,11 +46,20 @@ class Analyzer implements ClassAnalyzer
 
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getDefinitions(
-                    $subject->getProperties(),
+                    array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
                         => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
                 );
                 $classDef->setProperties($properties);
+            }
+
+            if ($classDef instanceof ParseStaticProperties) {
+                $properties = $this->getDefinitions(
+                    array_filter($subject->getProperties(), method('isStatic')),
+                    fn (\ReflectionProperty $r)
+                        => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
+                );
+                $classDef->setStaticProperties($properties);
             }
 
             if ($classDef instanceof ParseMethods) {
