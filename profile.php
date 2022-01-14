@@ -6,10 +6,9 @@ use Crell\AttributeUtils\Analyzer;
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
-use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
+use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
-use Crell\AttributeUtils\Attributes\TransitiveClassAttribute;
 use Crell\AttributeUtils\MemoryCacheAnalyzer;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
@@ -34,10 +33,10 @@ function run(): void
     $analyzer->analyze(ClassWithDefaultFields::class, ClassWithProperties::class);
     $analyzer->analyze(ClassWithCustomizedFields::class, ClassWithProperties::class);
     $analyzer->analyze(ClassWithCustomizedPropertiesExcludeByDefault::class, ClassWithProperties::class);
-    $analyzer->analyze(ClassWithPropertiesWithReflection::class, ClassWithReflectableProperties::class);
+    $analyzer->analyze(ClassWithPropertiesWithReflection::class, GenericClass::class);
     $analyzer->analyze(ClassWithSubAttributes::class, ClassWithPropertiesWithSubAttributes::class);
     $analyzer->analyze(AttributesInheritChild::class, InheritableClassAttributeMain::class);
-    $analyzer->analyze(TransitiveFieldClass::class, TransitiveClassAttribute::class);
+    $analyzer->analyze(TransitiveFieldClass::class, GenericClass::class);
 }
 
 for ($i=0; $i < 100; ++$i) {

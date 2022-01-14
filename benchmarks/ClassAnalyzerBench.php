@@ -8,10 +8,9 @@ use Crell\AttributeUtils\Analyzer;
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
-use Crell\AttributeUtils\Attributes\ClassWithReflectableProperties;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
+use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
-use Crell\AttributeUtils\Attributes\TransitiveClassAttribute;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
@@ -80,7 +79,7 @@ class ClassAnalyzerBench
 
     public function benchFieldableReflectableFields(): void
     {
-        $this->analyzer->analyze(ClassWithPropertiesWithReflection::class, ClassWithReflectableProperties::class);
+        $this->analyzer->analyze(ClassWithPropertiesWithReflection::class, GenericClass::class);
     }
 
     public function benchFieldableWithSubAttributes(): void
@@ -95,7 +94,7 @@ class ClassAnalyzerBench
 
     public function benchTransitiveFieldsInherit(): void
     {
-        $this->analyzer->analyze(TransitiveFieldClass::class, TransitiveClassAttribute::class);
+        $this->analyzer->analyze(TransitiveFieldClass::class, GenericClass::class);
     }
 
 
