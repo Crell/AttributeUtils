@@ -8,6 +8,7 @@ use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassMethodsProperties;
 use Crell\AttributeUtils\Attributes\ClassWithClassConstants;
+use Crell\AttributeUtils\Attributes\ClassWithOwnSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
@@ -30,6 +31,7 @@ use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
 use Crell\AttributeUtils\Records\PropertiesWithMultipleSubattributes;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
+use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\TestCase;
 
 class ClassAnalyzerTest extends TestCase
@@ -285,6 +287,16 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('a', $classDef->properties['target']->targetDef->properties['a']->a);
             },
         ];
+
+        if (version_compare(PHP_VERSION, '8.1.0') >= 0) {
+            yield 'UnitEnum with subattributes' => [
+                'subject' => Suit::class,
+                'attribute' => ClassWithOwnSubAttributes::class,
+                'test' => static function(ClassWithOwnSubAttributes $classDef) {
+                    self::assertEquals('C', $classDef->c);
+                },
+            ];
+        }
     }
 
     /**
@@ -293,6 +305,11 @@ class ClassAnalyzerTest extends TestCase
     public function attributeObjectTestProvider(): iterable
     {
         $tests = iterator_to_array($this->attributeTestProvider());
+
+        // For enum tests, skip those entirely since there's nothing to instantiate.
+        if (function_exists('\enum_exists')) {
+            $tests = array_filter($tests, static fn (array $test): bool => !\enum_exists($test['subject']));
+        }
 
         $new = [];
         foreach ($tests as $name => $test) {

@@ -102,6 +102,8 @@ class AttributeParser
                 \ReflectionMethod::class => $this->classElementInheritanceTree($subject),
                 \ReflectionClassConstant::class => $this->classElementInheritanceTree($subject),
                 \ReflectionParameter::class => $this->parameterInheritanceTree($subject),
+                // If it's an enum, there's nothing to inherit so just stub that out.
+                \ReflectionEnum::class => [],
             };
         }
     }
