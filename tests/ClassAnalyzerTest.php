@@ -12,6 +12,7 @@ use Crell\AttributeUtils\Attributes\ClassWithOwnSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
+use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
@@ -24,6 +25,7 @@ use Crell\AttributeUtils\Records\ClassWithExtraAnalysisSource;
 use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
+use Crell\AttributeUtils\Records\ClassWithRecursiveSubAttributes;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\MissingPropertyAttributeArguments;
 use Crell\AttributeUtils\Records\NoProps;
@@ -285,6 +287,17 @@ class ClassAnalyzerTest extends TestCase
             'attribute' => GenericClass::class,
             'test' => static function(GenericClass $classDef) {
                 self::assertEquals('a', $classDef->properties['target']->targetDef->properties['a']->a);
+            },
+        ];
+
+        yield 'Sub-attribute with its own sub-attribute' => [
+            'subject' => ClassWithRecursiveSubAttributes::class,
+            'attribute' => ClassWithSubSubAttributes::class,
+            'test' => static function(ClassWithSubSubAttributes $classDef) {
+                self::assertEquals('A', $classDef->a);
+                self::assertEquals('B', $classDef->sub->b);
+                self::assertEquals('C', $classDef->sub->sub->c);
+                self::assertEquals(['D', 'E', 'F'], $classDef->sub->d);
             },
         ];
 

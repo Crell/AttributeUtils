@@ -206,9 +206,16 @@ class Analyzer implements ClassAnalyzer
         if ($attribute instanceof HasSubAttributes) {
             foreach ($attribute->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $attribute->$callback($this->parser->getInheritedAttributes($reflection, $type));
+                    $subs = $this->parser->getInheritedAttributes($reflection, $type);
+                    foreach ($subs as $sub) {
+                        $this->loadSubAttributes($sub, $reflection);
+                    }
+                    $attribute->$callback($subs);
+
                 } else {
-                    $attribute->$callback($this->parser->getInheritedAttribute($reflection, $type));
+                    $sub = $this->parser->getInheritedAttribute($reflection, $type);
+                    $this->loadSubAttributes($sub, $reflection);
+                    $attribute->$callback($sub);
                 }
             }
         }
