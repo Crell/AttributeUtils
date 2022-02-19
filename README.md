@@ -83,7 +83,7 @@ There are similarly [`FromReflectionProperty`](src/FromReflectionProperty.php), 
 
 ### Additional class components
 
-The class attribute may also opt-in to analyzing various portions of the the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [ParseStaticProperties](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
+The class attribute may also opt-in to analyzing various portions of the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [ParseStaticProperties](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
 
 An example is the easiest way to explain it:
 
@@ -205,7 +205,7 @@ print $attrib->name . PHP_EOL; // prints Jorge
 
 Because `MyClass` is inheritable, the Analyzer notes that it is absent on `B` so checks class `A` instead.  All attribute components may be inheritable if desired just by implementing the interface.
 
-When checking for inherited attributes, ancestor classes are all checked first, then implementing interfaces, in the order returned by `class_implements()`.  Properties will not check for interfaces, of course, as interfaces cannot have properties.
+When checking for inherited attributes, ancestor classes are all checked first, then implemented interfaces, in the order returned by `class_implements()`.  Properties will not check for interfaces, of course, as interfaces cannot have properties.
 
 ### Attribute child classes
 
@@ -336,7 +336,7 @@ There are a couple of other advanced features also available.  These are rarely 
 
 ### Transitivity
 
-Transitivity applies only to attributes on properties, and only if the attribute in question can target both propeties and classes.  It is an alternate form of inheritance.  Specifically, if a property is typed to a class or interface, and the attribute in question implements `TransitiveProperty`, and the property does not have that attribute on it, then instead of looking up the inheritance tree the analyzer will first look at the class the property is typed for.
+Transitivity applies only to attributes on properties, and only if the attribute in question can target both properties and classes.  It is an alternate form of inheritance.  Specifically, if a property is typed to a class or interface, and the attribute in question implements `TransitiveProperty`, and the property does not have that attribute on it, then instead of looking up the inheritance tree the analyzer will first look at the class the property is typed for.
 
 That's a lot of conditionals, so here's an example to make it clearer:
 
