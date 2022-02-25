@@ -224,17 +224,11 @@ class Analyzer implements ClassAnalyzer
     /**
      * Determines if a given attribute class allows repeating.
      *
-     * If passed a non-attribute class, it will return false.
+     * This is only meaningful for attributes used as sub-attributes.
      */
     protected function isMultivalueAttribute(string $attributeType): bool
     {
-        $rAttribs = (new \ReflectionClass($attributeType))
-            ->getAttributes(\Attribute::class);
-        if (!isset($rAttribs[0])) {
-            return false;
-        }
-
-        return (bool)($rAttribs[0]->newInstance()->flags & \Attribute::IS_REPEATABLE);
+        return is_a($attributeType, Multivalue::class, true);
     }
 
     /**
