@@ -318,37 +318,50 @@ class ClassAnalyzerTest extends TestCase
      * @test
      * @dataProvider groupedAttributeTestProvider()
      */
-    public function analyze_classes_grouped(string $subject, string $attribute, array $groups , array $tests): void
+    public function analyze_classes_grouped(string $subject, string $attribute, ?string $group , callable $tests): void
     {
         $analyzer = new Analyzer();
 
-        foreach ($groups as $group) {
-            $classDef = $analyzer->analyze($subject, $attribute, group: $group);
-            $tests[$group]($classDef);
-        }
+        $classDef = $analyzer->analyze($subject, $attribute, group: $group);
+        $tests($classDef);
     }
 
     public function groupedAttributeTestProvider(): iterable
     {
-        yield 'Grouped attributes' => [
+        yield 'Grouped attributes (One)' => [
             'subject' => ClassWithGroups::class,
             'attribute' => GroupedClass::class,
-            'groups' => ['One', 'Two'],
-            'tests' => [
-                'One' => static function(GroupedClass $classDef) {
-                    self::assertEquals('A', $classDef->val);
-                    self::assertEquals('A', $classDef->properties['prop']->val);
-                    self::assertEquals('A', $classDef->methods['aMethod']->val);
-                    self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
-                },
-                'Two' => static function(GroupedClass $classDef) {
-                    self::assertEquals('B', $classDef->val);
-                    self::assertEquals('B', $classDef->properties['prop']->val);
-                    self::assertEquals('B', $classDef->properties['prop']->val);
-                    self::assertEquals('B', $classDef->methods['aMethod']->val);
-                    self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
-                },
-            ],
+            'group' => 'One',
+            'test' => static function(GroupedClass $classDef) {
+                self::assertEquals('A', $classDef->val);
+                self::assertEquals('A', $classDef->properties['prop']->val);
+                self::assertEquals('A', $classDef->methods['aMethod']->val);
+                self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
+            },
+        ];
+
+        yield 'Grouped attributes (Two)' => [
+            'subject' => ClassWithGroups::class,
+            'attribute' => GroupedClass::class,
+            'group' => 'Two',
+            'test' => static function(GroupedClass $classDef) {
+                self::assertEquals('B', $classDef->val);
+                self::assertEquals('B', $classDef->properties['prop']->val);
+                self::assertEquals('B', $classDef->methods['aMethod']->val);
+                self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
+            },
+        ];
+
+        yield 'Grouped attributes (None)' => [
+            'subject' => ClassWithGroups::class,
+            'attribute' => GroupedClass::class,
+            'group' => null,
+            'test' => static function(GroupedClass $classDef) {
+                self::assertEquals('Z', $classDef->val);
+                self::assertEquals('Z', $classDef->properties['prop']->val);
+                self::assertEquals('Z', $classDef->methods['aMethod']->val);
+                self::assertEquals('Z', $classDef->methods['aMethod']->parameters['param']->val);
+            },
         ];
     }
 
