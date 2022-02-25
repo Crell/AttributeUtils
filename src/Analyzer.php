@@ -49,7 +49,7 @@ class Analyzer implements ClassAnalyzer
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
-                        => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
+                        => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class, $group)
                 );
                 $classDef->setProperties($properties);
             }
@@ -58,7 +58,7 @@ class Analyzer implements ClassAnalyzer
                 $properties = $this->getDefinitions(
                     $subject->getProperties(\ReflectionProperty::IS_STATIC),
                     fn (\ReflectionProperty $r)
-                        => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
+                        => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class, $group)
                 );
                 $classDef->setStaticProperties($properties);
             }
@@ -68,7 +68,7 @@ class Analyzer implements ClassAnalyzer
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getMethods(), static fn (\ReflectionMethod $r) => !$r->isStatic()),
                     fn (\ReflectionMethod $r)
-                        => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
+                        => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault(), $group),
                 );
                 $classDef->setMethods($methods);
             }
@@ -77,7 +77,7 @@ class Analyzer implements ClassAnalyzer
                 $methods = $this->getDefinitions(
                     $subject->getMethods(\ReflectionMethod::IS_STATIC),
                     fn (\ReflectionMethod $r)
-                        => $this->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault()),
+                        => $this->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault(), $group),
                 );
                 $classDef->setStaticMethods($methods);
             }
@@ -90,7 +90,7 @@ class Analyzer implements ClassAnalyzer
                 $cases = $this->getDefinitions(
                     $subject->getCases(),
                     fn (\ReflectionEnumUnitCase $r)
-                        => $this->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class),
+                        => $this->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class, $group),
                 );
                 $classDef->setCases($cases);
             }
@@ -99,7 +99,7 @@ class Analyzer implements ClassAnalyzer
                 $constants = $this->getDefinitions(
                     $subject->getReflectionConstants(),
                     fn (\ReflectionClassConstant $r)
-                        => $this->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class),
+                        => $this->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class, $group),
                 );
                 $classDef->setConstants($constants);
             }
@@ -147,9 +147,9 @@ class Analyzer implements ClassAnalyzer
     /**
      * Returns the attribute definition for a class component.
      */
-    protected function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface): ?object
+    protected function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface, ?string $group = null): ?object
     {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
+        $def = $this->parser->getInheritedAttribute($reflection, $attributeType, $group)
             ?? ($includeByDefault ?  new $attributeType() : null);
 
         if ($def instanceof $reflectionInterface) {
@@ -171,9 +171,9 @@ class Analyzer implements ClassAnalyzer
      * Methods can't just reuse getComponentDefinition() because they
      * also have parameters of their own to parse.
      */
-    protected function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault): ?object
+    protected function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault, ?string $group = null): ?object
     {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
+        $def = $this->parser->getInheritedAttribute($reflection, $attributeType, $group)
             ?? ($includeByDefault ?  new $attributeType() : null);
 
         if ($def instanceof FromReflectionMethod) {
@@ -186,7 +186,7 @@ class Analyzer implements ClassAnalyzer
             $parameters = $this->getDefinitions(
                 $reflection->getParameters(),
                 fn (\ReflectionParameter $p)
-                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class)
+                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class, $group)
             );
             $def->setParameters($parameters);
         }

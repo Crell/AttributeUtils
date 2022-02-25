@@ -337,9 +337,16 @@ class ClassAnalyzerTest extends TestCase
             'tests' => [
                 'One' => static function(GroupedClass $classDef) {
                     self::assertEquals('A', $classDef->val);
+                    self::assertEquals('A', $classDef->properties['prop']->val);
+                    self::assertEquals('A', $classDef->methods['aMethod']->val);
+                    self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
                 },
                 'Two' => static function(GroupedClass $classDef) {
                     self::assertEquals('B', $classDef->val);
+                    self::assertEquals('B', $classDef->properties['prop']->val);
+                    self::assertEquals('B', $classDef->properties['prop']->val);
+                    self::assertEquals('B', $classDef->methods['aMethod']->val);
+                    self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
                 },
             ],
         ];
