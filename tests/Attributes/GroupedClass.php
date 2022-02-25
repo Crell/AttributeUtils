@@ -10,9 +10,10 @@ use Crell\AttributeUtils\Attributes\Reflect\CollectProperties;
 use Crell\AttributeUtils\HasSubAttributes;
 use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
+use Crell\AttributeUtils\SupportsGroups;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-class GroupedClass implements HasSubAttributes, ParseProperties, ParseMethods
+class GroupedClass implements HasSubAttributes, ParseProperties, ParseMethods, SupportsGroups
 {
     use CollectProperties;
     use CollectMethods;
@@ -28,6 +29,11 @@ class GroupedClass implements HasSubAttributes, ParseProperties, ParseMethods
         public string $val = 'Z',
         public ?string $group = null,
     ) {}
+
+    public function groups(): array
+    {
+        return $this->group ? [$this->group] : [];
+    }
 
     public function subAttributes(): array
     {

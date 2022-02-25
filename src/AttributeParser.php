@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use function Crell\fp\afilter;
+use function Crell\fp\amap;
 use function Crell\fp\firstValue;
 use function Crell\fp\method;
 use function Crell\fp\pipe;
@@ -25,10 +27,17 @@ class AttributeParser
      * and enumerating them manually is stupidly verbose and clunky. Instead just refer
      * to any reflectable thing and hope for the best.
      */
-    public function getAttributes(\Reflector $target, string $name): array
+    public function getAttributes(\Reflector $target, string $name, ?string $group = null): array
     {
         // @phpstan-ignore-next-line.
-        return array_map(method('newInstance'), $target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF));
+        return pipe($target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF),
+            amap(method('newInstance')),
+            afilter(fn(object $attr) =>
+                $group === null
+                || ($attr instanceof SupportsGroups && in_array($group, $attr->groups(), true))
+            ),
+            array_values(...),
+        );
     }
 
     /**
@@ -36,9 +45,9 @@ class AttributeParser
      *
      * @see getInheritedAttributes()
      */
-    public function getInheritedAttribute(\Reflector $target, string $name): ?object
+    public function getInheritedAttribute(\Reflector $target, string $name, ?string $group = null): ?object
     {
-        return $this->getInheritedAttributes($target, $name)[0] ?? null;
+        return $this->getInheritedAttributes($target, $name, $group)[0] ?? null;
     }
 
     /**
@@ -57,10 +66,10 @@ class AttributeParser
      * @param string $name
      * @return array
      */
-    public function getInheritedAttributes(\Reflector $target, string $name): array
+    public function getInheritedAttributes(\Reflector $target, string $name, ?string $group = null): array
     {
         $attributes = pipe($this->attributeInheritanceTree($target, $name),
-            firstValue(fn ($r): array => $this->getAttributes($r, $name))
+            firstValue(fn ($r): array => $this->getAttributes($r, $name, $group))
         );
 
         if ($attributes) {
@@ -74,7 +83,7 @@ class AttributeParser
             && $class = $this->getPropertyClass($target))
         {
             return pipe($this->classAncestors($class),
-                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name)),
+                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name, $group)),
             ) ?? [];
         }
 

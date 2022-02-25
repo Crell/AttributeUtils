@@ -330,7 +330,7 @@ class ClassAnalyzerTest extends TestCase
 
     public function groupedAttributeTestProvider(): iterable
     {
-        yield 'Sub-attribute with its own sub-attribute' => [
+        yield 'Grouped attributes' => [
             'subject' => ClassWithGroups::class,
             'attribute' => GroupedClass::class,
             'groups' => ['One', 'Two'],

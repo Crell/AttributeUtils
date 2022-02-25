@@ -32,7 +32,7 @@ class Analyzer implements ClassAnalyzer
         }
 
         try {
-            $classDef = $this->parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
+            $classDef = $this->parser->getInheritedAttribute($subject, $attribute, $group) ?? new $attribute;
 
             if ($classDef instanceof FromReflectionClass) {
                 $classDef->fromReflection($subject);
