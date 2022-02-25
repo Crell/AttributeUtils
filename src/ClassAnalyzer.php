@@ -23,5 +23,5 @@ interface ClassAnalyzer
      * @return T
      *   The class attribute requested, including dependent data as appropriate.
      */
-    public function analyze(string|object $class, string $attribute): object;
+    public function analyze(string|object $class, string $attribute, ?string $group = null): object;
 }

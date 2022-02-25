@@ -14,6 +14,7 @@ use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
 use Crell\AttributeUtils\Attributes\GenericClass;
+use Crell\AttributeUtils\Attributes\GroupedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
@@ -22,6 +23,7 @@ use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
 use Crell\AttributeUtils\Records\ClassWithExtraAnalysisSource;
+use Crell\AttributeUtils\Records\ClassWithGroups;
 use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
@@ -310,6 +312,37 @@ class ClassAnalyzerTest extends TestCase
                 },
             ];
         }
+    }
+
+    /**
+     * @test
+     * @dataProvider groupedAttributeTestProvider()
+     */
+    public function analyze_classes_grouped(string $subject, string $attribute, array $groups , array $tests): void
+    {
+        $analyzer = new Analyzer();
+
+        foreach ($groups as $group) {
+            $classDef = $analyzer->analyze($subject, $attribute, group: $group);
+            $tests[$group]($classDef);
+        }
+    }
+
+    public function groupedAttributeTestProvider(): iterable
+    {
+        yield 'Sub-attribute with its own sub-attribute' => [
+            'subject' => ClassWithGroups::class,
+            'attribute' => GroupedClass::class,
+            'groups' => ['One', 'Two'],
+            'tests' => [
+                'One' => static function(GroupedClass $classDef) {
+                    self::assertEquals('A', $classDef->val);
+                },
+                'Two' => static function(GroupedClass $classDef) {
+                    self::assertEquals('B', $classDef->val);
+                },
+            ],
+        ];
     }
 
     /**

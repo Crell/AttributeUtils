@@ -17,7 +17,7 @@ class Analyzer implements ClassAnalyzer
         $this->parser ??= new AttributeParser();
     }
 
-    public function analyze(string|object $class, string $attribute): object
+    public function analyze(string|object $class, string $attribute, ?string $group = null): object
     {
         // Everything is easier if we normalize to a class first.
         // Because anon classes have generated internal class names, they work, too.
