@@ -337,6 +337,9 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('A', $classDef->properties['prop']->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
+                self::assertEquals('A', $classDef->sub->val);
+                self::assertEquals('A1', $classDef->multi[0]->val);
+                self::assertEquals('A2', $classDef->multi[1]->val);
             },
         ];
 
@@ -349,6 +352,9 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('B', $classDef->properties['prop']->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
+                self::assertEquals('B', $classDef->sub->val);
+                self::assertEquals('B1', $classDef->multi[0]->val);
+                self::assertEquals('B2', $classDef->multi[1]->val);
             },
         ];
 
@@ -361,6 +367,9 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('Z', $classDef->properties['prop']->val);
                 self::assertEquals('Z', $classDef->methods['aMethod']->val);
                 self::assertEquals('Z', $classDef->methods['aMethod']->parameters['param']->val);
+                self::assertEquals('Z', $classDef->sub->val);
+                self::assertEquals('X', $classDef->multi[0]->val);
+                self::assertEquals('Y', $classDef->multi[1]->val);
             },
         ];
     }

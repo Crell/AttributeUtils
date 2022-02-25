@@ -42,7 +42,7 @@ class Analyzer implements ClassAnalyzer
                 $classDef->fromReflection($subject);
             }
 
-            $this->loadSubAttributes($classDef, $subject);
+            $this->loadSubAttributes($classDef, $subject, $group);
 
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getDefinitions(
@@ -156,7 +156,7 @@ class Analyzer implements ClassAnalyzer
             $def->fromReflection($reflection);
         }
 
-        $this->loadSubAttributes($def, $reflection);
+        $this->loadSubAttributes($def, $reflection, $group);
 
         if ($def instanceof CustomAnalysis) {
             $def->customAnalysis($this);
@@ -180,7 +180,7 @@ class Analyzer implements ClassAnalyzer
             $def->fromReflection($reflection);
         }
 
-        $this->loadSubAttributes($def, $reflection);
+        $this->loadSubAttributes($def, $reflection, $group);
 
         if ($def instanceof ParseParameters) {
             $parameters = $this->getDefinitions(
@@ -201,20 +201,20 @@ class Analyzer implements ClassAnalyzer
     /**
      * Loads sub-attributes onto an attribute, if appropriate.
      */
-    protected function loadSubAttributes(?object $attribute, \Reflector $reflection): void
+    protected function loadSubAttributes(?object $attribute, \Reflector $reflection, ?string $group = null): void
     {
         if ($attribute instanceof HasSubAttributes) {
             foreach ($attribute->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $subs = $this->parser->getInheritedAttributes($reflection, $type);
+                    $subs = $this->parser->getInheritedAttributes($reflection, $type, $group);
                     foreach ($subs as $sub) {
-                        $this->loadSubAttributes($sub, $reflection);
+                        $this->loadSubAttributes($sub, $reflection, $group);
                     }
                     $attribute->$callback($subs);
 
                 } else {
-                    $sub = $this->parser->getInheritedAttribute($reflection, $type);
-                    $this->loadSubAttributes($sub, $reflection);
+                    $sub = $this->parser->getInheritedAttribute($reflection, $type, $group);
+                    $this->loadSubAttributes($sub, $reflection, $group);
                     $attribute->$callback($sub);
                 }
             }
