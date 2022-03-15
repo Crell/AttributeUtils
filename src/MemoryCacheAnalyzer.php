@@ -17,7 +17,7 @@ class MemoryCacheAnalyzer implements ClassAnalyzer
     public function __construct(private ClassAnalyzer $analyzer)
     {}
 
-    public function analyze(object|string $class, string $attribute, ?string $group = null): object
+    public function analyze(object|string $class, string $attribute, ?string $scope = null): object
     {
         $key = is_object($class) ? $class::class : $class;
 

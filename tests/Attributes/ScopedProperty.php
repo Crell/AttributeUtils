@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
-use Crell\AttributeUtils\SupportsGroups;
+use Crell\AttributeUtils\SupportsScopes;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
-class GroupedProperty implements SupportsGroups
+class ScopedProperty implements SupportsScopes
 {
     public function __construct(
         public string $val = 'Z',
-        public ?string $group = null,
+        public ?string $scope = null,
     ) {}
 
-    public function groups(): array
+    public function scopes(): array
     {
-        return $this->group ? [$this->group] : [];
+        return $this->scope ? [$this->scope] : [];
     }
 }

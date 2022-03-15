@@ -14,7 +14,7 @@ use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
 use Crell\AttributeUtils\Attributes\GenericClass;
-use Crell\AttributeUtils\Attributes\GroupedClass;
+use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
@@ -23,7 +23,7 @@ use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
 use Crell\AttributeUtils\Records\ClassWithExtraAnalysisSource;
-use Crell\AttributeUtils\Records\ClassWithGroups;
+use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
@@ -316,23 +316,23 @@ class ClassAnalyzerTest extends TestCase
 
     /**
      * @test
-     * @dataProvider groupedAttributeTestProvider()
+     * @dataProvider scopedAttributeTestProvider()
      */
-    public function analyze_classes_grouped(string $subject, string $attribute, ?string $group , callable $tests): void
+    public function analyze_classes_scoped(string $subject, string $attribute, ?string $scope , callable $tests): void
     {
         $analyzer = new Analyzer();
 
-        $classDef = $analyzer->analyze($subject, $attribute, group: $group);
+        $classDef = $analyzer->analyze($subject, $attribute, scope: $scope);
         $tests($classDef);
     }
 
-    public function groupedAttributeTestProvider(): iterable
+    public function scopedAttributeTestProvider(): iterable
     {
-        yield 'Grouped attributes (One)' => [
-            'subject' => ClassWithGroups::class,
-            'attribute' => GroupedClass::class,
-            'group' => 'One',
-            'test' => static function(GroupedClass $classDef) {
+        yield 'Scoped attributes (One)' => [
+            'subject' => ClassWithScopes::class,
+            'attribute' => ScopedClass::class,
+            'scope' => 'One',
+            'test' => static function(ScopedClass $classDef) {
                 self::assertEquals('A', $classDef->val);
                 self::assertEquals('A', $classDef->properties['prop']->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->val);
@@ -343,11 +343,11 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        yield 'Grouped attributes (Two)' => [
-            'subject' => ClassWithGroups::class,
-            'attribute' => GroupedClass::class,
-            'group' => 'Two',
-            'test' => static function(GroupedClass $classDef) {
+        yield 'Scoped attributes (Two)' => [
+            'subject' => ClassWithScopes::class,
+            'attribute' => ScopedClass::class,
+            'scope' => 'Two',
+            'test' => static function(ScopedClass $classDef) {
                 self::assertEquals('B', $classDef->val);
                 self::assertEquals('B', $classDef->properties['prop']->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->val);
@@ -358,11 +358,11 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        yield 'Grouped attributes (None)' => [
-            'subject' => ClassWithGroups::class,
-            'attribute' => GroupedClass::class,
-            'group' => null,
-            'test' => static function(GroupedClass $classDef) {
+        yield 'Scoped attributes (None)' => [
+            'subject' => ClassWithScopes::class,
+            'attribute' => ScopedClass::class,
+            'scope' => null,
+            'test' => static function(ScopedClass $classDef) {
                 self::assertEquals('Z', $classDef->val);
                 self::assertEquals('Z', $classDef->properties['prop']->val);
                 self::assertEquals('Z', $classDef->methods['aMethod']->val);

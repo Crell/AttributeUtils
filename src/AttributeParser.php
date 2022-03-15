@@ -27,14 +27,14 @@ class AttributeParser
      * and enumerating them manually is stupidly verbose and clunky. Instead just refer
      * to any reflectable thing and hope for the best.
      */
-    public function getAttributes(\Reflector $target, string $name, ?string $group = null): array
+    public function getAttributes(\Reflector $target, string $name, ?string $scope = null): array
     {
         // @phpstan-ignore-next-line.
         return pipe($target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF),
             amap(method('newInstance')),
-            afilter(fn(object $attr) =>
-                $group === null
-                || ($attr instanceof SupportsGroups && in_array($group, $attr->groups(), true))
+            afilter(static fn(object $attr) =>
+                $scope === null
+                || ($attr instanceof SupportsScopes && in_array($scope, $attr->scopes(), true))
             ),
             array_values(...),
         );
@@ -45,9 +45,9 @@ class AttributeParser
      *
      * @see getInheritedAttributes()
      */
-    public function getInheritedAttribute(\Reflector $target, string $name, ?string $group = null): ?object
+    public function getInheritedAttribute(\Reflector $target, string $name, ?string $scope = null): ?object
     {
-        return $this->getInheritedAttributes($target, $name, $group)[0] ?? null;
+        return $this->getInheritedAttributes($target, $name, $scope)[0] ?? null;
     }
 
     /**
@@ -66,10 +66,10 @@ class AttributeParser
      * @param string $name
      * @return array
      */
-    public function getInheritedAttributes(\Reflector $target, string $name, ?string $group = null): array
+    public function getInheritedAttributes(\Reflector $target, string $name, ?string $scope = null): array
     {
         $attributes = pipe($this->attributeInheritanceTree($target, $name),
-            firstValue(fn ($r): array => $this->getAttributes($r, $name, $group))
+            firstValue(fn ($r): array => $this->getAttributes($r, $name, $scope))
         );
 
         if ($attributes) {
@@ -83,7 +83,7 @@ class AttributeParser
             && $class = $this->getPropertyClass($target))
         {
             return pipe($this->classAncestors($class),
-                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name, $group)),
+                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name, $scope)),
             ) ?? [];
         }
 

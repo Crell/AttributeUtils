@@ -18,7 +18,7 @@ trait CacheTestMethods
     protected function getMockAnalyzer(): ClassAnalyzer
     {
         return new class implements ClassAnalyzer {
-            public function analyze(object|string $class, string $attribute, ?string $group = null): object
+            public function analyze(object|string $class, string $attribute, ?string $scope = null): object
             {
                 $key = is_object($class) ? $class::class : $class;
 

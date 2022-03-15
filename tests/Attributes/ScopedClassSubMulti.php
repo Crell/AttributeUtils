@@ -6,18 +6,18 @@ namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
 use Crell\AttributeUtils\Multivalue;
-use Crell\AttributeUtils\SupportsGroups;
+use Crell\AttributeUtils\SupportsScopes;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-class GroupedClassSubMulti implements Multivalue, SupportsGroups
+class ScopedClassSubMulti implements Multivalue, SupportsScopes
 {
     public function __construct(
         public string $val = 'Z',
-        public ?string $group = null,
+        public ?string $scope = null,
     ) {}
 
-    public function groups(): array
+    public function scopes(): array
     {
-        return $this->group ? [$this->group] : [];
+        return $this->scope ? [$this->scope] : [];
     }
 }
