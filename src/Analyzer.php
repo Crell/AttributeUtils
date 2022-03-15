@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
-use function Crell\fp\afilter;
-use function Crell\fp\amap;
-use function Crell\fp\indexBy;
-use function Crell\fp\method;
-use function Crell\fp\pipe;
-
 class Analyzer implements ClassAnalyzer
 {
     public function __construct(protected ?AttributeParser $parser = null)
@@ -33,6 +27,8 @@ class Analyzer implements ClassAnalyzer
 
         $parser = $scope ? $this->parser->forScope($scope) : $this->parser;
 
+        $inner = new ReflectionAnalyzerRunner($parser, $this);
+
         try {
             $classDef = $parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
 
@@ -44,42 +40,42 @@ class Analyzer implements ClassAnalyzer
                 $classDef->fromReflection($subject);
             }
 
-            $this->loadSubAttributes($classDef, $subject, $parser);
+            $inner->loadSubAttributes($classDef, $subject);
 
             if ($classDef instanceof ParseProperties) {
-                $properties = $this->getDefinitions(
+                $properties = $inner->getDefinitions(
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
-                        => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class, $parser)
+                        => $inner->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
                 );
                 $classDef->setProperties($properties);
             }
 
             if ($classDef instanceof ParseStaticProperties) {
-                $properties = $this->getDefinitions(
+                $properties = $inner->getDefinitions(
                     $subject->getProperties(\ReflectionProperty::IS_STATIC),
                     fn (\ReflectionProperty $r)
-                        => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class, $parser)
+                        => $inner->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
                 );
                 $classDef->setStaticProperties($properties);
             }
 
             if ($classDef instanceof ParseMethods) {
-                $methods = $this->getDefinitions(
+                $methods = $inner->getDefinitions(
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getMethods(), static fn (\ReflectionMethod $r) => !$r->isStatic()),
                     fn (\ReflectionMethod $r)
-                        => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault(), $parser),
+                        => $inner->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
                 );
                 $classDef->setMethods($methods);
             }
 
             if ($classDef instanceof ParseStaticMethods) {
-                $methods = $this->getDefinitions(
+                $methods = $inner->getDefinitions(
                     $subject->getMethods(\ReflectionMethod::IS_STATIC),
                     fn (\ReflectionMethod $r)
-                        => $this->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault(), $parser),
+                        => $inner->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault()),
                 );
                 $classDef->setStaticMethods($methods);
             }
@@ -89,19 +85,19 @@ class Analyzer implements ClassAnalyzer
             // implementing attribute class to filter out the enums
             // from the constants.  Sadly, there is no better API for it.
             if ($classDef instanceof ParseEnumCases) {
-                $cases = $this->getDefinitions(
+                $cases = $inner->getDefinitions(
                     $subject->getCases(),
                     fn (\ReflectionEnumUnitCase $r)
-                        => $this->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class, $parser),
+                        => $inner->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class),
                 );
                 $classDef->setCases($cases);
             }
 
             if ($classDef instanceof ParseClassConstants) {
-                $constants = $this->getDefinitions(
+                $constants = $inner->getDefinitions(
                     $subject->getReflectionConstants(),
                     fn (\ReflectionClassConstant $r)
-                        => $this->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class, $parser),
+                        => $inner->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class),
                 );
                 $classDef->setConstants($constants);
             }
@@ -119,118 +115,6 @@ class Analyzer implements ClassAnalyzer
             // @phpstan-ignore-next-line
             return new \stdClass();
         }
-    }
-
-    /**
-     * Gets all applicable attribute definitions of a given class element type.
-     *
-     * Eg, gets all property attributes, or all method attributes.
-     *
-     * @param \Reflector[] $reflections
-     *   The reflection objects to turn into attributes.
-     * @param callable $deriver
-     *   Callback for turning a reflection object into the corresponding attribute.
-     *   It must already have closed over the attribute type to retrieve.
-     * @return array
-     *   An array of attributes across all items of the applicable type.
-     */
-    protected function getDefinitions(array $reflections, callable $deriver): array
-    {
-        return pipe($reflections,
-            // The Reflector interface is insufficient, but getName() is defined
-            // on all types we care about. This is a reflection API limitation.
-            // @phpstan-ignore-next-line
-            indexBy(method('getName')),
-            amap($deriver),
-            afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
-        );
-    }
-
-    /**
-     * Returns the attribute definition for a class component.
-     */
-    protected function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface, AttributeParser $parser): ?object
-    {
-        $def = $parser->getInheritedAttribute($reflection, $attributeType)
-            ?? ($includeByDefault ?  new $attributeType() : null);
-
-        if ($def instanceof $reflectionInterface) {
-            $def->fromReflection($reflection);
-        }
-
-        $this->loadSubAttributes($def, $reflection, $parser);
-
-        if ($def instanceof CustomAnalysis) {
-            $def->customAnalysis($this);
-        }
-
-        return $def;
-    }
-
-    /**
-     * Returns the attribute definition for a method.
-     *
-     * Methods can't just reuse getComponentDefinition() because they
-     * also have parameters of their own to parse.
-     */
-    protected function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault, AttributeParser $parser): ?object
-    {
-        $def = $parser->getInheritedAttribute($reflection, $attributeType)
-            ?? ($includeByDefault ?  new $attributeType() : null);
-
-        if ($def instanceof FromReflectionMethod) {
-            $def->fromReflection($reflection);
-        }
-
-        $this->loadSubAttributes($def, $reflection, $parser);
-
-        if ($def instanceof ParseParameters) {
-            $parameters = $this->getDefinitions(
-                $reflection->getParameters(),
-                fn (\ReflectionParameter $p)
-                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class, $parser)
-            );
-            $def->setParameters($parameters);
-        }
-
-        if ($def instanceof CustomAnalysis) {
-            $def->customAnalysis($this);
-        }
-
-        return $def;
-    }
-
-    /**
-     * Loads sub-attributes onto an attribute, if appropriate.
-     */
-    protected function loadSubAttributes(?object $attribute, \Reflector $reflection, AttributeParser $parser): void
-    {
-        if ($attribute instanceof HasSubAttributes) {
-            foreach ($attribute->subAttributes() as $type => $callback) {
-                if ($this->isMultivalueAttribute($type)) {
-                    $subs = $parser->getInheritedAttributes($reflection, $type);
-                    foreach ($subs as $sub) {
-                        $this->loadSubAttributes($sub, $reflection, $parser);
-                    }
-                    $attribute->$callback($subs);
-
-                } else {
-                    $sub = $parser->getInheritedAttribute($reflection, $type);
-                    $this->loadSubAttributes($sub, $reflection, $parser);
-                    $attribute->$callback($sub);
-                }
-            }
-        }
-    }
-
-    /**
-     * Determines if a given attribute class allows repeating.
-     *
-     * This is only meaningful for attributes used as sub-attributes.
-     */
-    protected function isMultivalueAttribute(string $attributeType): bool
-    {
-        return is_a($attributeType, Multivalue::class, true);
     }
 
     /**
