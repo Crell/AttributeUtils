@@ -31,8 +31,10 @@ class Analyzer implements ClassAnalyzer
             $subject = new \ReflectionClass($class);
         }
 
+        $parser = $scope ? $this->parser->forScope($scope) : $this->parser;
+
         try {
-            $classDef = $this->parser->getInheritedAttribute($subject, $attribute, $scope) ?? new $attribute;
+            $classDef = $parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
 
             if ($classDef instanceof FromReflectionClass) {
                 $classDef->fromReflection($subject);
@@ -42,14 +44,14 @@ class Analyzer implements ClassAnalyzer
                 $classDef->fromReflection($subject);
             }
 
-            $this->loadSubAttributes($classDef, $subject, $scope);
+            $this->loadSubAttributes($classDef, $subject, $parser);
 
             if ($classDef instanceof ParseProperties) {
                 $properties = $this->getDefinitions(
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
-                        => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class, $scope)
+                        => $this->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class, $parser)
                 );
                 $classDef->setProperties($properties);
             }
@@ -58,7 +60,7 @@ class Analyzer implements ClassAnalyzer
                 $properties = $this->getDefinitions(
                     $subject->getProperties(\ReflectionProperty::IS_STATIC),
                     fn (\ReflectionProperty $r)
-                        => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class, $scope)
+                        => $this->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class, $parser)
                 );
                 $classDef->setStaticProperties($properties);
             }
@@ -68,7 +70,7 @@ class Analyzer implements ClassAnalyzer
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getMethods(), static fn (\ReflectionMethod $r) => !$r->isStatic()),
                     fn (\ReflectionMethod $r)
-                        => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault(), $scope),
+                        => $this->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault(), $parser),
                 );
                 $classDef->setMethods($methods);
             }
@@ -77,7 +79,7 @@ class Analyzer implements ClassAnalyzer
                 $methods = $this->getDefinitions(
                     $subject->getMethods(\ReflectionMethod::IS_STATIC),
                     fn (\ReflectionMethod $r)
-                        => $this->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault(), $scope),
+                        => $this->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault(), $parser),
                 );
                 $classDef->setStaticMethods($methods);
             }
@@ -90,7 +92,7 @@ class Analyzer implements ClassAnalyzer
                 $cases = $this->getDefinitions(
                     $subject->getCases(),
                     fn (\ReflectionEnumUnitCase $r)
-                        => $this->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class, $scope),
+                        => $this->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class, $parser),
                 );
                 $classDef->setCases($cases);
             }
@@ -99,7 +101,7 @@ class Analyzer implements ClassAnalyzer
                 $constants = $this->getDefinitions(
                     $subject->getReflectionConstants(),
                     fn (\ReflectionClassConstant $r)
-                        => $this->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class, $scope),
+                        => $this->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class, $parser),
                 );
                 $classDef->setConstants($constants);
             }
@@ -147,16 +149,16 @@ class Analyzer implements ClassAnalyzer
     /**
      * Returns the attribute definition for a class component.
      */
-    protected function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface, ?string $scope = null): ?object
+    protected function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface, AttributeParser $parser): ?object
     {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType, $scope)
+        $def = $parser->getInheritedAttribute($reflection, $attributeType)
             ?? ($includeByDefault ?  new $attributeType() : null);
 
         if ($def instanceof $reflectionInterface) {
             $def->fromReflection($reflection);
         }
 
-        $this->loadSubAttributes($def, $reflection, $scope);
+        $this->loadSubAttributes($def, $reflection, $parser);
 
         if ($def instanceof CustomAnalysis) {
             $def->customAnalysis($this);
@@ -171,22 +173,22 @@ class Analyzer implements ClassAnalyzer
      * Methods can't just reuse getComponentDefinition() because they
      * also have parameters of their own to parse.
      */
-    protected function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault, ?string $scope = null): ?object
+    protected function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault, AttributeParser $parser): ?object
     {
-        $def = $this->parser->getInheritedAttribute($reflection, $attributeType, $scope)
+        $def = $parser->getInheritedAttribute($reflection, $attributeType)
             ?? ($includeByDefault ?  new $attributeType() : null);
 
         if ($def instanceof FromReflectionMethod) {
             $def->fromReflection($reflection);
         }
 
-        $this->loadSubAttributes($def, $reflection, $scope);
+        $this->loadSubAttributes($def, $reflection, $parser);
 
         if ($def instanceof ParseParameters) {
             $parameters = $this->getDefinitions(
                 $reflection->getParameters(),
                 fn (\ReflectionParameter $p)
-                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class, $scope)
+                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class, $parser)
             );
             $def->setParameters($parameters);
         }
@@ -201,20 +203,20 @@ class Analyzer implements ClassAnalyzer
     /**
      * Loads sub-attributes onto an attribute, if appropriate.
      */
-    protected function loadSubAttributes(?object $attribute, \Reflector $reflection, ?string $scope = null): void
+    protected function loadSubAttributes(?object $attribute, \Reflector $reflection, AttributeParser $parser): void
     {
         if ($attribute instanceof HasSubAttributes) {
             foreach ($attribute->subAttributes() as $type => $callback) {
                 if ($this->isMultivalueAttribute($type)) {
-                    $subs = $this->parser->getInheritedAttributes($reflection, $type, $scope);
+                    $subs = $parser->getInheritedAttributes($reflection, $type);
                     foreach ($subs as $sub) {
-                        $this->loadSubAttributes($sub, $reflection, $scope);
+                        $this->loadSubAttributes($sub, $reflection, $parser);
                     }
                     $attribute->$callback($subs);
 
                 } else {
-                    $sub = $this->parser->getInheritedAttribute($reflection, $type, $scope);
-                    $this->loadSubAttributes($sub, $reflection, $scope);
+                    $sub = $parser->getInheritedAttribute($reflection, $type);
+                    $this->loadSubAttributes($sub, $reflection, $parser);
                     $attribute->$callback($sub);
                 }
             }

@@ -12,6 +12,15 @@ use function Crell\fp\pipe;
 
 class AttributeParser
 {
+    private ?string $scope = null;
+
+    public function forScope(string $scope): static
+    {
+        $new = clone($this);
+        $new->scope = $scope;
+        return $new;
+    }
+
     /**
      * Returns a single attribute of a given type from a target, or null if not found.
      */
@@ -27,14 +36,14 @@ class AttributeParser
      * and enumerating them manually is stupidly verbose and clunky. Instead just refer
      * to any reflectable thing and hope for the best.
      */
-    public function getAttributes(\Reflector $target, string $name, ?string $scope = null): array
+    public function getAttributes(\Reflector $target, string $name): array
     {
         // @phpstan-ignore-next-line.
         return pipe($target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF),
             amap(method('newInstance')),
-            afilter(static fn(object $attr) =>
-                $scope === null
-                || ($attr instanceof SupportsScopes && in_array($scope, $attr->scopes(), true))
+            afilter(fn (object $attr) =>
+                $this->scope === null
+                || ($attr instanceof SupportsScopes && in_array($this->scope, $attr->scopes(), true))
             ),
             array_values(...),
         );
@@ -45,9 +54,9 @@ class AttributeParser
      *
      * @see getInheritedAttributes()
      */
-    public function getInheritedAttribute(\Reflector $target, string $name, ?string $scope = null): ?object
+    public function getInheritedAttribute(\Reflector $target, string $name): ?object
     {
-        return $this->getInheritedAttributes($target, $name, $scope)[0] ?? null;
+        return $this->getInheritedAttributes($target, $name)[0] ?? null;
     }
 
     /**
@@ -66,10 +75,10 @@ class AttributeParser
      * @param string $name
      * @return array
      */
-    public function getInheritedAttributes(\Reflector $target, string $name, ?string $scope = null): array
+    public function getInheritedAttributes(\Reflector $target, string $name): array
     {
         $attributes = pipe($this->attributeInheritanceTree($target, $name),
-            firstValue(fn ($r): array => $this->getAttributes($r, $name, $scope))
+            firstValue(fn ($r): array => $this->getAttributes($r, $name))
         );
 
         if ($attributes) {
@@ -83,7 +92,7 @@ class AttributeParser
             && $class = $this->getPropertyClass($target))
         {
             return pipe($this->classAncestors($class),
-                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name, $scope)),
+                firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name)),
             ) ?? [];
         }
 
