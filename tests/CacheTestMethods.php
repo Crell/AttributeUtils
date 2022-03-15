@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils;
 
 use Crell\AttributeUtils\Attributes\ClassWithProperties;
+use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
+use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\Point;
 
 /**
@@ -26,8 +28,8 @@ trait CacheTestMethods
                 // Since attributes can be anything, that's fine. We just
                 // want a unique object each time. Capturing the parameters
                 // is just for extra verification.
-                return new class($key, $attribute) {
-                    public function __construct(public string $key, public string $attribute) {}
+                return new class($key, $attribute, $scope) {
+                    public function __construct(public string $key, public string $attribute, public ?string $scope) {}
                 };
             }
         };
@@ -38,12 +40,26 @@ trait CacheTestMethods
      */
     public function cache_analysis(): void
     {
-
         $analyzer = $this->getTestSubject();
 
         $def1 = $analyzer->analyze(Point::class, ClassWithProperties::class);
         $def2 = $analyzer->analyze(Point::class, ClassWithProperties::class);
         $def3 = $analyzer->analyze(Point::class, ClassWithDefaultFields::class);
+
+        self::assertSame($def1, $def2);
+        self::assertNotSame($def1, $def3);
+    }
+
+    /**
+     * @test
+     */
+    public function cache_analysis_scopes(): void
+    {
+        $analyzer = $this->getTestSubject();
+
+        $def1 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class);
+        $def2 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class);
+        $def3 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class, scope: 'One');
 
         self::assertSame($def1, $def2);
         self::assertNotSame($def1, $def3);

@@ -21,6 +21,6 @@ class MemoryCacheAnalyzer implements ClassAnalyzer
     {
         $key = is_object($class) ? $class::class : $class;
 
-        return $this->cache[$key][$attribute] ??= $this->analyzer->analyze($class, $attribute);
+        return $this->cache[$key][$attribute][$scope ?? ''] ??= $this->analyzer->analyze($class, $attribute, $scope);
     }
 }
