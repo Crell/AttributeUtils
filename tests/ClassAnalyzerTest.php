@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
+use Crell\AttributeUtils\Attributes\AppliesEverywhere;
 use Crell\AttributeUtils\Attributes\BasicClass;
 use Crell\AttributeUtils\Attributes\BasicProperty;
 use Crell\AttributeUtils\Attributes\ClassMethodsProperties;
@@ -30,6 +31,7 @@ use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
 use Crell\AttributeUtils\Records\ClassWithRecursiveSubAttributes;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\MissingPropertyAttributeArguments;
+use Crell\AttributeUtils\Records\MultiuseClass;
 use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
@@ -300,6 +302,23 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('B', $classDef->sub->b);
                 self::assertEquals('C', $classDef->sub->sub->c);
                 self::assertEquals(['D', 'E', 'F'], $classDef->sub->d);
+            },
+        ];
+
+        yield 'Attribute on multiple components' => [
+            'subject' => MultiuseClass::class,
+            'attribute' => AppliesEverywhere::class,
+            'test' => static function(AppliesEverywhere $classDef) {
+                self::assertEquals(1, $classDef->a);
+                self::assertEquals(MultiuseClass::class, $classDef->phpName);
+                self::assertEquals(2, $classDef->properties['prop']->a);
+                self::assertEquals('prop', $classDef->properties['prop']->phpName);
+                self::assertEquals(3, $classDef->constants['B']->a);
+                self::assertEquals('B', $classDef->constants['B']->phpName);
+                self::assertEquals(4, $classDef->methods['method']->a);
+                self::assertEquals('method', $classDef->methods['method']->phpName);
+                self::assertEquals(5, $classDef->methods['method']->parameters['arg']->a);
+                self::assertEquals('arg', $classDef->methods['method']->parameters['arg']->phpName);
             },
         ];
 
