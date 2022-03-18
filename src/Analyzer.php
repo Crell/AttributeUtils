@@ -22,7 +22,7 @@ class Analyzer implements ClassAnalyzer
 
         $parser = new AttributeParser($scope);
 
-        $inner = new ReflectionAnalyzerRunner($parser, $this);
+        $defBuilder = new ReflectionDefinitionBuilder($parser, $this);
 
         try {
             $classDef = $parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
@@ -35,42 +35,42 @@ class Analyzer implements ClassAnalyzer
                 $classDef->fromReflection($subject);
             }
 
-            $inner->loadSubAttributes($classDef, $subject);
+            $defBuilder->loadSubAttributes($classDef, $subject);
 
             if ($classDef instanceof ParseProperties) {
-                $properties = $inner->getDefinitions(
+                $properties = $defBuilder->getDefinitions(
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
-                        => $inner->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
+                        => $defBuilder->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
                 );
                 $classDef->setProperties($properties);
             }
 
             if ($classDef instanceof ParseStaticProperties) {
-                $properties = $inner->getDefinitions(
+                $properties = $defBuilder->getDefinitions(
                     $subject->getProperties(\ReflectionProperty::IS_STATIC),
                     fn (\ReflectionProperty $r)
-                        => $inner->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
+                        => $defBuilder->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
                 );
                 $classDef->setStaticProperties($properties);
             }
 
             if ($classDef instanceof ParseMethods) {
-                $methods = $inner->getDefinitions(
+                $methods = $defBuilder->getDefinitions(
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getMethods(), static fn (\ReflectionMethod $r) => !$r->isStatic()),
                     fn (\ReflectionMethod $r)
-                        => $inner->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
+                        => $defBuilder->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
                 );
                 $classDef->setMethods($methods);
             }
 
             if ($classDef instanceof ParseStaticMethods) {
-                $methods = $inner->getDefinitions(
+                $methods = $defBuilder->getDefinitions(
                     $subject->getMethods(\ReflectionMethod::IS_STATIC),
                     fn (\ReflectionMethod $r)
-                        => $inner->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault()),
+                        => $defBuilder->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault()),
                 );
                 $classDef->setStaticMethods($methods);
             }
@@ -80,19 +80,19 @@ class Analyzer implements ClassAnalyzer
             // implementing attribute class to filter out the enums
             // from the constants.  Sadly, there is no better API for it.
             if ($classDef instanceof ParseEnumCases) {
-                $cases = $inner->getDefinitions(
+                $cases = $defBuilder->getDefinitions(
                     $subject->getCases(),
                     fn (\ReflectionEnumUnitCase $r)
-                        => $inner->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class),
+                        => $defBuilder->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class),
                 );
                 $classDef->setCases($cases);
             }
 
             if ($classDef instanceof ParseClassConstants) {
-                $constants = $inner->getDefinitions(
+                $constants = $defBuilder->getDefinitions(
                     $subject->getReflectionConstants(),
                     fn (\ReflectionClassConstant $r)
-                        => $inner->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class),
+                        => $defBuilder->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class),
                 );
                 $classDef->setConstants($constants);
             }

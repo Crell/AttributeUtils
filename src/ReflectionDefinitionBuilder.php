@@ -11,12 +11,9 @@ use function Crell\fp\method;
 use function Crell\fp\pipe;
 
 /**
- * Context-sensitive parts of the reflection analysis process.
- *
- * Mainly this holds the customized parser, which itself is closed over
- * any analysis-specific information (e.g., the scope).
+ * Derives the definition for a component's attributes.
  */
-class ReflectionAnalyzerRunner
+class ReflectionDefinitionBuilder
 {
     public function __construct(
         protected AttributeParser $parser,
