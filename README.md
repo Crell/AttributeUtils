@@ -20,7 +20,7 @@ $ composer require crell/attributeutils
 
 ### Basic usage
 
-The most important class in the system is `Analyzer`, which implements the `ClassAnalyzer` interface.  It has one optional dependency, `AttributeParser`.  For casual usage you do not need it, although if you are wiring `Analyzer` into a DI system you should inject it as its own service so that you can guarantee only one instances is created.
+The most important class in the system is `Analyzer`, which implements the `ClassAnalyzer` interface.
 
 ```php
 
@@ -402,9 +402,7 @@ As a last resort, an attribute may also implement the [`CustomAnalysis`](src/Cus
 
 ### Dependency Injection
 
-The Analyzer is designed to be usable on its own without any setup.  However, if configuring it as a service in a Dependency Injection framework it is strongly recommended that you make the `AttributeParser` its own service and inject it directly.  That ensures that only a single instance of that service will be created.  As it is stateless, there is no need to ever have more than one instance of it.
-
-An appropriate cache wrapper should also be included in the DI configuration.
+The Analyzer is designed to be usable on its own without any setup.  Making it available via a Dependency Injection Container is recommended.  An appropriate cache wrapper should also be included in the DI configuration.
 
 ## The Reflect library
 
