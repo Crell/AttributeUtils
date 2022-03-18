@@ -6,11 +6,6 @@ namespace Crell\AttributeUtils;
 
 class Analyzer implements ClassAnalyzer
 {
-    public function __construct(protected ?AttributeParser $parser = null)
-    {
-        $this->parser ??= new AttributeParser();
-    }
-
     public function analyze(string|object $class, string $attribute, ?string $scope = null): object
     {
         // Everything is easier if we normalize to a class first.
@@ -25,7 +20,7 @@ class Analyzer implements ClassAnalyzer
             $subject = new \ReflectionClass($class);
         }
 
-        $parser = $scope ? $this->parser->forScope($scope) : $this->parser;
+        $parser = new AttributeParser($scope);
 
         $inner = new ReflectionAnalyzerRunner($parser, $this);
 

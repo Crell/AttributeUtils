@@ -12,14 +12,7 @@ use function Crell\fp\pipe;
 
 class AttributeParser
 {
-    private ?string $scope = null;
-
-    public function forScope(string $scope): static
-    {
-        $new = clone($this);
-        $new->scope = $scope;
-        return $new;
-    }
+    public function __construct(private ?string $scope = null) {}
 
     /**
      * Returns a single attribute of a given type from a target, or null if not found.
