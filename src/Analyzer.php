@@ -79,7 +79,7 @@ class Analyzer implements ClassAnalyzer
             // constants will include enums cases.  It's up to the
             // implementing attribute class to filter out the enums
             // from the constants.  Sadly, there is no better API for it.
-            if ($classDef instanceof ParseEnumCases) {
+            if ($subject instanceof \ReflectionEnum && $classDef instanceof ParseEnumCases) {
                 $cases = $defBuilder->getDefinitions(
                     $subject->getCases(),
                     fn (\ReflectionEnumUnitCase $r)
@@ -101,14 +101,10 @@ class Analyzer implements ClassAnalyzer
                 $classDef->customAnalysis($this);
             }
 
+            // @phpstan-ignore-next-line
             return $classDef;
         } catch (\ArgumentCountError $e) {
             $this->translateArgumentCountError($e);
-            // This line is unreachable. It's here only to make phpstan
-            // happy that this method always returns an object.
-            // There is probably a much better way.
-            // @phpstan-ignore-next-line
-            return new \stdClass();
         }
     }
 
@@ -120,10 +116,8 @@ class Analyzer implements ClassAnalyzer
      * properties or methods or something.
      *
      * Conclusion: Write better, more debuggable exceptions than PHP does.
-     *
-     * @todo In PHP 8.1, the return type can be `never`.
      */
-    protected function translateArgumentCountError(\ArgumentCountError $error): void
+    protected function translateArgumentCountError(\ArgumentCountError $error): never
     {
         $message = $error->getMessage();
         // PHPStan doesn't understand this syntax style of sscanf(), so skip it.

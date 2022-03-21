@@ -63,7 +63,10 @@ class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseStaticMethod
 
         $this->isBacked = $subject->isBacked();
 
-        $this->backingType = $this->isBacked ? $subject->getBackingType()->getName() : null;
+        // getName() is a valid method on ReflectionType, even if the
+        // stubs in PHP are outdated.
+        // @phpstan-ignore-next-line
+        $this->backingType = $this->isBacked ? $subject->getBackingType()?->getName() : null;
 
         // @todo getFileName, getStartLine, getEndLine - Needed or no? Should they go in a separate struct?
         // @todo do we want getDocComment, or is that too much data to cache?

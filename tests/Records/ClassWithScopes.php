@@ -30,6 +30,8 @@ class ClassWithScopes
     #[ScopedProperty(val: 'B', scope: 'Two')]
     public string $prop;
 
+    public string $noAttrib;
+
     #[ScopedMethod]
     #[ScopedMethod(val: 'A', scope: 'One')]
     #[ScopedMethod(val: 'B', scope: 'Two')]

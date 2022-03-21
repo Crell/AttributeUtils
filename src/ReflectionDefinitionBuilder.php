@@ -38,7 +38,6 @@ class ReflectionDefinitionBuilder
         return pipe($reflections,
             // The Reflector interface is insufficient, but getName() is defined
             // on all types we care about. This is a reflection API limitation.
-            // @phpstan-ignore-next-line
             indexBy(method('getName')),
             amap($deriver),
             afilter(static fn (?object $attr): bool => $attr && !($attr instanceof Excludable && $attr->exclude())),
