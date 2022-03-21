@@ -322,15 +322,13 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        if (version_compare(PHP_VERSION, '8.1.0') >= 0) {
-            yield 'UnitEnum with subattributes' => [
-                'subject' => Suit::class,
-                'attribute' => ClassWithOwnSubAttributes::class,
-                'test' => static function(ClassWithOwnSubAttributes $classDef) {
-                    self::assertEquals('C', $classDef->c);
-                },
-            ];
-        }
+        yield 'UnitEnum with subattributes' => [
+            'subject' => Suit::class,
+            'attribute' => ClassWithOwnSubAttributes::class,
+            'test' => static function(ClassWithOwnSubAttributes $classDef) {
+                self::assertEquals('C', $classDef->c);
+            },
+        ];
     }
 
     /**
