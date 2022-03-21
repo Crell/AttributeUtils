@@ -31,7 +31,7 @@ class Analyzer implements ClassAnalyzer
                 $classDef->fromReflection($subject);
             }
 
-            if ($classDef instanceof FromReflectionEnum) {
+            if ($subject instanceof \ReflectionEnum && $classDef instanceof FromReflectionEnum) {
                 $classDef->fromReflection($subject);
             }
 
