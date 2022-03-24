@@ -29,7 +29,6 @@ class ScopedClass implements HasSubAttributes, ParseProperties, ParseMethods, Su
         public string $val = 'Z',
         public ?string $scope = null,
         public bool $includeInAll = true,
-        public bool $includePropsByDefault = true,
     ) {}
 
     public function scopes(): array
@@ -62,7 +61,7 @@ class ScopedClass implements HasSubAttributes, ParseProperties, ParseMethods, Su
 
     public function includePropertiesByDefault(): bool
     {
-        return $this->includePropsByDefault;
+        return true;
     }
 
     public function propertyAttribute(): string

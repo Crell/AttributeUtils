@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Records;
 
-use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\ScopedClassNoDefaultInclude;
 use Crell\AttributeUtils\Attributes\ScopedClassSub;
 use Crell\AttributeUtils\Attributes\ScopedClassSubMulti;
@@ -26,18 +25,41 @@ use Crell\AttributeUtils\Attributes\ScopedProperty;
 #[ScopedClassSubMulti(val: 'B2', scope: 'Two')]
 class ClassWithScopesNotDefault
 {
+    public string $noAttrib;
+
     #[ScopedProperty]
     #[ScopedProperty(val: 'A', scope: 'One')]
     #[ScopedProperty(val: 'B', scope: 'Two')]
-    public string $prop;
+    public string $scoped;
 
-    public string $noAttrib;
+    #[ScopedProperty]
+    public string $defaultAttrib;
+
+    #[ScopedProperty(exclude: true)]
+    public string $defaultAttribExcluded;
+
+    #[ScopedProperty(val: 'A', scope: 'One', includeUnscopedInScope: false)]
+    #[ScopedProperty(val: 'B', scope: 'Two', includeUnscopedInScope: false)]
+    public string $notNullScope;
+
+    #[ScopedProperty]
+    #[ScopedProperty(val: 'A', scope: 'One', exclude: true)]
+    #[ScopedProperty(val: 'B', scope: 'Two', exclude: true)]
+    public string $excludeOnlyInScopes;
+
+    #[ScopedProperty(includeUnscopedInScope: false)]
+    #[ScopedProperty(val: 'A', scope: 'One', includeUnscopedInScope: false)]
+    #[ScopedProperty(val: 'B', scope: 'Two', includeUnscopedInScope: false)]
+    public string $excludeFromNullScopeHasScope;
+
+    #[ScopedProperty(val: 'A', scope: 'One')]
+    public string $onlyInScopeOne;
 
     #[ScopedMethod]
     #[ScopedMethod(val: 'A', scope: 'One')]
     #[ScopedMethod(val: 'B', scope: 'Two')]
     public function aMethod(
-        #[ScopedParam(includeInAll: false)]
+        #[ScopedParam]
         #[ScopedParam(val: 'A', scope: 'One')]
         #[ScopedParam(val: 'B', scope: 'Two')]
         string $param

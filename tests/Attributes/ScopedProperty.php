@@ -21,22 +21,12 @@ class ScopedProperty implements SupportsScopes, Excludable
     public function scopes(): array
     {
         return [$this->scope];
-
-        /*
-        return match ([$scope, $this->scope]) {
-            [null, null] => true,
-            [null, $this->scope] => false,
-            [$scope, null] => $this->includeUnscopedInScope,
-            default => $this->scope === $scope,
-        };
-        */
     }
 
     public function includeUnscopedInScope(): bool
     {
         return $this->includeUnscopedInScope;
     }
-
 
     public function exclude(): bool
     {

@@ -13,7 +13,7 @@ use Crell\AttributeUtils\Attributes\ScopedProperty;
 
 #[ScopedClass]
 #[ScopedClass(val: 'A', scope: 'One')]
-#[ScopedClass(val: 'B', scope: 'Two', includePropsByDefault: false)]
+#[ScopedClass(val: 'B', scope: 'Two')]
 #[ScopedClassSub]
 #[ScopedClassSub(val: 'A', scope: 'One')]
 #[ScopedClassSub(val: 'B', scope: 'Two')]

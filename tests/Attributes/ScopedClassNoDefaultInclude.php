@@ -12,6 +12,10 @@ use Crell\AttributeUtils\ParseMethods;
 use Crell\AttributeUtils\ParseProperties;
 use Crell\AttributeUtils\SupportsScopes;
 
+/**
+ * This can't just extend ScopedClass, as it would then be included in a
+ * type-based lookup for that class. Redundancy it is then.
+ */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 class ScopedClassNoDefaultInclude implements HasSubAttributes, ParseProperties, ParseMethods, SupportsScopes
 {
