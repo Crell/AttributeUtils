@@ -4,6 +4,8 @@ parameters:
         - src
     ignoreErrors:
         - '#Match expression does not handle remaining value#'
+        - '#has an uninitialized readonly property (.*). Assign it in the constructor.#'
+        - '#Readonly property (.*) is assigned outside of the constructor.#'
 
 # Tests include an absurd number of classes that are by design not tricked-out, so don't
 # bother checking those.

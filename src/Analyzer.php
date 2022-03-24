@@ -100,8 +100,6 @@ class Analyzer implements ClassAnalyzer
             if ($classDef instanceof CustomAnalysis) {
                 $classDef->customAnalysis($this);
             }
-
-            // @phpstan-ignore-next-line
             return $classDef;
         } catch (\ArgumentCountError $e) {
             $this->translateArgumentCountError($e);
