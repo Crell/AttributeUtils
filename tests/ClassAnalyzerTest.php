@@ -29,6 +29,7 @@ use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
 use Crell\AttributeUtils\Records\ClassWithRecursiveSubAttributes;
+use Crell\AttributeUtils\Records\ClassWithScopesNotDefault;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\MissingPropertyAttributeArguments;
 use Crell\AttributeUtils\Records\MultiuseClass;
@@ -345,50 +346,175 @@ class ClassAnalyzerTest extends TestCase
 
     public function scopedAttributeTestProvider(): iterable
     {
-        yield 'Scoped attributes (One)' => [
+        yield 'Incl by default: true; scope: One' => [
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
             'scope' => 'One',
             'test' => static function(ScopedClass $classDef) {
+                // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('A', $classDef->val);
-                self::assertEquals('A', $classDef->properties['prop']->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
                 self::assertEquals('A', $classDef->sub->val);
                 self::assertEquals('A1', $classDef->multi[0]->val);
                 self::assertEquals('A2', $classDef->multi[1]->val);
+
+                // The specific interpretation of this case.
+                self::assertEquals('Z', $classDef->properties['noAttrib']->val);
+                self::assertEquals('A', $classDef->properties['scoped']->val);
+                self::assertEquals('Z', $classDef->properties['defaultAttrib']->val);
+                self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
+                self::assertEquals('A', $classDef->properties['notNullScope']->val);
+                self::assertArrayNotHasKey('excludeOnlyInScopes', $classDef->properties);
+                self::assertEquals('A', $classDef->properties['onlyInScopeOne']->val);
             },
         ];
 
-        yield 'Scoped attributes (Two)' => [
+        yield 'Incl by default: false; scope: Two' => [
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
             'scope' => 'Two',
             'test' => static function(ScopedClass $classDef) {
+                // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('B', $classDef->val);
-                self::assertEquals('B', $classDef->properties['prop']->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
                 self::assertEquals('B', $classDef->sub->val);
                 self::assertEquals('B1', $classDef->multi[0]->val);
                 self::assertEquals('B2', $classDef->multi[1]->val);
+
+                // The specific interpretation of this case.
+                self::assertArrayNotHasKey('noAttrib', $classDef->properties);
+                self::assertEquals('B', $classDef->properties['scoped']->val);
+                self::assertEquals('Z', $classDef->properties['defaultAttrib']->val);
+                self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
+                self::assertEquals('B', $classDef->properties['notNullScope']->val);
+                self::assertArrayNotHasKey('excludeOnlyInScopes', $classDef->properties);
+                self::assertArrayNotHasKey('onlyInScopeOne', $classDef->properties);
             },
         ];
 
-        yield 'Scoped attributes (None)' => [
+
+        yield 'Incl by default: true; scope: null' => [
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
             'scope' => null,
             'test' => static function(ScopedClass $classDef) {
+                // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('Z', $classDef->val);
-                self::assertEquals('Z', $classDef->properties['prop']->val);
                 self::assertEquals('Z', $classDef->methods['aMethod']->val);
                 self::assertEquals('Z', $classDef->methods['aMethod']->parameters['param']->val);
                 self::assertEquals('Z', $classDef->sub->val);
                 self::assertEquals('X', $classDef->multi[0]->val);
                 self::assertEquals('Y', $classDef->multi[1]->val);
+
+                // The specific interpretation of this case.
+                self::assertEquals('Z', $classDef->properties['noAttrib']->val);
+                self::assertEquals('Z', $classDef->properties['scoped']->val);
+                self::assertEquals('Z', $classDef->properties['defaultAttrib']->val);
+                self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['notNullScope']->val);
+                self::assertEquals('Z', $classDef->properties['excludeOnlyInScopes']->val);
+                self::assertEquals('Z', $classDef->properties['onlyInScopeOne']->val);
             },
         ];
+
+//
+//        yield 'Scoped attributes (One)' => [
+//            'subject' => ClassWithScopes::class,
+//            'attribute' => ScopedClass::class,
+//            'scope' => 'One',
+//            'test' => static function(ScopedClass $classDef) {
+//                self::assertEquals('A', $classDef->val);
+//                self::assertEquals('A', $classDef->properties['prop']->val);
+//                self::assertEquals('A', $classDef->methods['aMethod']->val);
+//                self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
+//                self::assertEquals('A', $classDef->sub->val);
+//                self::assertEquals('A1', $classDef->multi[0]->val);
+//                self::assertEquals('A2', $classDef->multi[1]->val);
+//                self::assertEquals('Z', $classDef->properties['noAttrib']->val);
+//            },
+//        ];
+//
+//        yield 'Scoped attributes (Two)' => [
+//            'subject' => ClassWithScopes::class,
+//            'attribute' => ScopedClass::class,
+//            'scope' => 'Two',
+//            'test' => static function(ScopedClass $classDef) {
+//                self::assertEquals('B', $classDef->val);
+//                self::assertEquals('B', $classDef->properties['prop']->val);
+//                self::assertEquals('B', $classDef->methods['aMethod']->val);
+//                self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
+//                self::assertEquals('B', $classDef->sub->val);
+//                self::assertEquals('B1', $classDef->multi[0]->val);
+//                self::assertEquals('B2', $classDef->multi[1]->val);
+//                self::assertEquals('Z', $classDef->properties['noAttrib']->val);
+//            },
+//        ];
+//
+//        yield 'Scoped attributes (None)' => [
+//            'subject' => ClassWithScopes::class,
+//            'attribute' => ScopedClass::class,
+//            'scope' => null,
+//            'test' => static function(ScopedClass $classDef) {
+//                self::assertEquals('Z', $classDef->val);
+//                self::assertEquals('Z', $classDef->properties['prop']->val);
+//                self::assertEquals('Z', $classDef->methods['aMethod']->val);
+//                self::assertEquals('Z', $classDef->methods['aMethod']->parameters['param']->val);
+//                self::assertEquals('Z', $classDef->sub->val);
+//                self::assertEquals('X', $classDef->multi[0]->val);
+//                self::assertEquals('Y', $classDef->multi[1]->val);
+//                self::assertEquals('Z', $classDef->properties['noAttrib']->val);
+//            },
+//        ];
+//
+//        yield 'Scoped attributes, default no (One)' => [
+//            'subject' => ClassWithScopesNotDefault::class,
+//            'attribute' => ScopedClass::class,
+//            'scope' => 'One',
+//            'test' => static function(ScopedClass $classDef) {
+//                self::assertEquals('A', $classDef->val);
+//                self::assertEquals('A', $classDef->properties['prop']->val);
+//                self::assertEquals('A', $classDef->methods['aMethod']->val);
+//                self::assertEquals('A', $classDef->methods['aMethod']->parameters['param']->val);
+//                self::assertEquals('A', $classDef->sub->val);
+//                self::assertEquals('A1', $classDef->multi[0]->val);
+//                self::assertEquals('A2', $classDef->multi[1]->val);
+//                self::assertArrayNotHasKey('noAttrib', $classDef->properties);
+//            },
+//        ];
+//
+//        yield 'Scoped attributes, default no (Two)' => [
+//            'subject' => ClassWithScopesNotDefault::class,
+//            'attribute' => ScopedClass::class,
+//            'scope' => 'Two',
+//            'test' => static function(ScopedClass $classDef) {
+//                self::assertEquals('B', $classDef->val);
+//                self::assertEquals('B', $classDef->properties['prop']->val);
+//                self::assertEquals('B', $classDef->methods['aMethod']->val);
+//                self::assertEquals('B', $classDef->methods['aMethod']->parameters['param']->val);
+//                self::assertEquals('B', $classDef->sub->val);
+//                self::assertEquals('B1', $classDef->multi[0]->val);
+//                self::assertEquals('B2', $classDef->multi[1]->val);
+//                self::assertArrayNotHasKey('noAttrib', $classDef->properties);
+//            },
+//        ];
+//
+//        yield 'beep' => [
+////        yield 'Scoped attributes, default no (None)' => [
+//            'subject' => ClassWithScopesNotDefault::class,
+//            'attribute' => ScopedClass::class,
+//            'scope' => null,
+//            'test' => static function(ScopedClass $classDef) {
+//                self::assertEquals('Z', $classDef->val);
+//                self::assertEquals('Z', $classDef->properties['prop']->val);
+//                self::assertEquals('Z', $classDef->methods['aMethod']->val);
+//                self::assertEquals('Z', $classDef->methods['aMethod']->parameters['param']->val);
+//                self::assertEquals(null, $classDef->sub);
+//                self::assertEquals([], $classDef->multi);
+//                self::assertArrayNotHasKey('noAttrib', $classDef->properties);
+//            },
+//        ];
     }
 
     /**

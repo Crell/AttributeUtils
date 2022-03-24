@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils;
 
 use function Crell\fp\afilter;
+use function Crell\fp\all;
 use function Crell\fp\amap;
 use function Crell\fp\firstValue;
 use function Crell\fp\method;
@@ -12,7 +13,7 @@ use function Crell\fp\pipe;
 
 class AttributeParser
 {
-    public function __construct(private ?string $scope = null) {}
+    public function __construct(private readonly ?string $scope = null) {}
 
     /**
      * Returns a single attribute of a given type from a target, or null if not found.
@@ -32,14 +33,77 @@ class AttributeParser
     public function getAttributes(\Reflector $target, string $name): array
     {
         // @phpstan-ignore-next-line.
-        return pipe($target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF),
+        $attribs =  pipe($target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF),
             amap(method('newInstance')),
-            afilter(fn (object $attr) =>
-                $this->scope === null
-                || ($attr instanceof SupportsScopes && in_array($this->scope, $attr->scopes(), true))
-            ),
-            array_values(...),
+//            afilter(fn (object $attr) =>
+//                !$attr instanceof SupportsScopes || $attr->hasScope($this->scope)
+//            ),
+//            array_values(...),
         );
+
+        if (is_a($name, SupportsScopes::class, true)) {
+            $inDefaultScope = static fn (SupportsScopes $attr): bool
+                => in_array(null, $attr->scopes(), true);
+            $hasAScope = static fn (SupportsScopes $attr): bool
+                => !all(is_null(...))($attr->scopes());
+            $hasNoScope = static fn (SupportsScopes $attr): bool
+                => array_unique($attr->scopes()) === [null];
+            $hasSpecificScope = static fn(string $scope): \Closure
+                => static fn (SupportsScopes $attr): bool => in_array($scope, $attr->scopes(), true);
+
+            if (is_null($this->scope)) {
+                $inGlobal = pipe($attribs,
+                    afilter($inDefaultScope),
+                    afilter($hasNoScope),
+                );
+                return $inGlobal;
+            }
+
+            $filter = fn (SupportsScopes $attr): bool =>
+                in_array(null, $attr->scopes(), true)
+                || in_array($this->scope, $attr->scopes(), true);
+
+            // Attributes that are in the current scope OR global.
+            $attribs = \array_filter($attribs, $filter);
+
+            if (count($attribs) > 1) {
+                $attribsWithNonDefaultScope = \array_filter($attribs, $hasAScope);
+                if (count($attribsWithNonDefaultScope)) {
+                    $attribs = \array_filter($attribs, $hasSpecificScope($this->scope));
+                }
+            }
+
+            /*
+            If non-global scope requested:
+            * Filter out anything without a matching scope OR null.
+            * If the result has multiple items, AND one of them has non-null scopes, filter out anything without a matching scope, excluding null.
+            * Use first.
+            */
+
+
+
+            /*
+            foreach ($attribs as $attrib) {
+                match ([
+                    $this->scope, // The scope being requested.
+                    in_array($this->scope, $attrib->scopes(), true), // If this attrib is explicitly in scope.
+                    $attrib->includeUnscopedInScope(),  //Should an unscoped attrib count if there is no scoped attrib.
+                ]) {
+                    [null, true, true] => ,
+                    [null, true, false] => ,
+                    [null, false, true] => ,
+                    [null, false, false] => ,
+                    [$this->scope, true, true] => ,
+                    [$this->scope, true, false] => ,
+                    [$this->scope, false, true] => ,
+                    [$this->scope, false, false] => ,
+                };
+            }
+            */
+        }
+
+        return \array_values($attribs);
+
     }
 
     /**

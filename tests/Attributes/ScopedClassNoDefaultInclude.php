@@ -13,7 +13,7 @@ use Crell\AttributeUtils\ParseProperties;
 use Crell\AttributeUtils\SupportsScopes;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-class ScopedClass implements HasSubAttributes, ParseProperties, ParseMethods, SupportsScopes
+class ScopedClassNoDefaultInclude implements HasSubAttributes, ParseProperties, ParseMethods, SupportsScopes
 {
     use CollectProperties;
     use CollectMethods;
@@ -29,7 +29,6 @@ class ScopedClass implements HasSubAttributes, ParseProperties, ParseMethods, Su
         public string $val = 'Z',
         public ?string $scope = null,
         public bool $includeInAll = true,
-        public bool $includePropsByDefault = true,
     ) {}
 
     public function scopes(): array
@@ -62,7 +61,7 @@ class ScopedClass implements HasSubAttributes, ParseProperties, ParseMethods, Su
 
     public function includePropertiesByDefault(): bool
     {
-        return $this->includePropsByDefault;
+        return false;
     }
 
     public function propertyAttribute(): string

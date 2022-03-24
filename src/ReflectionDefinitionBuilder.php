@@ -16,8 +16,8 @@ use function Crell\fp\pipe;
 class ReflectionDefinitionBuilder
 {
     public function __construct(
-        protected AttributeParser $parser,
-        protected Analyzer $analyzer,
+        protected readonly AttributeParser $parser,
+        protected readonly Analyzer $analyzer,
     ) {}
 
     /**
@@ -49,6 +49,10 @@ class ReflectionDefinitionBuilder
      */
     public function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface): ?object
     {
+        // @todo This is a problem. IF an attribute supports scopes, and is excluded,
+        // then we do NOT want to have a default empty added, regardless of $includeByDefault.
+        // I think?  But we don't know about scopes at this point, which means we don't know
+        // what we should do here. I don't know how to solve this.
         $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
             ?? ($includeByDefault ?  new $attributeType() : null);
 

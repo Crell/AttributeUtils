@@ -17,11 +17,12 @@ class ScopedMethod implements SupportsScopes, ParseParameters
     public function __construct(
         public string $val = 'Z',
         public ?string $scope = null,
+        public bool $includeInAll = true,
     ) {}
 
     public function scopes(): array
     {
-        return $this->scope ? [$this->scope] : [];
+        return [$this->scope];
     }
 
     public function parameterAttribute(): string
