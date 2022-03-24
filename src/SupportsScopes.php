@@ -7,21 +7,50 @@ namespace Crell\AttributeUtils;
 interface SupportsScopes
 {
     /**
-     * Whether or not this attribute should be included for a given scope.
+     * The scopes this attribute should be included in.
      *
-     * Note that $scope may be null, which indicates the attribute lookup
-     * is happening without a specified scope.  It is up to the attribute
-     * to decide if it should be included in that case.
+     * If a caller does not specify a scope, then the scope
+     * will be `null`.  Therefore, to include this attribute
+     * in the "no scope requested" case, include `null` in the
+     * returned array.
      *
-     * Examples:
-     * - To include this attribute in a no-scope case, return true for null.
-     * - If an attribute has no scope set and you want it to be included in
-     *   all scopes, return true unconditionally.
-     * - If an attribute has no scope set and you want it to be included
-     *   only in a no-scope case, return is_null($scope);
+     * In the typical case of an attribute only having a single
+     * scope that is specified by an argument, do this:
      *
+     * class Attr implements SupportsScopes
+     * {
+     *     public function __construct(private ?string $scope) {}
+     *
+     *     public function scopes(): array
+     *     {
+     *         return [$this->scope];
+     *     }
+     * }
+     *
+     * If the intent is to allow multiple scopes on the same
+     * attribute instance, you would do this (assuming you want
+     * it included it unscoped requests):
+     *
+     * class Attr implements SupportsScopes
+     * {
+     *     public function __construct(private array $scopes)
+     *     {
+     *        $this->scopes[] = null;
+     *     }
+     *
+     *     public function scopes(): array
+     *     {
+     *         return $this->scopes;
+     *     }
+     * }
+     *
+     * Returning an empty array means this attribute will never be
+     * included, so that is most likely not what you want, ever.
+     *
+     * @return array<string|null>
+     *   An array of scope names in which this attribute should
+     *   be included.  Include a value of `null` to have it
+     *   present in the "none requested" scope.
      */
     public function scopes(): array;
-
-//    public function includeUnscopedInScope(): bool;
 }
