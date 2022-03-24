@@ -4,9 +4,9 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Total Downloads][ico-downloads]][link-downloads]
 
-AttributeUtils provides utilities to simplify working with and reading Attributes in PHP 8.0 and later.
+AttributeUtils provides utilities to simplify working with and reading Attributes in PHP 8.1 and later.
 
-Its primary tool is the Class Analzyer, which allows you to analyze a given class (or enum, in PHP 8.1) with respect to some attribute class.  Attribute classes may implement various interfaces in order to opt-in to additional behavior, as described below.  The overall intent is to provide a simple but powerful framework for reading metadata off of a class, including with reflection data.
+Its primary tool is the Class Analyzer, which allows you to analyze a given class or enum with respect to some attribute class.  Attribute classes may implement various interfaces in order to opt-in to additional behavior, as described below.  The overall intent is to provide a simple but powerful framework for reading metadata off of a class, including with reflection data.
 
 ## Install
 
@@ -77,13 +77,13 @@ class AttribWithName implements FromReflectionClass
 }
 ```
 
-The reflection object itself should *never ever* be saved to the attribute object.  Reflection objects cannot be cached, so doing so would render the attribute object uncacheable.  It's also wasteful, as any data you need can be retrieved from the reflection object and saved individually.
+The reflection object itself should *never ever* be saved to the attribute object.  Reflection objects cannot be cached, so saving it would render the attribute object uncacheable.  It's also wasteful, as any data you need can be retrieved from the reflection object and saved individually.
 
 There are similarly [`FromReflectionProperty`](src/FromReflectionProperty.php), [`FromReflectionMethod`](src/FromReflectionMethod.php), [`FromReflectionClassConstant`](src/FromReflectionClassConstant.php), and [`FromReflectionParameter`](src/FromReflectionParameter.php) interfaces that do the same for their respective bits of a class.
 
 ### Additional class components
 
-The class attribute may also opt-in to analyzing various portions of the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [ParseStaticProperties](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
+The class attribute may also opt-in to analyzing various portions of the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [`ParseStaticProperties`](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
 
 An example is the easiest way to explain it:
 
@@ -213,7 +213,7 @@ When checking for an attribute, the Analyzer uses an `instanceof` check in Refle
 
 ### Sub-attributes
 
-`Analyzer` can only parse a single attribute on each target.  However, it also supports the concept of "sub-attributes."  Sub-attributes work similarly to the way a class can opt-in to parsing properties or methods, but for sibling attributes instead of child components.  That way, any number of attributes on the same component can be folded together into a single attribute object.  Any attribute for any component may opt-in to sub-attributes by implementing [`HasAttributes`](src/HasSubAttributes.php).
+`Analyzer` can only handle a single attribute on each target.  However, it also supports the concept of "sub-attributes."  Sub-attributes work similarly to the way a class can opt-in to parsing properties or methods, but for sibling attributes instead of child components.  That way, any number of attributes on the same component can be folded together into a single attribute object.  Any attribute for any component may opt-in to sub-attributes by implementing [`HasAttributes`](src/HasSubAttributes.php).
 
 The following example should make it clearer:
 
@@ -267,11 +267,11 @@ Note that if the sub-attribute is missing, `null` will be passed to the method. 
 
 Sub-attributes may also be `Inheritable`.
 
-### Multi-value attributes
+### Multi-value sub-attributes
 
 By default, PHP attributes can only be placed on a given target once.  However, they may be marked as "repeatable," in which case multiple of the same attribute may be placed on the same target.  (Class, property, method, etc.)
 
-The Analyzer does not support multi-value attributes, but it does support multi-value sub-attributes.  Specifically, if the sub-attribute is marked as multi-value, then an array of sub-attributes will be passed to the callback instead.
+The Analyzer does not support multi-value attributes, but it does support multi-value sub-attributes.  If the sub-attribute implements the [`Multivalue`](src/Multivalue.php) marker interface, then an array of sub-attributes will be passed to the callback instead.
 
 For example:
 
@@ -296,7 +296,7 @@ class MainAttrib implements HasSubAttributes
     }
 }
 
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS, \Attribute::IS_REPEATABLE)]
 class Knows
 {
     public function __construct(public readonly string $name) {}
@@ -313,6 +313,8 @@ class B {}
 In this case, any number of `Knows` attributes may be included, including zero, but if included the `$name` argument is required.  The `fromKnows()` method will be called with a (possibly empty, in the case of `B`) array of `Knows` objects, and can do what it likes with it.  In this example the objects are saved in their entirety, but they could also be mushed into a single array or used to set some other value if desired.
 
 Note that if a multi-value sub-attribute is `Inheritable`, ancestor classes will only be checked if there are no local sub-attributes.  If there is at least one, it will take precedence and the ancestors will be ignored.
+
+Note: In order to make use of multi-value sub-attributes, the attribute class itself must be marked as "repeatable" as in the example above or PHP will generate an error.  However, that is not sufficient for the Analyzer to parse it as multi-value.  That's because attributes may also be multi-value when implementing scopes, but still only single-value from the Analzyer's point of view.  See the section on Scopes below.
 
 ### Caching
 
@@ -332,7 +334,95 @@ $analyzer = new MemoryCacheAnalyzer(new Psr6CacheAnalyzer(new Analyzer()));
 
 ## Advanced features
 
-There are a couple of other advanced features also available.  These are rarely useful, but if useful they can be very helpful.
+There are a couple of other advanced features also available.  These are less frequently used, but in the right circumstances they can be very helpful.
+
+### Scopes
+
+Attributes may opt-in to supporting "scopes".  "Scopes" allow you to specify alternate versions of the same attribute to use in different contexts.  Examples include different serialization groups or different languages.  Often, scopes will be hidden behind some other name in another library (like language), which is fine.
+
+If an attribute implements [`SupportsScopes`](src/SupportsScopes.php), then when looking for attributes additional filtering will be performed.  The exact logic also interacts with exclusion and whether a class attribute specifies a component should be loaded by default if missing, leading to a highly robust set of potential rules for what attribute to use when.
+
+As an example, let's consider providing alternate language versions of a property attribute.  The logic is identical for any component, as well as for sub-attributes.
+
+```php
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class Labeled implements \Crell\AttributeUtils\ParseProperties
+{
+    public readonly array $properties;
+
+    public function setProperties(array $properties): void
+    {
+        $this->properties ??= $properties;
+    }
+
+    public function includePropertiesByDefault(): bool
+    {
+        return true;
+    }
+
+    public function propertyAttribute(): string
+    {
+        return Label::class;
+    }
+}
+
+#[\Attribute(\Attribute::TARGET_PROPERTY, \Attribute::IS_REPEATABLE)]
+class Label implements \Crell\AttributeUtils\SupportsScopes, \Crell\AttributeUtils\Excludable
+{
+    public function __construct(
+        public readonly string $name = 'Untitled',
+        public readonly ?string $language = null,
+        public readonly bool $exclude = false,
+    ) {}
+
+    public function scopes(): array
+    {
+        return [$this->language];
+    }
+
+    public function exclude(): bool
+    {
+        return $this->exclude;
+    }
+}
+
+#[Labeled]
+class App
+{
+    #[Label(name: 'Installation')]
+    #[Label(name: 'Instalación', language: 'es')]
+    public string $install;
+
+    #[Label(name: 'Setup')]
+    #[Label(name: 'Configurar', language: 'es')]
+    #[Label(name: 'Einrichten', language: 'de')]
+    public string $setup;
+
+    #[Label(name: 'Einloggen', language: 'de')]
+    #[Label(language: 'fr', exclude: true)]
+    public string $login;
+
+    public string $customization;
+}
+```
+
+The `Labeled` attribute on the class is nothing we haven't seen before.  The `Label` attribute for properties is both excludable and supports scopes, although it exposes it with the name `language`.
+
+Calling the Analyzer as we've seen before will ignore the scoped versions, and result in an array of `Label`s with names "Installation", "Setup", "Untitled", and "Untitled".  However, it may also be invoked with a specific scope:
+
+```php
+$labels = $analyzer->analyze(App::class, Labeled::class, scope: 'es');
+```
+
+Now, `$labels` will contain an array of `Label`s with names "Instalación", "Configurar", "Untitled", and "Untitled".  On `$stepThree`, there is no `es` scoped version so it falls back to the default.  Similarly, a scope of `de` will result in "Installation", "Einrichten", "Einloggen", and "Untitled" (as "Installation" is spelled the same in both English and German).
+
+A scope of `fr` will result in the default (English) for each case, except for `$stepThree` which will be omitted entirely.  The `exclude` directive is applicable only in that scope.  The result will therefore be "Installation", "Setup", "Untitled".
+
+(If you were doing this for real, it would make sense to derive a default `name` off of the property name itself via `FromReflectionProperty` rather than a hard-coded "Untitled.")
+
+By contrast, if `Labeled::includePropertiesByDefault()` returns false, then `$customization` will not be included in any scope.  `$login` will be included in `de` only, and in no other scope at all.  That's because there is no default-scope option specified, and so in any scope other than `de` no default will be created.  A lookup for scope `fr` will be empty.
+
+Note that the `scopes()` method returns an array.  That means an attribute being part of multiple scopes is fully supported.  How you populate the return of that method (whether an array argument or something else) is up to you.
 
 ### Transitivity
 
@@ -426,8 +516,6 @@ Even if you do not need to use the entire Reflect tree, it's worth studying as a
 
 A number of traits are included as well that handle the common case of collecting all of a given class component.  Feel free to use them in your own classes if you wish.
 
-The Reflect tree requires PHP 8.1, as it makes extensive use of both Enums and `readonly` properties.
-
 ## Advanced tricks
 
 The following are a collection of advanced and fancy uses of the Analyzer, mostly to help demonstrate just how powerful it can be when used appropriately.
@@ -509,7 +597,7 @@ Bruce Wayne
 Bat Man
 ```
 
-The `IteratorAggregate` and `ArrayAccess` interfaces are optional; I include them here just to show that you can do it if you want.  Here, the `Names` attribute is never put on a class directly.  However, by analyzing a class "with respect to" `Names`, you can collect all of the multi-value sub-attributes that it has, giving the impression of a multi-value attribute.
+The `IteratorAggregate` and `ArrayAccess` interfaces are optional; I include them here just to show that you can do it if you want.  Here, the `Names` attribute is never put on a class directly.  However, by analyzing a class "with respect to" `Names`, you can collect all the multi-value sub-attributes that it has, giving the impression of a multi-value attribute.
 
 ## Interface attributes
 
@@ -579,6 +667,8 @@ class Something
 
 The interface needs to be marked as an attribute and repeatable so that `Analyzer` can recognize that it should allow multiple values.  However, you can now mix and match `RealName` and `Alias` on the same class.  Only one `RealName` is allowed, but any number of `Alias` attributes are allowed.  All are `Name` according to the `Names` main attribute, and so all will get picked up and made available.
 
+Be aware that some static analyzers will complain about marking an interface as an attribute, since PHP doesn't do anything with them.  It is syntactically legal, however, so it's best to just silence that error in the static analyzer as it is being over-protective.
+
 ### One of many options
 
 In a similar vein, it's possible to use sub-attributes to declare that a component may be marked with one of a few attributes, but only one of them.
@@ -630,7 +720,7 @@ $displayInfoB = $analyzer->analzyer(B::class, DisplayInfo::class);
 $displayInfoC = $analyzer->analzyer(C::class, DisplayInfo::class);
 ```
 
-In this case, a class may be marked with either `Screen` or `Audio`, but no both.  If both are specified, only the first one listed will be used; the others will be ignored.
+In this case, a class may be marked with either `Screen` or `Audio`, but not both.  If both are specified, only the first one listed will be used; the others will be ignored.
 
 In this example, `$displayInfoA->type` will be an instance of `Screen`, `$displayInfoB->type` will be an instance of `Audio`, and `$displayInfoC->type` will be `null`.
 
@@ -668,8 +758,6 @@ The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for mor
 [ico-downloads]: https://img.shields.io/packagist/dt/Crell/AttributeUtils.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/Crell/AttributeUtils
-[link-scrutinizer]: https://scrutinizer-ci.com/g/Crell/AttributeUtils/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/Crell/AttributeUtils
 [link-downloads]: https://packagist.org/packages/Crell/AttributeUtils
 [link-author]: https://github.com/Crell
 [link-contributors]: ../../contributors
