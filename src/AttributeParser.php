@@ -35,75 +35,113 @@ class AttributeParser
         // @phpstan-ignore-next-line.
         $attribs =  pipe($target->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF),
             amap(method('newInstance')),
-//            afilter(fn (object $attr) =>
-//                !$attr instanceof SupportsScopes || $attr->hasScope($this->scope)
-//            ),
-//            array_values(...),
         );
 
         if (is_a($name, SupportsScopes::class, true)) {
-            $inDefaultScope = static fn (SupportsScopes $attr): bool
-                => in_array(null, $attr->scopes(), true);
-            $hasAScope = static fn (SupportsScopes $attr): bool
-                => !all(is_null(...))($attr->scopes());
-            $hasNoScope = static fn (SupportsScopes $attr): bool
-                => array_unique($attr->scopes()) === [null];
-            $hasSpecificScope = static fn(string $scope): \Closure
-                => static fn (SupportsScopes $attr): bool => in_array($scope, $attr->scopes(), true);
-
-            if (is_null($this->scope)) {
-                $inGlobal = pipe($attribs,
-                    afilter($inDefaultScope),
-                    afilter($hasNoScope),
-                );
-                return $inGlobal;
-            }
-
-            $filter = fn (SupportsScopes $attr): bool =>
-                in_array(null, $attr->scopes(), true)
-                || in_array($this->scope, $attr->scopes(), true);
-
-            // Attributes that are in the current scope OR global.
-            $attribs = \array_filter($attribs, $filter);
-
-            if (count($attribs) > 1) {
-                $attribsWithNonDefaultScope = \array_filter($attribs, $hasAScope);
-                if (count($attribsWithNonDefaultScope)) {
-                    $attribs = \array_filter($attribs, $hasSpecificScope($this->scope));
-                }
-            }
-
-            /*
-            If non-global scope requested:
-            * Filter out anything without a matching scope OR null.
-            * If the result has multiple items, AND one of them has non-null scopes, filter out anything without a matching scope, excluding null.
-            * Use first.
-            */
-
-
-
-            /*
-            foreach ($attribs as $attrib) {
-                match ([
-                    $this->scope, // The scope being requested.
-                    in_array($this->scope, $attrib->scopes(), true), // If this attrib is explicitly in scope.
-                    $attrib->includeUnscopedInScope(),  //Should an unscoped attrib count if there is no scoped attrib.
-                ]) {
-                    [null, true, true] => ,
-                    [null, true, false] => ,
-                    [null, false, true] => ,
-                    [null, false, false] => ,
-                    [$this->scope, true, true] => ,
-                    [$this->scope, true, false] => ,
-                    [$this->scope, false, true] => ,
-                    [$this->scope, false, false] => ,
-                };
-            }
-            */
+            $attribs = $this->filterForScopes($attribs, $this->scope);
         }
 
-        return \array_values($attribs);
+        return array_values($attribs);
+    }
 
+    /**
+     * Filters a list of attributes based on their declared scope.
+     *
+     * If the current scope is null, meaning no scope, then only
+     * attributes that also have no scope at all (their scope list is `[null]`)
+     * will be retained.
+     *
+     * If the current scope is non-null, and there is at least one in-scope
+     * attribute, then only attributes that match the current scope are returned.
+     *
+     * If there are only unscoped attributes, then those will be returned. That
+     * allows a scoped lookup to still include all attributes that are not scope-specific.
+     * To explicitly exclude an attribute in unscoped or scoped requests, implement
+     * `Excludable` and mark it excluded in the appropriate scope.
+     *
+     * @param object[] $attribs
+     *   An array of loaded attribute objects.
+     * @param string|null $currentScope
+     *   The scope being requested.
+     * @return array
+     */
+    protected function filterForScopes(array $attribs, ?string $currentScope): array
+    {
+        // If the request is for "unscoped" attributes, filter out
+        // any that specify a scope other than unscoped.
+        if (is_null($currentScope)) {
+            return pipe($attribs,
+                afilter($this->hasNoScope(...)),
+                array_values(...),
+            );
+        }
+
+        // If both a scoped and unscoped version of an attribute is present,
+        // and the request is for that scope, we want the scoped version, NOT
+        // the unscoped version, regardless of lexical order.  That requires
+        // this extra song-and-dance to see if we should fall back to the unscoped
+        // version or not.
+
+        // Attributes that are in the current scope OR unscoped.
+        $attribs = \array_filter($attribs, $this->inScopeOrUnscoped($currentScope));
+
+        // If there are any attributes with a scope, filter out the
+        // ones that have no scope.
+        $attribsWithNonDefaultScope = \array_filter($attribs, $this->hasAnyScope(...));
+        if (count($attribsWithNonDefaultScope)) {
+            $attribs = \array_filter($attribs, $this->hasScope($currentScope));
+        }
+
+        return $attribs;
+    }
+
+    /**
+     * Determines if an attribute has no scope specified at all.
+     *
+     * @param SupportsScopes $attr
+     * @return bool
+     */
+    protected function hasNoScope(SupportsScopes $attr): bool
+    {
+        return array_unique($attr->scopes()) === [null];
+    }
+
+    /**
+     * Determines if an attribute has any scope specified.
+     *
+     * @param SupportsScopes $attr
+     * @return bool
+     */
+    protected function hasAnyScope(SupportsScopes $attr): bool
+    {
+        return !$this->hasNoScope($attr);
+    }
+
+    /**
+     * Builds a pipe-friendly closure that determines if an attribute is in a scope.
+     *
+     * @param string|null $scope
+     *   The name of the scope, or null if checking for the unscoped case.
+     * @return \Closure
+     */
+    protected function hasScope(?string $scope): \Closure
+    {
+        return static fn (SupportsScopes $attr): bool
+            => in_array($scope, $attr->scopes(), true);
+    }
+
+    /**
+     * Builds a pipe-friendly closure that determines if an attribute is in a scope, or supports unscoped cases.
+     *
+     * This is a performance optimization of hasScope($scope) || hasScope(null).
+     */
+    protected function inScopeOrUnscoped(string $scope): \Closure
+    {
+        return static function (SupportsScopes $attr) use ($scope): bool {
+            $scopes = $attr->scopes();
+            return  in_array($scope, $scopes, true)
+                || in_array(null, $scopes, true);
+        };
     }
 
     /**
