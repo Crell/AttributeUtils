@@ -422,6 +422,8 @@ Now, `$labels` will contain an array of `Label`s with names "Instalación", "Con
 
 By contrast, if `Labeled::includePropertiesByDefault()` returns false, then `$customization` will not be included in any scope.  `$login` will be included in `de` only, and in no other scope at all.  That's because there is no default-scope option specified, and so in any scope other than `de` no default will be created.  A lookup for scope `fr` will be empty.
 
+A useful way to control what properties are included is to make the class-level attribute scope-aware as well, and control `includePropertiesByDefault()` via an argument. That way, for example, `includePropertiesByDefault()` can return true in the unscoped case, but false in when a scope is explicitly specified; that way, properties will only be included in a scope if they explicitly opt-in to being in that scope, while in the unscoped case all properties are included.
+
 Note that the `scopes()` method returns an array.  That means an attribute being part of multiple scopes is fully supported.  How you populate the return of that method (whether an array argument or something else) is up to you.
 
 ### Transitivity

@@ -33,10 +33,7 @@ interface SupportsScopes
      *
      * class Attr implements SupportsScopes
      * {
-     *     public function __construct(private array $scopes)
-     *     {
-     *        $this->scopes[] = null;
-     *     }
+     *     public function __construct(private array $scopes = [null]) {}
      *
      *     public function scopes(): array
      *     {
