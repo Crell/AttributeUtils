@@ -15,6 +15,7 @@ use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
 use Crell\AttributeUtils\Attributes\GenericClass;
+use Crell\AttributeUtils\Attributes\Labeled;
 use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\ScopedClassNoDefaultInclude;
@@ -32,6 +33,7 @@ use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
 use Crell\AttributeUtils\Records\ClassWithRecursiveSubAttributes;
 use Crell\AttributeUtils\Records\ClassWithScopesNotDefault;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
+use Crell\AttributeUtils\Records\LabeledApp;
 use Crell\AttributeUtils\Records\MissingPropertyAttributeArguments;
 use Crell\AttributeUtils\Records\MultiuseClass;
 use Crell\AttributeUtils\Records\NoProps;
@@ -488,6 +490,54 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('notNullScope', $classDef->properties);
                 self::assertEquals('Z', $classDef->properties['excludeOnlyInScopes']->val);
                 self::assertArrayNotHasKey('onlyInScopeOne', $classDef->properties);
+            },
+        ];
+
+        yield 'LabeledApp: English' => [
+            'subject' => LabeledApp::class,
+            'attribute' => Labeled::class,
+            'scope' => null,
+            'test' => static function(Labeled $classDef) {
+                self::assertEquals('Installation', $classDef->properties['install']->name);
+                self::assertEquals('Setup', $classDef->properties['setup']->name);
+                self::assertEquals('Untitled', $classDef->properties['login']->name);
+                self::assertEquals('Untitled', $classDef->properties['customization']->name);
+            },
+        ];
+
+        yield 'LabeledApp: Spanish' => [
+            'subject' => LabeledApp::class,
+            'attribute' => Labeled::class,
+            'scope' => 'es',
+            'test' => static function(Labeled $classDef) {
+                self::assertEquals('Instalación', $classDef->properties['install']->name);
+                self::assertEquals('Configurar', $classDef->properties['setup']->name);
+                self::assertEquals('Untitled', $classDef->properties['login']->name);
+                self::assertEquals('Untitled', $classDef->properties['customization']->name);
+            },
+        ];
+
+        yield 'LabeledApp: German' => [
+            'subject' => LabeledApp::class,
+            'attribute' => Labeled::class,
+            'scope' => 'de',
+            'test' => static function(Labeled $classDef) {
+                self::assertEquals('Installation', $classDef->properties['install']->name);
+                self::assertEquals('Einrichten', $classDef->properties['setup']->name);
+                self::assertEquals('Einloggen', $classDef->properties['login']->name);
+                self::assertEquals('Untitled', $classDef->properties['customization']->name);
+            },
+        ];
+
+        yield 'LabeledApp: French' => [
+            'subject' => LabeledApp::class,
+            'attribute' => Labeled::class,
+            'scope' => 'fr',
+            'test' => static function(Labeled $classDef) {
+                self::assertEquals('Installation', $classDef->properties['install']->name);
+                self::assertEquals('Setup', $classDef->properties['setup']->name);
+                self::assertArrayNotHasKey('login', $classDef->properties);
+                self::assertEquals('Untitled', $classDef->properties['customization']->name);
             },
         ];
     }

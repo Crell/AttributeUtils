@@ -346,7 +346,7 @@ As an example, let's consider providing alternate language versions of a propert
 
 ```php
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class Labeled implements \Crell\AttributeUtils\ParseProperties
+class Labeled implements ParseProperties
 {
     public readonly array $properties;
 
@@ -366,8 +366,8 @@ class Labeled implements \Crell\AttributeUtils\ParseProperties
     }
 }
 
-#[\Attribute(\Attribute::TARGET_PROPERTY, \Attribute::IS_REPEATABLE)]
-class Label implements \Crell\AttributeUtils\SupportsScopes, \Crell\AttributeUtils\Excludable
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
+class Label implements SupportsScopes, Excludable
 {
     public function __construct(
         public readonly string $name = 'Untitled',
@@ -416,7 +416,7 @@ $labels = $analyzer->analyze(App::class, Labeled::class, scope: 'es');
 
 Now, `$labels` will contain an array of `Label`s with names "Instalación", "Configurar", "Untitled", and "Untitled".  On `$stepThree`, there is no `es` scoped version so it falls back to the default.  Similarly, a scope of `de` will result in "Installation", "Einrichten", "Einloggen", and "Untitled" (as "Installation" is spelled the same in both English and German).
 
-A scope of `fr` will result in the default (English) for each case, except for `$stepThree` which will be omitted entirely.  The `exclude` directive is applicable only in that scope.  The result will therefore be "Installation", "Setup", "Untitled".
+*A scope of `fr` will result in the default (English) for each case, except for `$stepThree` which will be omitted entirely.  The `exclude` directive is applicable only in that scope.  The result will therefore be "Installation", "Setup", "Untitled".
 
 (If you were doing this for real, it would make sense to derive a default `name` off of the property name itself via `FromReflectionProperty` rather than a hard-coded "Untitled.")
 
