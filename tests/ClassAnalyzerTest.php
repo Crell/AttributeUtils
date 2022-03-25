@@ -369,6 +369,7 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
                 self::assertEquals('A', $classDef->properties['notNullScope']->val);
                 self::assertArrayNotHasKey('excludeOnlyInScopes', $classDef->properties);
+                self::assertEquals('A', $classDef->properties['excludeFromNullScopeHasScope']->val);
                 self::assertEquals('A', $classDef->properties['onlyInScopeOne']->val);
             },
         ];
@@ -393,6 +394,7 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
                 self::assertEquals('B', $classDef->properties['notNullScope']->val);
                 self::assertArrayNotHasKey('excludeOnlyInScopes', $classDef->properties);
+                self::assertEquals('B', $classDef->properties['excludeFromNullScopeHasScope']->val);
                 self::assertEquals('Z', $classDef->properties['onlyInScopeOne']->val);
             },
         ];
@@ -417,6 +419,7 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
                 self::assertEquals('Z', $classDef->properties['notNullScope']->val);
                 self::assertEquals('Z', $classDef->properties['excludeOnlyInScopes']->val);
+                self::assertEquals('Z', $classDef->properties['excludeFromNullScopeHasScope']->val);
                 self::assertEquals('Z', $classDef->properties['onlyInScopeOne']->val);
             },
         ];
@@ -441,6 +444,7 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
                 self::assertEquals('A', $classDef->properties['notNullScope']->val);
                 self::assertArrayNotHasKey('excludeOnlyInScopes', $classDef->properties);
+                self::assertEquals('A', $classDef->properties['excludeFromNullScopeHasScope']->val);
                 self::assertEquals('A', $classDef->properties['onlyInScopeOne']->val);
             },
         ];
@@ -465,6 +469,7 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
                 self::assertEquals('B', $classDef->properties['notNullScope']->val);
                 self::assertArrayNotHasKey('excludeOnlyInScopes', $classDef->properties);
+                self::assertEquals('B', $classDef->properties['excludeFromNullScopeHasScope']->val);
                 self::assertArrayNotHasKey('onlyInScopeOne', $classDef->properties);
             },
         ];
@@ -489,6 +494,7 @@ class ClassAnalyzerTest extends TestCase
                 self::assertArrayNotHasKey('defaultAttributeExcluded', $classDef->properties);
                 self::assertArrayNotHasKey('notNullScope', $classDef->properties);
                 self::assertEquals('Z', $classDef->properties['excludeOnlyInScopes']->val);
+                self::assertEquals('Z', $classDef->properties['excludeFromNullScopeHasScope']->val);
                 self::assertArrayNotHasKey('onlyInScopeOne', $classDef->properties);
             },
         ];

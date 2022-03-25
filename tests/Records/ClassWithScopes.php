@@ -47,7 +47,6 @@ class ClassWithScopes
     #[ScopedProperty(val: 'B', scope: 'Two', exclude: true)]
     public string $excludeOnlyInScopes;
 
-    #[ScopedProperty(includeUnscopedInScope: false)]
     #[ScopedProperty(val: 'A', scope: 'One', includeUnscopedInScope: false)]
     #[ScopedProperty(val: 'B', scope: 'Two', includeUnscopedInScope: false)]
     public string $excludeFromNullScopeHasScope;

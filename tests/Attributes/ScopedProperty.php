@@ -16,16 +16,15 @@ class ScopedProperty implements SupportsScopes, Excludable
         public ?string $scope = null,
         public bool $includeUnscopedInScope = true,
         public bool $exclude = false,
-    ) {}
+    ) {
+    }
 
     public function scopes(): array
     {
+        if ($this->includeUnscopedInScope) {
+            return [$this->scope, null];
+        }
         return [$this->scope];
-    }
-
-    public function includeUnscopedInScope(): bool
-    {
-        return $this->includeUnscopedInScope;
     }
 
     public function exclude(): bool
