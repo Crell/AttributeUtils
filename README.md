@@ -296,7 +296,7 @@ class MainAttrib implements HasSubAttributes
     }
 }
 
-#[\Attribute(\Attribute::TARGET_CLASS, \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Knows
 {
     public function __construct(public readonly string $name) {}
@@ -411,20 +411,28 @@ The `Labeled` attribute on the class is nothing we haven't seen before.  The `La
 Calling the Analyzer as we've seen before will ignore the scoped versions, and result in an array of `Label`s with names "Installation", "Setup", "Untitled", and "Untitled".  However, it may also be invoked with a specific scope:
 
 ```php
-$labels = $analyzer->analyze(App::class, Labeled::class, scope: 'es');
+$labels = $analyzer->analyze(App::class, Labeled::class, scopes: ['es']);
 ```
 
 Now, `$labels` will contain an array of `Label`s with names "Instalación", "Configurar", "Untitled", and "Untitled".  On `$stepThree`, there is no `es` scoped version so it falls back to the default.  Similarly, a scope of `de` will result in "Installation", "Einrichten", "Einloggen", and "Untitled" (as "Installation" is spelled the same in both English and German).
 
-*A scope of `fr` will result in the default (English) for each case, except for `$stepThree` which will be omitted entirely.  The `exclude` directive is applicable only in that scope.  The result will therefore be "Installation", "Setup", "Untitled".
+A scope of `fr` will result in the default (English) for each case, except for `$stepThree` which will be omitted entirely.  The `exclude` directive is applicable only in that scope.  The result will therefore be "Installation", "Setup", "Untitled".
 
 (If you were doing this for real, it would make sense to derive a default `name` off of the property name itself via `FromReflectionProperty` rather than a hard-coded "Untitled.")
 
 By contrast, if `Labeled::includePropertiesByDefault()` returns false, then `$customization` will not be included in any scope.  `$login` will be included in `de` only, and in no other scope at all.  That's because there is no default-scope option specified, and so in any scope other than `de` no default will be created.  A lookup for scope `fr` will be empty.
 
-A useful way to control what properties are included is to make the class-level attribute scope-aware as well, and control `includePropertiesByDefault()` via an argument. That way, for example, `includePropertiesByDefault()` can return true in the unscoped case, but false in when a scope is explicitly specified; that way, properties will only be included in a scope if they explicitly opt-in to being in that scope, while in the unscoped case all properties are included.
+A useful way to control what properties are included is to make the class-level attribute scope-aware as well, and control `includePropertiesByDefault()` via an argument. That way, for example, `includePropertiesByDefault()` can return true in the unscoped case, but false when a scope is explicitly specified; that way, properties will only be included in a scope if they explicitly opt-in to being in that scope, while in the unscoped case all properties are included.
 
 Note that the `scopes()` method returns an array.  That means an attribute being part of multiple scopes is fully supported.  How you populate the return of that method (whether an array argument or something else) is up to you.
+
+Additionally, scopes are looked up as an ORed array.  That is, the following command:
+
+```php
+$labels = $analyzer->analyze(SomeClass::class, AnAttribute::class, scopes: ['One', 'Two']);
+```
+
+will retrieve any attributes that return *either* `One` or `Two` from their `scopes()` method.  If multiple attributes on the same component match that rule (say, one returns `['One']` and another returns `['Two']`), the lexically first will be used.
 
 ### Transitivity
 
