@@ -20,6 +20,14 @@ use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\ScopedClassMulti;
 use Crell\AttributeUtils\Attributes\ScopedClassNoDefaultInclude;
+use Crell\AttributeUtils\ExclusiveOptions\Audio;
+use Crell\AttributeUtils\ExclusiveOptions\AudioData;
+use Crell\AttributeUtils\ExclusiveOptions\BothData;
+use Crell\AttributeUtils\ExclusiveOptions\DisplayInfo;
+use Crell\AttributeUtils\ExclusiveOptions\DisplayType;
+use Crell\AttributeUtils\ExclusiveOptions\NoData;
+use Crell\AttributeUtils\ExclusiveOptions\Screen;
+use Crell\AttributeUtils\ExclusiveOptions\ScreenData;
 use Crell\AttributeUtils\InterfaceAttributes\Hero;
 use Crell\AttributeUtils\InterfaceAttributes\Name;
 use Crell\AttributeUtils\InterfaceAttributes\Names;
@@ -345,6 +353,32 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
+        yield 'Exclusive attributes (screen)' => [
+            'subject' => ScreenData::class,
+            'attribute' => DisplayInfo::class,
+            'test' => static function(DisplayInfo $classDef) {
+                self::assertInstanceOf(Screen::class, $classDef->type);
+                self::assertEquals('#00AA00', $classDef->type->color);
+            },
+        ];
+
+        yield 'Exclusive attributes (audio)' => [
+            'subject' => AudioData::class,
+            'attribute' => DisplayInfo::class,
+            'test' => static function(DisplayInfo $classDef) {
+                self::assertInstanceOf(Audio::class, $classDef->type);
+                self::assertEquals(10, $classDef->type->volume);
+            },
+        ];
+
+        yield 'Exclusive attributes (neither)' => [
+            'subject' => NoData::class,
+            'attribute' => DisplayInfo::class,
+            'test' => static function(DisplayInfo $classDef) {
+                self::assertNull($classDef->type);
+            },
+        ];
+
         yield 'UnitEnum with subattributes' => [
             'subject' => Suit::class,
             'attribute' => ClassWithOwnSubAttributes::class,
@@ -352,6 +386,18 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('C', $classDef->c);
             },
         ];
+    }
+
+    /**
+     * @test-disabled
+     */
+    public function analyze_broken_exclusive(): void
+    {
+        $analyzer = new Analyzer();
+
+        $classDef = $analyzer->analyze(BothData::class, DisplayInfo::class);
+
+        // This should probably error somehow, but not sure how.
     }
 
     /**

@@ -617,7 +617,7 @@ A good use for that is sub-attributes, which may also be specified as an interfa
 
 ```php
 
-#[\Attribute(Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class Names implements HasSubAttributes, IteratorAggregate, ArrayAccess
 {
     protected readonly array $names;
@@ -640,7 +640,7 @@ interface Name extends Multivalue
     public function fullName(): string;
 }
 
-#[\Attribute(Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class RealName implements Name
 {
     public function __construct(
@@ -654,7 +654,7 @@ class RealName implements Name
     }
 }
 
-#[\Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Alias implements Name
 {
     public function __construct(public readonly string $name) {}
@@ -683,18 +683,17 @@ Note that the interface must be marked `Multivalue` so that `Analyzer` will allo
 In a similar vein, it's possible to use sub-attributes to declare that a component may be marked with one of a few attributes, but only one of them.
 
 ```php
-#[\Attribute(Attribute::TARGET_CLASS)]
 interface DisplayType
 {
 }
 
-#[\Attribute(Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class Screen implements DisplayType
 {
     public function __construct(public readonly string $color) {}
 }
 
-#[\Attribute(Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS)]
 class Audio implements DisplayType
 {
     public function __construct(public readonly int $volume) {}
