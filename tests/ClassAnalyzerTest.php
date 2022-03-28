@@ -20,6 +20,9 @@ use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\ScopedClassMulti;
 use Crell\AttributeUtils\Attributes\ScopedClassNoDefaultInclude;
+use Crell\AttributeUtils\InterfaceAttributes\Hero;
+use Crell\AttributeUtils\InterfaceAttributes\Name;
+use Crell\AttributeUtils\InterfaceAttributes\Names;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
@@ -325,6 +328,20 @@ class ClassAnalyzerTest extends TestCase
                 self::assertEquals('method', $classDef->methods['method']->phpName);
                 self::assertEquals(5, $classDef->methods['method']->parameters['arg']->a);
                 self::assertEquals('arg', $classDef->methods['method']->parameters['arg']->phpName);
+            },
+        ];
+
+        yield 'Interface attributes' => [
+            'subject' => Hero::class,
+            'attribute' => Names::class,
+            'test' => static function(Names $classDef) {
+                self::assertCount(4, $classDef);
+
+                $names = $classDef->nameList();
+                self::assertContains('Bruce Wayne', $names);
+                self::assertContains('Batman', $names);
+                self::assertContains('The Dark Knight', $names);
+                self::assertContains('The Caped Crusader', $names);
             },
         ];
 

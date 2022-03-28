@@ -635,8 +635,7 @@ class Names implements HasSubAttributes, IteratorAggregate, ArrayAccess
     // The same ArrayAccess and IteratorAggregate code as above.
 }
 
-#[\Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-interface Name
+interface Name extends Multivalue
 {
     public function fullName(): string;
 }
@@ -670,14 +669,14 @@ class Alias implements Name
 #[Alias('Batman')]
 #[Alias('The Dark Knight')]
 #[Alias('The Caped Crusader')]
-class Something
+class Hero
 {
 }
 ```
 
-The interface needs to be marked as an attribute and repeatable so that `Analyzer` can recognize that it should allow multiple values.  However, you can now mix and match `RealName` and `Alias` on the same class.  Only one `RealName` is allowed, but any number of `Alias` attributes are allowed.  All are `Name` according to the `Names` main attribute, and so all will get picked up and made available.
+You can now mix and match `RealName` and `Alias` on the same class.  Only one `RealName` is allowed, but any number of `Alias` attributes are allowed.  All are `Name` according to the `Names` main attribute, and so all will get picked up and made available.
 
-Be aware that some static analyzers will complain about marking an interface as an attribute, since PHP doesn't do anything with them.  It is syntactically legal, however, so it's best to just silence that error in the static analyzer as it is being over-protective.
+Note that the interface must be marked `Multivalue` so that `Analyzer` will allow more than one attribute of that type.  However, the `RealName` attribute is not marked as repeatable, so PHP will prevent more than one `RealName` being used at once while `Alias` may be used any number of times.
 
 ### One of many options
 
