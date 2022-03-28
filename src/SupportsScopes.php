@@ -9,10 +9,8 @@ interface SupportsScopes
     /**
      * The scopes this attribute should be included in.
      *
-     * If a caller does not specify a scope, then the scope
-     * will be `null`.  Therefore, to include this attribute
-     * in the "no scope requested" case, include `null` in the
-     * returned array.
+     * To include this attribute in the "no scope requested" case,
+     * include `null` in the returned array.
      *
      * In the typical case of an attribute only having a single
      * scope that is specified by an argument, do this:
@@ -42,7 +40,10 @@ interface SupportsScopes
      * }
      *
      * Returning an empty array means this attribute will never be
-     * included, so that is most likely not what you want, ever.
+     * included, so that is most likely never what you want.
+     *
+     * To explicitly exclude an attribute in unscoped or scoped requests, implement
+     * `Excludable` and mark it excluded in the appropriate scope.
      *
      * @return array<string|null>
      *   An array of scope names in which this attribute should

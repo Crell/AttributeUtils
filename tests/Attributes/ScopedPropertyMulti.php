@@ -9,11 +9,11 @@ use Crell\AttributeUtils\Excludable;
 use Crell\AttributeUtils\SupportsScopes;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
-class ScopedProperty implements SupportsScopes, Excludable
+class ScopedPropertyMulti implements SupportsScopes, Excludable
 {
     public function __construct(
         public string $val = 'Z',
-        public ?string $scope = null,
+        public array $scopes = [null],
         public bool $includeUnscopedInScope = true,
         public bool $exclude = false,
     ) {
@@ -21,15 +21,7 @@ class ScopedProperty implements SupportsScopes, Excludable
 
     public function scopes(): array
     {
-        if ($this->includeUnscopedInScope && !is_null($this->scope)) {
-            return [$this->scope, null];
-        }
-        return [$this->scope];
-    }
-
-    public function includePropertiesByDefault(): bool
-    {
-        return false;
+        return $this->scopes;
     }
 
     public function exclude(): bool

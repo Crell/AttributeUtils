@@ -17,10 +17,17 @@ class MemoryCacheAnalyzer implements ClassAnalyzer
     public function __construct(private ClassAnalyzer $analyzer)
     {}
 
-    public function analyze(object|string $class, string $attribute, ?string $scope = null): object
+    public function analyze(object|string $class, string $attribute, array $scopes = []): object
     {
         $key = is_object($class) ? $class::class : $class;
 
-        return $this->cache[$key][$attribute][$scope ?? ''] ??= $this->analyzer->analyze($class, $attribute, $scope);
+        $scopekey = '';
+        if ($scopes) {
+            sort($scopes);
+            $scopekey = implode(',', $scopes);
+        }
+
+
+        return $this->cache[$key][$attribute][$scopekey] ??= $this->analyzer->analyze($class, $attribute, $scopes);
     }
 }

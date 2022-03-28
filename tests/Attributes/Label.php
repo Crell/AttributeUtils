@@ -18,7 +18,10 @@ class Label implements SupportsScopes, Excludable
 
     public function scopes(): array
     {
-        return [$this->language];
+        if (is_null($this->language)) {
+            return [$this->language];
+        }
+        return [null, $this->language];
     }
 
     public function exclude(): bool

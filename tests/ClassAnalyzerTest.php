@@ -18,6 +18,7 @@ use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\Labeled;
 use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
+use Crell\AttributeUtils\Attributes\ScopedClassMulti;
 use Crell\AttributeUtils\Attributes\ScopedClassNoDefaultInclude;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
@@ -31,6 +32,7 @@ use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
 use Crell\AttributeUtils\Records\ClassWithRecursiveSubAttributes;
+use Crell\AttributeUtils\Records\ClassWithScopesMulti;
 use Crell\AttributeUtils\Records\ClassWithScopesNotDefault;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
 use Crell\AttributeUtils\Records\LabeledApp;
@@ -339,11 +341,11 @@ class ClassAnalyzerTest extends TestCase
      * @test
      * @dataProvider scopedAttributeTestProvider()
      */
-    public function analyze_classes_scoped(string $subject, string $attribute, ?string $scope , callable $tests): void
+    public function analyze_classes_scoped(string $subject, string $attribute, array $scopes, callable $tests): void
     {
         $analyzer = new Analyzer();
 
-        $classDef = $analyzer->analyze($subject, $attribute, scope: $scope);
+        $classDef = $analyzer->analyze($subject, $attribute, scopes: $scopes);
         $tests($classDef);
     }
 
@@ -352,7 +354,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'Incl by default: true; scope: One' => [
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
-            'scope' => 'One',
+            'scopes' => ['One'],
             'test' => static function(ScopedClass $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('A', $classDef->val);
@@ -377,7 +379,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'Incl by default: true; scope: Two' => [
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
-            'scope' => 'Two',
+            'scopes' => ['Two'],
             'test' => static function(ScopedClass $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('B', $classDef->val);
@@ -402,7 +404,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'Incl by default: true; scope: null' => [
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
-            'scope' => null,
+            'scopes' => [],
             'test' => static function(ScopedClass $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('Z', $classDef->val);
@@ -427,7 +429,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'Incl by default: false; scope: One' => [
             'subject' => ClassWithScopesNotDefault::class,
             'attribute' => ScopedClassNoDefaultInclude::class,
-            'scope' => 'One',
+            'scopes' => ['One'],
             'test' => static function(ScopedClassNoDefaultInclude $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('A', $classDef->val);
@@ -452,7 +454,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'Incl by default: false; scope: Two' => [
             'subject' => ClassWithScopesNotDefault::class,
             'attribute' => ScopedClassNoDefaultInclude::class,
-            'scope' => 'Two',
+            'scopes' => ['Two'],
             'test' => static function(ScopedClassNoDefaultInclude $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('B', $classDef->val);
@@ -477,7 +479,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'Incl by default: false; scope: null' => [
             'subject' => ClassWithScopesNotDefault::class,
             'attribute' => ScopedClassNoDefaultInclude::class,
-            'scope' => null,
+            'scopes' => [],
             'test' => static function(ScopedClassNoDefaultInclude $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertArrayNotHasKey('noAttrib', $classDef->properties);
@@ -502,7 +504,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'LabeledApp: English' => [
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
-            'scope' => null,
+            'scopes' => [],
             'test' => static function(Labeled $classDef) {
                 self::assertEquals('Installation', $classDef->properties['install']->name);
                 self::assertEquals('Setup', $classDef->properties['setup']->name);
@@ -514,7 +516,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'LabeledApp: Spanish' => [
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
-            'scope' => 'es',
+            'scopes' => ['es'],
             'test' => static function(Labeled $classDef) {
                 self::assertEquals('Instalación', $classDef->properties['install']->name);
                 self::assertEquals('Configurar', $classDef->properties['setup']->name);
@@ -526,7 +528,7 @@ class ClassAnalyzerTest extends TestCase
         yield 'LabeledApp: German' => [
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
-            'scope' => 'de',
+            'scopes' => ['de'],
             'test' => static function(Labeled $classDef) {
                 self::assertEquals('Installation', $classDef->properties['install']->name);
                 self::assertEquals('Einrichten', $classDef->properties['setup']->name);
@@ -538,12 +540,115 @@ class ClassAnalyzerTest extends TestCase
         yield 'LabeledApp: French' => [
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
-            'scope' => 'fr',
+            'scopes' => ['fr'],
             'test' => static function(Labeled $classDef) {
                 self::assertEquals('Installation', $classDef->properties['install']->name);
                 self::assertEquals('Setup', $classDef->properties['setup']->name);
                 self::assertArrayNotHasKey('login', $classDef->properties);
                 self::assertEquals('Untitled', $classDef->properties['customization']->name);
+            },
+        ];
+
+        yield 'Multiscope: One' => [
+            'subject' => ClassWithScopesMulti::class,
+            'attribute' => ScopedClassMulti::class,
+            'scopes' => ['One'],
+            'test' => static function(ScopedClassMulti $classDef) {
+                self::assertEquals('A', $classDef->val);
+
+                self::assertEquals('A', $classDef->properties['inOne']->val);
+                self::assertEquals('A', $classDef->properties['inOneDefault']->val);
+                self::assertArrayNotHasKey('inTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inTwoDefault']->val);
+                self::assertEquals('A', $classDef->properties['inOneTwo']->val);
+                self::assertEquals('A', $classDef->properties['inOneTwoDefault']->val);
+                self::assertArrayNotHasKey('inThree', $classDef->properties);
+            },
+        ];
+
+        yield 'Multiscope: Two' => [
+            'subject' => ClassWithScopesMulti::class,
+            'attribute' => ScopedClassMulti::class,
+            'scopes' => ['Two'],
+            'test' => static function(ScopedClassMulti $classDef) {
+                self::assertEquals('B', $classDef->val);
+
+                self::assertArrayNotHasKey('inOne', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneDefault']->val);
+                self::assertEquals('B', $classDef->properties['inTwo']->val);
+                self::assertEquals('B', $classDef->properties['inTwoDefault']->val);
+                self::assertEquals('A', $classDef->properties['inOneTwo']->val);
+                self::assertEquals('A', $classDef->properties['inOneTwoDefault']->val);
+                self::assertArrayNotHasKey('inThree', $classDef->properties);
+            },
+        ];
+
+        yield 'Multiscope: Three' => [
+            'subject' => ClassWithScopesMulti::class,
+            'attribute' => ScopedClassMulti::class,
+            'scopes' => ['Three'],
+            'test' => static function(ScopedClassMulti $classDef) {
+                self::assertEquals('Z', $classDef->val);
+
+                self::assertArrayNotHasKey('inOne', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneDefault']->val);
+                self::assertArrayNotHasKey('inTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inTwoDefault']->val);
+                self::assertArrayNotHasKey('inOneTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneTwoDefault']->val);
+                self::assertEquals('C', $classDef->properties['inThree']->val);
+            },
+        ];
+
+        yield 'Multiscope: null' => [
+            'subject' => ClassWithScopesMulti::class,
+            'attribute' => ScopedClassMulti::class,
+            'scopes' => [],
+            'test' => static function(ScopedClassMulti $classDef) {
+                self::assertEquals('Z', $classDef->val);
+
+                self::assertArrayNotHasKey('inOne', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneDefault']->val);
+                self::assertArrayNotHasKey('inTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inTwoDefault']->val);
+                self::assertArrayNotHasKey('inOneTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneTwoDefault']->val);
+                self::assertArrayNotHasKey('inThree', $classDef->properties);
+            },
+        ];
+
+        yield 'Multiscope: null explicit' => [
+            'subject' => ClassWithScopesMulti::class,
+            'attribute' => ScopedClassMulti::class,
+            'scopes' => [null],
+            'test' => static function(ScopedClassMulti $classDef) {
+                self::assertEquals('Z', $classDef->val);
+
+                self::assertArrayNotHasKey('inOne', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneDefault']->val);
+                self::assertArrayNotHasKey('inTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inTwoDefault']->val);
+                self::assertArrayNotHasKey('inOneTwo', $classDef->properties);
+                self::assertEquals('Z', $classDef->properties['inOneTwoDefault']->val);
+                self::assertArrayNotHasKey('inThree', $classDef->properties);
+            },
+        ];
+
+        yield 'Multiscope: One, Two' => [
+            'subject' => ClassWithScopesMulti::class,
+            'attribute' => ScopedClassMulti::class,
+            'scopes' => ['One', 'Two'],
+            'test' => static function(ScopedClassMulti $classDef) {
+                // The lexically first wins.
+                self::assertEquals('A', $classDef->val);
+
+                self::assertEquals('A', $classDef->properties['inOne']->val);
+                self::assertEquals('A', $classDef->properties['inOneDefault']->val);
+                self::assertEquals('B', $classDef->properties['inTwo']->val);
+                self::assertEquals('B', $classDef->properties['inTwoDefault']->val);
+                self::assertEquals('A', $classDef->properties['inOneTwo']->val);
+                self::assertEquals('A', $classDef->properties['inOneTwoDefault']->val);
+                self::assertArrayNotHasKey('inThree', $classDef->properties);
             },
         ];
     }

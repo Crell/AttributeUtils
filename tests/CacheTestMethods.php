@@ -20,7 +20,7 @@ trait CacheTestMethods
     protected function getMockAnalyzer(): ClassAnalyzer
     {
         return new class implements ClassAnalyzer {
-            public function analyze(object|string $class, string $attribute, ?string $scope = null): object
+            public function analyze(object|string $class, string $attribute, array $scopes = []): object
             {
                 $key = is_object($class) ? $class::class : $class;
 
@@ -28,8 +28,8 @@ trait CacheTestMethods
                 // Since attributes can be anything, that's fine. We just
                 // want a unique object each time. Capturing the parameters
                 // is just for extra verification.
-                return new class($key, $attribute, $scope) {
-                    public function __construct(public string $key, public string $attribute, public ?string $scope) {}
+                return new class($key, $attribute, $scopes) {
+                    public function __construct(public string $key, public string $attribute, public array $scope) {}
                 };
             }
         };
@@ -59,7 +59,7 @@ trait CacheTestMethods
 
         $def1 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class);
         $def2 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class);
-        $def3 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class, scope: 'One');
+        $def3 = $analyzer->analyze(ClassWithScopes::class, ScopedClass::class, scopes: ['One']);
 
         self::assertSame($def1, $def2);
         self::assertNotSame($def1, $def3);

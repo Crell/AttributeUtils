@@ -6,7 +6,7 @@ namespace Crell\AttributeUtils;
 
 class Analyzer implements ClassAnalyzer
 {
-    public function analyze(string|object $class, string $attribute, ?string $scope = null): object
+    public function analyze(string|object $class, string $attribute, array $scopes = []): object
     {
         // Everything is easier if we normalize to a class first.
         // Because anon classes have generated internal class names, they work, too.
@@ -20,7 +20,7 @@ class Analyzer implements ClassAnalyzer
             $subject = new \ReflectionClass($class);
         }
 
-        $parser = new AttributeParser($scope);
+        $parser = new AttributeParser($scopes);
 
         $defBuilder = new ReflectionDefinitionBuilder($parser, $this);
 

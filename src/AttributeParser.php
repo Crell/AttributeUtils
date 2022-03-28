@@ -13,7 +13,7 @@ use function Crell\fp\pipe;
 
 class AttributeParser
 {
-    public function __construct(private readonly ?string $scope = null) {}
+    public function __construct(private readonly array $scopes = []) {}
 
     /**
      * Returns a single attribute of a given type from a target, or null if not found.
@@ -38,7 +38,7 @@ class AttributeParser
         );
 
         if (is_a($name, SupportsScopes::class, true)) {
-            $attribs = $this->filterForScopes($attribs, $this->scope);
+            $attribs = $this->filterForScopes($attribs, $this->scopes);
         }
 
         return array_values($attribs);
@@ -47,11 +47,11 @@ class AttributeParser
     /**
      * Filters a list of attributes based on their declared scope.
      *
-     * If the current scope is null, meaning no scope, then only
+     * If the current scope list is empty, meaning no scope, then only
      * attributes that also have no scope at all (their scope list is `[null]`)
      * will be retained.
      *
-     * If the current scope is non-null, and there is at least one in-scope
+     * If the current scope is non-empty, and there is at least one in-scope
      * attribute, then only attributes that match the current scope are returned.
      *
      * If there are only unscoped attributes, then those will be returned. That
@@ -59,20 +59,19 @@ class AttributeParser
      * To explicitly exclude an attribute in unscoped or scoped requests, implement
      * `Excludable` and mark it excluded in the appropriate scope.
      *
-     * @param object[] $attribs
+     * @param SupportsScopes[] $attribs
      *   An array of loaded attribute objects.
-     * @param string|null $currentScope
-     *   The scope being requested.
+     * @param array $currentScopes
+     *   The scopes being requested.
      * @return array
      */
-    protected function filterForScopes(array $attribs, ?string $currentScope): array
+    protected function filterForScopes(array $attribs, array $currentScopes): array
     {
         // If the request is for "unscoped" attributes, filter out
         // any that specify a scope other than unscoped.
-        if (is_null($currentScope)) {
+        if (empty($currentScopes)) {
             return pipe($attribs,
                 afilter($this->hasNoScope(...)),
-                array_values(...),
             );
         }
 
@@ -83,13 +82,13 @@ class AttributeParser
         // version or not.
 
         // Attributes that are in the current scope OR unscoped.
-        $attribs = \array_filter($attribs, $this->inScopeOrUnscoped($currentScope));
+        $attribs = \array_filter($attribs, $this->inScopeOrUnscoped($currentScopes));
 
         // If there are any attributes with a scope, filter out the
         // ones that have no scope.
         $attribsWithNonDefaultScope = \array_filter($attribs, $this->hasAnyScope(...));
         if (count($attribsWithNonDefaultScope)) {
-            $attribs = \array_filter($attribs, $this->hasScope($currentScope));
+            $attribs = \array_filter($attribs, $this->matchesScopes($currentScopes));
         }
 
         return $attribs;
@@ -103,7 +102,7 @@ class AttributeParser
      */
     protected function hasNoScope(SupportsScopes $attr): bool
     {
-        return array_unique($attr->scopes()) === [null];
+        return $attr->scopes() === [null];
     }
 
     /**
@@ -120,27 +119,27 @@ class AttributeParser
     /**
      * Builds a pipe-friendly closure that determines if an attribute is in a scope.
      *
-     * @param string|null $scope
+     * @param array $scopes
      *   The name of the scope, or null if checking for the unscoped case.
      * @return \Closure
      */
-    protected function hasScope(?string $scope): \Closure
+    protected function matchesScopes(array $scopes): \Closure
     {
         return static fn (SupportsScopes $attr): bool
-            => in_array($scope, $attr->scopes(), true);
+            => (bool)array_intersect($scopes, $attr->scopes());
     }
 
     /**
      * Builds a pipe-friendly closure that determines if an attribute is in a scope, or supports unscoped cases.
      *
-     * This is a performance optimization of hasScope($scope) || hasScope(null).
+     * This is a performance optimization of matchesScopes($scopes) || hasNoScope($attr).
      */
-    protected function inScopeOrUnscoped(string $scope): \Closure
+    protected function inScopeOrUnscoped(array $scopes): \Closure
     {
-        return static function (SupportsScopes $attr) use ($scope): bool {
-            $scopes = $attr->scopes();
-            return  in_array($scope, $scopes, true)
-                || in_array(null, $scopes, true);
+        return static function (SupportsScopes $attr) use ($scopes): bool {
+            $attrScopes = $attr->scopes();
+            return $attrScopes === [null]
+                || array_intersect($attrScopes, $scopes);
         };
     }
 
