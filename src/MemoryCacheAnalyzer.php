@@ -27,7 +27,6 @@ class MemoryCacheAnalyzer implements ClassAnalyzer
             $scopekey = implode(',', $scopes);
         }
 
-
         return $this->cache[$key][$attribute][$scopekey] ??= $this->analyzer->analyze($class, $attribute, $scopes);
     }
 }

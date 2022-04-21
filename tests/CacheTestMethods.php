@@ -29,7 +29,11 @@ trait CacheTestMethods
                 // want a unique object each time. Capturing the parameters
                 // is just for extra verification.
                 return new class($key, $attribute, $scopes) {
-                    public function __construct(public string $key, public string $attribute, public array $scope) {}
+                    public function __construct(
+                        public string $key,
+                        public string $attribute,
+                        public array $scope,
+                    ) {}
                 };
             }
         };
