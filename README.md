@@ -326,10 +326,16 @@ For example, the [`MemoryCacheAnalyzer`](src/MemoryCacheAnalyzer.php) class prov
 $analyzer = new MemoryCacheAnalyzer(new Analyzer());
 ```
 
-Other cache wrappers may also be implemented, and PSR-6 and PSR-16 wrappers are on the roadmap.  (PRs welcome in the meantime.)  Wrappers may also compose each other, so the following would be an entirely valid and probably good approach:
+A PSR-6 cache bridge is also included, allowing the Analyzer to be used with any PSR-6 compatible cache pool.
 
 ```php
-$analyzer = new MemoryCacheAnalyzer(new Psr6CacheAnalyzer(new Analyzer()));
+$anaylzer = new Psr6CacheAnalyzer(new Analyzer(), $somePsr6CachePoolObject);
+```
+
+Wrappers may also compose each other, so the following would be an entirely valid and probably good approach:
+
+```php
+$analyzer = new MemoryCacheAnalyzer(new Psr6CacheAnalyzer(new Analyzer(), $psr6CachePool));
 ```
 
 ## Advanced features
