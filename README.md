@@ -583,7 +583,7 @@ class Names implements HasSubAttributes, IteratorAggregate, ArrayAccess
 }
 
 #[\Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
-class Alias
+class Alias implements Multivalue
 {
     public function __construct(
         public readonly string $first,
@@ -614,6 +614,8 @@ Bat Man
 ```
 
 The `IteratorAggregate` and `ArrayAccess` interfaces are optional; I include them here just to show that you can do it if you want.  Here, the `Names` attribute is never put on a class directly.  However, by analyzing a class "with respect to" `Names`, you can collect all the multi-value sub-attributes that it has, giving the impression of a multi-value attribute.
+
+Note that `Alias` needs to implement `Multivalue` so the analyzer knows to expect more than one of them.
 
 ## Interface attributes
 
