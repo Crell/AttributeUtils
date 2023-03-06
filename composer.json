@@ -1,7 +1,7 @@
 {
     "name": "crell/attributeutils",
     "type": "library",
-    "description": "WIP",
+    "description": "A robust, flexible attribute handling framework",
     "keywords": [
         "Attributes",
         "Reflection"
