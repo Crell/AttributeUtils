@@ -35,6 +35,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
  * @BeforeMethods({"setUp"})
  * @AfterMethods({"tearDown"})
  * @OutputTimeUnit("milliseconds", precision=3)
+ * @RetryThreshold(15.0)
  */
 class ClassAnalyzerBench
 {
