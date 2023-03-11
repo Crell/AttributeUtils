@@ -213,7 +213,7 @@ When checking for an attribute, the Analyzer uses an `instanceof` check in Refle
 
 ### Sub-attributes
 
-`Analyzer` can only handle a single attribute on each target.  However, it also supports the concept of "sub-attributes."  Sub-attributes work similarly to the way a class can opt-in to parsing properties or methods, but for sibling attributes instead of child components.  That way, any number of attributes on the same component can be folded together into a single attribute object.  Any attribute for any component may opt-in to sub-attributes by implementing [`HasAttributes`](src/HasSubAttributes.php).
+`Analyzer` can only handle a single attribute on each target.  However, it also supports the concept of "sub-attributes."  Sub-attributes work similarly to the way a class can opt-in to parsing properties or methods, but for sibling attributes instead of child components.  That way, any number of attributes on the same component can be folded together into a single attribute object.  Any attribute for any component may opt-in to sub-attributes by implementing [`HasSubAttributes`](src/HasSubAttributes.php).
 
 The following example should make it clearer:
 
