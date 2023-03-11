@@ -47,7 +47,7 @@ class ReflectionDefinitionBuilder
     /**
      * Returns the attribute definition for a class component.
      */
-    public function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface): ?object
+    public function getComponentDefinition(\Reflector $reflection, string $attributeType, bool $includeByDefault, string $reflectionInterface, object $classDef): ?object
     {
         // @todo This is a problem. IF an attribute supports scopes, and is excluded,
         // then we do NOT want to have a default empty added, regardless of $includeByDefault.
@@ -66,6 +66,10 @@ class ReflectionDefinitionBuilder
             $def->customAnalysis($this->analyzer);
         }
 
+        if ($def instanceof ReadsClass) {
+            $def->fromClassAttribute($classDef);
+        }
+
         return $def;
     }
 
@@ -75,7 +79,7 @@ class ReflectionDefinitionBuilder
      * Methods can't just reuse getComponentDefinition() because they
      * also have parameters of their own to parse.
      */
-    public function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault): ?object
+    public function getMethodDefinition(\ReflectionMethod $reflection, string $attributeType, bool $includeByDefault, object $classDef): ?object
     {
         $def = $this->parser->getInheritedAttribute($reflection, $attributeType)
             ?? ($includeByDefault ?  new $attributeType() : null);
@@ -90,13 +94,17 @@ class ReflectionDefinitionBuilder
             $parameters = $this->getDefinitions(
                 $reflection->getParameters(),
                 fn (\ReflectionParameter $p)
-                => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class)
+                    => $this->getComponentDefinition($p, $def->parameterAttribute(), $def->includeParametersByDefault(), FromReflectionParameter::class, $classDef)
             );
             $def->setParameters($parameters);
         }
 
         if ($def instanceof CustomAnalysis) {
             $def->customAnalysis($this->analyzer);
+        }
+
+        if ($def instanceof ReadsClass) {
+            $def->fromClassAttribute($classDef);
         }
 
         return $def;

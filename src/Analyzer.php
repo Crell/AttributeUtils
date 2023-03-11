@@ -42,7 +42,7 @@ class Analyzer implements ClassAnalyzer
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getProperties(), static fn (\ReflectionProperty $r) => !$r->isStatic()),
                     fn (\ReflectionProperty $r)
-                        => $defBuilder->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class)
+                        => $defBuilder->getComponentDefinition($r, $classDef->propertyAttribute(), $classDef->includePropertiesByDefault(), FromReflectionProperty::class, $classDef)
                 );
                 $classDef->setProperties($properties);
             }
@@ -51,7 +51,7 @@ class Analyzer implements ClassAnalyzer
                 $properties = $defBuilder->getDefinitions(
                     $subject->getProperties(\ReflectionProperty::IS_STATIC),
                     fn (\ReflectionProperty $r)
-                        => $defBuilder->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class)
+                        => $defBuilder->getComponentDefinition($r, $classDef->staticPropertyAttribute(), $classDef->includeStaticPropertiesByDefault(), FromReflectionProperty::class, $classDef)
                 );
                 $classDef->setStaticProperties($properties);
             }
@@ -61,7 +61,7 @@ class Analyzer implements ClassAnalyzer
                     // Reflection can get only static, but not only non-static. Because of course.
                     array_filter($subject->getMethods(), static fn (\ReflectionMethod $r) => !$r->isStatic()),
                     fn (\ReflectionMethod $r)
-                        => $defBuilder->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault()),
+                        => $defBuilder->getMethodDefinition($r, $classDef->methodAttribute(), $classDef->includeMethodsByDefault(), $classDef),
                 );
                 $classDef->setMethods($methods);
             }
@@ -70,7 +70,7 @@ class Analyzer implements ClassAnalyzer
                 $methods = $defBuilder->getDefinitions(
                     $subject->getMethods(\ReflectionMethod::IS_STATIC),
                     fn (\ReflectionMethod $r)
-                        => $defBuilder->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault()),
+                        => $defBuilder->getMethodDefinition($r, $classDef->staticMethodAttribute(), $classDef->includeStaticMethodsByDefault(), $classDef),
                 );
                 $classDef->setStaticMethods($methods);
             }
@@ -83,7 +83,7 @@ class Analyzer implements ClassAnalyzer
                 $cases = $defBuilder->getDefinitions(
                     $subject->getCases(),
                     fn (\ReflectionEnumUnitCase $r)
-                        => $defBuilder->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class),
+                        => $defBuilder->getComponentDefinition($r, $classDef->caseAttribute(), $classDef->includeCasesByDefault(), FromReflectionEnumCase::class, $classDef),
                 );
                 $classDef->setCases($cases);
             }
@@ -92,7 +92,7 @@ class Analyzer implements ClassAnalyzer
                 $constants = $defBuilder->getDefinitions(
                     $subject->getReflectionConstants(),
                     fn (\ReflectionClassConstant $r)
-                        => $defBuilder->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class),
+                        => $defBuilder->getComponentDefinition($r, $classDef->constantAttribute(), $classDef->includeConstantsByDefault(), FromReflectionClassConstant::class, $classDef),
                 );
                 $classDef->setConstants($constants);
             }
@@ -100,6 +100,7 @@ class Analyzer implements ClassAnalyzer
             if ($classDef instanceof CustomAnalysis) {
                 $classDef->customAnalysis($this);
             }
+
             return $classDef;
         } catch (\ArgumentCountError $e) {
             $this->translateArgumentCountError($e);

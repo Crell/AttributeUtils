@@ -147,6 +147,10 @@ The `ParseClassConstant` interface works the same way as `ParseProperties`.
 
 `ParseMethods` works the same way as `ParseProperties` (and also has a corresponding `ParseStaticMethods` interface for static methods).  However, a method-targeting attribute may also itself implement [`ParseParameters`](src/ParseParameters.php) in order to examine parameters on that method.  `ParseParameters` repeats the same pattern as `ParseProperties` above, with the methods suitably renamed.
 
+### Class-referring components
+
+A component-targeting attribute may also implement [`ReadsClass`](src/ReadsClass.php).  If so, then the class's attribute will be passed to the `fromClassAttribute()` method after all other setup has been done.  That allows the attribute to inherit default values from the class, or otherwise vary its behavior based on properties set on the class attribute.
+
 ### Excluding values
 
 When parsing components of a class, whether they are included depends on a number of factors.  The `includePropertiesByDefault()`, `includeMethodsByDefault()`, etc. methods on the various `Parse*` interfaces determine whether components that lack an attribute should be included with a default value, or excluded entirely.

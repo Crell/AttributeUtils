@@ -16,6 +16,7 @@ use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\Labeled;
+use Crell\AttributeUtils\Attributes\PropertyTakesClassDefaultClass;
 use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\ScopedClassMulti;
@@ -53,6 +54,7 @@ use Crell\AttributeUtils\Records\NoProps;
 use Crell\AttributeUtils\Records\NoPropsOverride;
 use Crell\AttributeUtils\Records\Point;
 use Crell\AttributeUtils\Records\PropertiesWithMultipleSubattributes;
+use Crell\AttributeUtils\Records\PropertyThatTakesClassDefault;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
 use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\TestCase;
@@ -384,6 +386,15 @@ class ClassAnalyzerTest extends TestCase
             'attribute' => ClassWithOwnSubAttributes::class,
             'test' => static function(ClassWithOwnSubAttributes $classDef) {
                 self::assertEquals('C', $classDef->c);
+            },
+        ];
+
+        yield 'Field takes defaults from class' => [
+            'subject' => PropertyThatTakesClassDefault::class,
+            'attribute' => PropertyTakesClassDefaultClass::class,
+            'test' => static function (PropertyTakesClassDefaultClass $classDef) {
+                self::assertEquals(5, $classDef->properties['val']->a);
+                self::assertEquals(3, $classDef->properties['val']->b);
             },
         ];
     }
