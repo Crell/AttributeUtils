@@ -101,6 +101,10 @@ class Analyzer implements ClassAnalyzer
                 $classDef->customAnalysis($this);
             }
 
+            if ($classDef instanceof Finalizable) {
+                $classDef->finalize();
+            }
+
             return $classDef;
         } catch (\ArgumentCountError $e) {
             $this->translateArgumentCountError($e);

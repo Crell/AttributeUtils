@@ -342,6 +342,10 @@ Wrappers may also compose each other, so the following would be an entirely vali
 $analyzer = new MemoryCacheAnalyzer(new Psr6CacheAnalyzer(new Analyzer(), $psr6CachePool));
 ```
 
+## Finalizing an attribute
+
+Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
+
 ## Advanced features
 
 There are a couple of other advanced features also available.  These are less frequently used, but in the right circumstances they can be very helpful.

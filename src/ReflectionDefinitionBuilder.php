@@ -70,6 +70,10 @@ class ReflectionDefinitionBuilder
             $def->fromClassAttribute($classDef);
         }
 
+        if ($def instanceof Finalizable) {
+            $def->finalize();
+        }
+
         return $def;
     }
 
@@ -107,6 +111,10 @@ class ReflectionDefinitionBuilder
             $def->fromClassAttribute($classDef);
         }
 
+        if ($def instanceof Finalizable) {
+            $def->finalize();
+        }
+
         return $def;
     }
 
@@ -120,11 +128,17 @@ class ReflectionDefinitionBuilder
                 if ($this->isMultivalueAttribute($type)) {
                     $subs = $this->parser->getInheritedAttributes($reflection, $type);
                     foreach ($subs as $sub) {
+                        if ($sub instanceof Finalizable) {
+                            $sub->finalize();
+                        }
                         $this->loadSubAttributes($sub, $reflection);
                     }
                     $attribute->$callback($subs);
                 } else {
                     $sub = $this->parser->getInheritedAttribute($reflection, $type);
+                    if ($sub instanceof Finalizable) {
+                        $sub->finalize();
+                    }
                     $this->loadSubAttributes($sub, $reflection);
                     $attribute->$callback($sub);
                 }

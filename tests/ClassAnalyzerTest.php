@@ -14,6 +14,7 @@ use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
+use Crell\AttributeUtils\Attributes\FinalizableClassAttribute;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\Labeled;
 use Crell\AttributeUtils\Attributes\PropertyTakesClassDefaultClass;
@@ -39,6 +40,7 @@ use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
 use Crell\AttributeUtils\Records\ClassWithExtraAnalysisSource;
+use Crell\AttributeUtils\Records\ClassWithFinalizableAttributes;
 use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
@@ -395,6 +397,15 @@ class ClassAnalyzerTest extends TestCase
             'test' => static function (PropertyTakesClassDefaultClass $classDef) {
                 self::assertEquals(5, $classDef->properties['val']->a);
                 self::assertEquals(3, $classDef->properties['val']->b);
+            },
+        ];
+
+        yield 'Class and property are finalizable' => [
+            'subject' => ClassWithFinalizableAttributes::class,
+            'attribute' => FinalizableClassAttribute::class,
+            'test' => static function (FinalizableClassAttribute $classDef) {
+                self::assertTrue($classDef->wasFinalized);
+                self::assertTrue($classDef->properties['foo']->greater);
             },
         ];
     }
