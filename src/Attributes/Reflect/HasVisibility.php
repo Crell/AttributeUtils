@@ -13,7 +13,7 @@ trait HasVisibility
      */
     public readonly Visibility $visibility;
 
-    protected function parseVisibility(\Reflector $subject)
+    protected function parseVisibility(\Reflector $subject): void
     {
         // The Reflector interface is insufficient, but these methods are defined
         // on all types we care about. This is a reflection API limitation.

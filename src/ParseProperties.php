@@ -22,6 +22,10 @@ namespace Crell\AttributeUtils;
  */
 interface ParseProperties
 {
+    /**
+     * @param array<string, object> $properties
+     *   The attribute objects on the properties.
+     */
     public function setProperties(array $properties): void;
 
     public function includePropertiesByDefault(): bool;

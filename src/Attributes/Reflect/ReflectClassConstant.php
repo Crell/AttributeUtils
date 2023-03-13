@@ -18,6 +18,8 @@ class ReflectClassConstant implements FromReflectionClassConstant
 
     /**
      * The value of the constant.
+     *
+     * @var int|string|array<mixed, mixed>|object
      */
     public readonly int|string|array|object $value;
 

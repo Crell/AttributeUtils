@@ -13,6 +13,10 @@ use function Crell\fp\pipe;
 
 class AttributeParser
 {
+    /**
+     * @param array<string|null> $scopes
+     *   The scopes for which this analysis should run.
+     */
     public function __construct(private readonly array $scopes = []) {}
 
     /**
@@ -29,6 +33,8 @@ class AttributeParser
      * Unfortunately PHP has no common interface for "reflection objects that support attributes",
      * and enumerating them manually is stupidly verbose and clunky. Instead just refer
      * to any reflectable thing and hope for the best.
+     *
+     * @return array<object>
      */
     public function getAttributes(\Reflector $target, string $name): array
     {
@@ -61,9 +67,9 @@ class AttributeParser
      *
      * @param SupportsScopes[] $attribs
      *   An array of loaded attribute objects.
-     * @param array $currentScopes
+     * @param array<string|null> $currentScopes
      *   The scopes being requested.
-     * @return array
+     * @return SupportsScopes[]
      */
     protected function filterForScopes(array $attribs, array $currentScopes): array
     {
@@ -119,7 +125,7 @@ class AttributeParser
     /**
      * Builds a pipe-friendly closure that determines if an attribute is in a scope.
      *
-     * @param array $scopes
+     * @param array<string|null> $scopes
      *   The name of the scope, or null if checking for the unscoped case.
      * @return \Closure
      */
@@ -133,6 +139,8 @@ class AttributeParser
      * Builds a pipe-friendly closure that determines if an attribute is in a scope, or supports unscoped cases.
      *
      * This is a performance optimization of matchesScopes($scopes) || hasNoScope($attr).
+     *
+     * @param array<string|null> $scopes
      */
     protected function inScopeOrUnscoped(array $scopes): \Closure
     {
@@ -167,7 +175,7 @@ class AttributeParser
      * @param \Reflector $target
      *   The property from which to get an attribute.
      * @param string $name
-     * @return array
+     * @return array<object>
      */
     public function getInheritedAttributes(\Reflector $target, string $name): array
     {
@@ -199,6 +207,7 @@ class AttributeParser
      * The property itself will be included first, and parents will only be
      * scanned if the attribute implements the Inheritable interface.
      *
+     * @return iterable<\Reflector>
      * @see Inheritable
      */
     protected function attributeInheritanceTree(\Reflector $subject, string $attributeType): iterable
@@ -285,7 +294,7 @@ class AttributeParser
      *
      * @param \ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject
      *   The reflection of the component for which we want the ancestors.
-     * @return iterable
+     * @return iterable<\Reflector>
      * @throws \ReflectionException
      */
     protected function classElementInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject): iterable
@@ -308,6 +317,8 @@ class AttributeParser
 
     /**
      * Returns a list of all class and interface parents of a class.
+     *
+     * @return array<class-string>
      */
     public function classAncestors(string $class, bool $includeClass = true): array
     {

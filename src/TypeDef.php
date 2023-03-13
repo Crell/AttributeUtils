@@ -10,7 +10,11 @@ use function Crell\fp\method;
 
 class TypeDef
 {
-    // Normalized to DNF form. (ORed list of ANDs.)
+    /**
+     * Normalized to DNF form. (ORed list of ANDs.)
+     *
+     * @var array<array<string>>
+     */
     private array $type = [[]];
 
     public readonly bool $allowsNull;
@@ -94,6 +98,9 @@ class TypeDef
         return any($intersectionAccepts)($this->type);
     }
 
+    /**
+     * @return array<array<int, string>>
+     */
     protected function parseUnionType(\ReflectionUnionType $type): array
     {
         $translate = static fn (\ReflectionType $innerType): array => match($innerType::class) {
@@ -104,11 +111,19 @@ class TypeDef
         return array_map($translate, $type->getTypes());
     }
 
+    /**
+     * @return array<array<int, string>>
+     */
     protected function parseIntersectionType(\ReflectionIntersectionType $type): array
     {
         return array_map(method('getName'), $type->getTypes());
     }
 
+    /**
+     *
+     *
+     * @param array<string>|array<array<string>> $type
+     */
     protected function deriveComplexity(array $type): TypeComplexity
     {
         if (count($type) === 1 && count($type[0]) === 1) {

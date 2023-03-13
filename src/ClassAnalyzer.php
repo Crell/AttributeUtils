@@ -20,6 +20,8 @@ interface ClassAnalyzer
      *   Either a fully qualified class name or an object to analyze.
      * @param class-string<T> $attribute
      *   The fully qualified class name of the class attribute to analyze.
+     * @param array<string|null> $scopes
+     *   The scopes for which this analysis should run.
      * @return T
      *   The class attribute requested, including dependent data as appropriate.
      */

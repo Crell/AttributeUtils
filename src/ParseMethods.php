@@ -22,6 +22,10 @@ namespace Crell\AttributeUtils;
  */
 interface ParseMethods
 {
+    /**
+     * @param array<string, object> $methods
+     *   The attribute objects on the methods.
+     */
     public function setMethods(array $methods): void;
 
     public function includeMethodsByDefault(): bool;

@@ -18,6 +18,9 @@ use Crell\AttributeUtils\ParseProperties;
 #[Attribute(Attribute::TARGET_CLASS)]
 class GenericClass implements ParseProperties
 {
+    /**
+     * @var array<string, object>
+     */
     public array $properties;
 
     public function __construct(

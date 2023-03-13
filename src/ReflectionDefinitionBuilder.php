@@ -30,7 +30,7 @@ class ReflectionDefinitionBuilder
      * @param callable $deriver
      *   Callback for turning a reflection object into the corresponding attribute.
      *   It must already have closed over the attribute type to retrieve.
-     * @return array
+     * @return array<string, object>
      *   An array of attributes across all items of the applicable type.
      */
     public function getDefinitions(array $reflections, callable $deriver): array

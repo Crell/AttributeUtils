@@ -22,6 +22,10 @@ namespace Crell\AttributeUtils;
  */
 interface ParseStaticProperties
 {
+    /**
+     * @param array<string, object> $properties
+     *   The attribute objects on the properties.
+     */
     public function setStaticProperties(array $properties): void;
 
     public function includeStaticPropertiesByDefault(): bool;

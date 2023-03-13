@@ -22,6 +22,10 @@ namespace Crell\AttributeUtils;
  */
 interface ParseStaticMethods
 {
+    /**
+     * @param array<string, object> $methods
+     *   The attribute objects on the methods.
+     */
     public function setStaticMethods(array $methods): void;
 
     public function includeStaticMethodsByDefault(): bool;

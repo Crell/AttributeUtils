@@ -33,6 +33,12 @@ class Psr6CacheAnalyzer implements ClassAnalyzer
         return $value;
     }
 
+    /**
+     * Generates the cache key for this request.
+     *
+     * @param array<string|null> $scopes
+     *   The scopes for which this analysis should run.
+     */
     private function buildKey(object|string $class, string $attribute, array $scopes): string
     {
         $parts = [
