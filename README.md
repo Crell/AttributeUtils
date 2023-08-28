@@ -236,7 +236,7 @@ class MainAttrib implements HasSubAttributes
         return [Age::class => 'fromAge'];
     }
     
-    public function fromAge(?ClassSubAttribute $sub): void
+    public function fromAge(?Age $sub): void
     {
         $this->age = $sub?->age ?? 0;
     }
@@ -301,7 +301,7 @@ class MainAttrib implements HasSubAttributes
 }
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Knows
+class Knows implements Multivalue
 {
     public function __construct(public readonly string $name) {}
 }
