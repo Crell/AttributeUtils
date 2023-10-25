@@ -274,7 +274,7 @@ class AttributeParser
         foreach ($this->classAncestors($subject->getDeclaringClass()->name) as $class) {
             $rClass = new \ReflectionClass($class);
             if ($rClass->hasMethod($methodName)) {
-                $rMethod = $rClass->getMethod($parameterName);
+                $rMethod = $rClass->getMethod($methodName);
                 foreach ($rMethod->getParameters() as $rParam) {
                     if ($rParam->name === $parameterName) {
                         yield $rParam;
