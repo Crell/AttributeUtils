@@ -267,6 +267,15 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
+        yield 'Parameter with sub attributes' => [
+            'subject' => ClassWithMethodsAndProperties::class,
+            'attribute' => ClassMethodsProperties::class,
+            'test' => static function (ClassMethodsProperties $classDef) {
+                static::assertEquals(5, $classDef->methods['methodTwo']->parameters['three']->x);
+                static::assertEquals('three', $classDef->methods['methodTwo']->parameters['three']->name);
+            },
+        ];
+
         yield 'Class with constants' => [
             'subject' => ClassWithConstantsChild::class,
             'attribute' => ClassWithClassConstants::class,
