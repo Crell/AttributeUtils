@@ -9,6 +9,11 @@ trait CollectClassConstants
     /** @var ReflectClassConstant[] */
     public readonly array $constants;
 
+    /**
+     *
+     *
+     * @param ReflectClassConstant[] $constants
+     */
     public function setConstants(array $constants): void
     {
         $this->constants = $constants;

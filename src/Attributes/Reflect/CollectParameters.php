@@ -9,6 +9,9 @@ trait CollectParameters
     /** @var ReflectParameter[] */
     public readonly array $parameters;
 
+    /**
+     * @param ReflectParameter[] $parameters
+     */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;

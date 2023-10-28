@@ -194,6 +194,8 @@ class AttributeParser
             && $class = $this->getPropertyClass($target))
         {
             return pipe($this->classAncestors($class),
+                // PHPStan gets confused by firstValue() and thinks $c is a string, not class-string.
+                // @phpstan-ignore-next-line
                 firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name)),
             ) ?? [];
         }
@@ -310,11 +312,13 @@ class AttributeParser
     /**
      * Returns a list of all class and interface parents of a class.
      *
+     * @param class-string $class
      * @return array<class-string>
      */
     public function classAncestors(string $class, bool $includeClass = true): array
     {
         // These methods both return associative arrays, making + safe.
+        /** @var array<class-string> $ancestors */
         $ancestors = class_parents($class) + class_implements($class);
         return $includeClass
             ? [$class => $class] + $ancestors
@@ -327,7 +331,7 @@ class AttributeParser
      *
      * @param \ReflectionProperty $rProperty
      *   The property to check
-     * @return string|null
+     * @return class-string|null
      *   The class/interface name, or null.
      */
     protected function getPropertyClass(\ReflectionProperty $rProperty): ?string

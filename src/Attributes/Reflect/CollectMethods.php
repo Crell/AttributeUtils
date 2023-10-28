@@ -9,6 +9,9 @@ trait CollectMethods
     /** @var ReflectMethod[] */
     public readonly array $methods;
 
+    /**
+     * @param ReflectMethod[] $methods
+     */
     public function setMethods(array $methods): void
     {
         $this->methods = $methods;

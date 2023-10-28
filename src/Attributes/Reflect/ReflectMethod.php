@@ -104,6 +104,9 @@ class ReflectMethod implements FromReflectionMethod, ParseParameters
         $this->returnType = new TypeDef($subject->getReturnType());
     }
 
+    /**
+     * @param ReflectParameter[] $parameters
+     */
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;

@@ -9,6 +9,9 @@ trait CollectStaticProperties
     /** @var ReflectProperty[] */
     public readonly array $staticProperties;
 
+    /**
+     * @param ReflectProperty[] $properties
+     */
     public function setStaticProperties(array $properties): void
     {
         $this->staticProperties = $properties;

@@ -78,6 +78,9 @@ class ReflectEnum implements FromReflectionEnum, ParseMethods, ParseStaticMethod
         // @todo We're ignoring extension information for now.
     }
 
+    /**
+     * @param ReflectClassConstant[] $constants
+     */
     public function setConstants(array $constants): void
     {
         // There's no way to tell a constant apart from a case in advance,
