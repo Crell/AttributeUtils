@@ -21,8 +21,8 @@
         "crell/fp": "~1.0.0"
     },
     "require-dev": {
-        "phpbench/phpbench": "^1.1",
-        "phpstan/phpstan": "^1.0",
+        "phpbench/phpbench": "^1.2",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "~9.0",
         "psr/cache": "^3.0",
         "psr/cache-util": "^2.0"

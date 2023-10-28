@@ -216,20 +216,12 @@ class AttributeParser
         yield $subject;
 
         if (is_a($attributeType, Inheritable::class, true)) {
-            // PHPStan doesn't understand that this is guaranteed type safe, so
-            // ignore it.
             yield from match(get_class($subject)) {
-                // @phpstan-ignore-next-line
                 \ReflectionClass::class => $this->classInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionObject::class => $this->classInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionProperty::class => $this->classElementInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionMethod::class => $this->classElementInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionClassConstant::class => $this->classElementInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionParameter::class => $this->parameterInheritanceTree($subject),
                 // If it's an enum, there's nothing to inherit so just stub that out.
                 \ReflectionEnum::class => [],

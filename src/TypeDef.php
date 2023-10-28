@@ -35,9 +35,6 @@ class TypeDef
             return;
         }
 
-        // PHPStan thinks this property is already assigned, despite
-        // the return statement above. This is a bug in PHPStan.
-        // @phpstan-ignore-next-line
         $this->allowsNull = $type->allowsNull();
 
         // PHPStan thinks this property is already assigned, despite
@@ -49,9 +46,6 @@ class TypeDef
             \ReflectionIntersectionType::class => [$this->parseIntersectionType($type)],
         };
 
-        // PHPStan thinks this property is already assigned, despite
-        // the return statement above. This is a bug in PHPStan.
-        // @phpstan-ignore-next-line
         $this->complexity = $this->deriveComplexity($this->type);
     }
 
