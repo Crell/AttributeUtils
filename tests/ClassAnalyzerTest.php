@@ -123,7 +123,7 @@ class ClassAnalyzerTest extends TestCase
     /**
      * @see analyze_classes()
      */
-    public function attributeTestProvider(): \Generator
+    public static function attributeTestProvider(): \Generator
     {
         yield 'Generic' => [
             'subject' => Point::class,
@@ -434,7 +434,7 @@ class ClassAnalyzerTest extends TestCase
         $tests($classDef);
     }
 
-    public function scopedAttributeTestProvider(): iterable
+    public static function scopedAttributeTestProvider(): iterable
     {
         yield 'Incl by default: true; scope: One' => [
             'subject' => ClassWithScopes::class,
@@ -741,9 +741,9 @@ class ClassAnalyzerTest extends TestCase
     /**
      * @see analyze_objects()
      */
-    public function attributeObjectTestProvider(): iterable
+    public static function attributeObjectTestProvider(): iterable
     {
-        $tests = iterator_to_array($this->attributeTestProvider());
+        $tests = iterator_to_array(self::attributeTestProvider());
 
         // For enum tests, skip those entirely since there's nothing to instantiate.
         if (function_exists('\enum_exists')) {

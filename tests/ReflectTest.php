@@ -47,7 +47,7 @@ class ReflectTest extends TestCase
         $test($classDef);
     }
 
-    public function enumAttributeExamples(): iterable
+    public static function enumAttributeExamples(): iterable
     {
         yield Suit::class => [
             'subject' => Suit::class,
@@ -86,7 +86,7 @@ class ReflectTest extends TestCase
         ];
     }
 
-    public function classAttributeExamples(): iterable
+    public static function classAttributeExamples(): iterable
     {
         yield NoProps::class => [
             'subject' => NoProps::class,

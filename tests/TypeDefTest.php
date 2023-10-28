@@ -27,7 +27,7 @@ class TypeDefTest extends TestCase
         $test($def);
     }
 
-    public function typeDefProvider(): iterable
+    public static function typeDefProvider(): iterable
     {
         yield 'simpleInt' => [
             'subject' => 'simpleInt',
