@@ -15,6 +15,8 @@ use Crell\AttributeUtils\Records\Reflect\Complete;
 use Crell\AttributeUtils\Records\Reflect\SampleTrait;
 use Crell\AttributeUtils\TypeDef\BackedSuit;
 use Crell\AttributeUtils\TypeDef\Suit;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,10 +24,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ReflectTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider classAttributeExamples()
-     */
+    #[Test, DataProvider('classAttributeExamples')]
     public function analyze_classes(string $subject, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -34,10 +33,8 @@ class ReflectTest extends TestCase
 
         $test($classDef);
     }
-    /**
-     * @test
-     * @dataProvider enumAttributeExamples()
-     */
+
+    #[Test, DataProvider('enumAttributeExamples')]
     public function analyze_enums(string $subject, callable $test): void
     {
         $analyzer = new Analyzer();

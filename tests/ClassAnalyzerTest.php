@@ -59,15 +59,13 @@ use Crell\AttributeUtils\Records\PropertiesWithMultipleSubattributes;
 use Crell\AttributeUtils\Records\PropertyThatTakesClassDefault;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
 use Crell\AttributeUtils\TypeDef\Suit;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ClassAnalyzerTest extends TestCase
 {
-
-    /**
-     * @test
-     * @dataProvider attributeTestProvider()
-     */
+    #[Test, DataProvider('attributeTestProvider')]
     public function analyze_classes(string $subject, string $attribute, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -77,9 +75,7 @@ class ClassAnalyzerTest extends TestCase
         $test($classDef);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function missing_required_fields(): void
     {
         $this->expectException(RequiredAttributeArgumentsMissing::class);
@@ -89,10 +85,7 @@ class ClassAnalyzerTest extends TestCase
 
     }
 
-    /**
-     * @test
-     * @dataProvider attributeObjectTestProvider()
-     */
+    #[Test, DataProvider('attributeObjectTestProvider')]
     public function analyze_objects(object $subject, string $attribute, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -102,9 +95,7 @@ class ClassAnalyzerTest extends TestCase
         $test($classDef);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function analyze_anonymous_objects(): void
     {
         $subject = new class {
@@ -422,10 +413,7 @@ class ClassAnalyzerTest extends TestCase
         // This should probably error somehow, but not sure how.
     }
 
-    /**
-     * @test
-     * @dataProvider scopedAttributeTestProvider()
-     */
+    #[Test, DataProvider('scopedAttributeTestProvider')]
     public function analyze_classes_scoped(string $subject, string $attribute, array $scopes, callable $tests): void
     {
         $analyzer = new Analyzer();

@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils;
 
 use Crell\AttributeUtils\TypeDef\Suit;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires PHP >= 8.1.0
- */
 class TypeDefTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider typeDefProvider()
-     */
+    #[Test, DataProvider('typeDefProvider')]
     public function typedefs(string $methodName, callable $test): void
     {
         $rType = (new \ReflectionClass(TypeDef\TypeExamples::class))
