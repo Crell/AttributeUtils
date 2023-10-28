@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                php: [ '8.1', '8.2' ]
+                php: [ '8.1', '8.2', '8.3' ]
                 composer-flags: [ '' ]
                 phpunit-flags: [ '--coverage-text' ]
         steps:
@@ -20,5 +20,5 @@ jobs:
                   php-version: ${{ matrix.php }}
                   coverage: xdebug
                   tools: composer:v2
-            - run: composer update --no-progress ${{ matrix.composer-flags }}
+            - run: composer install --no-progress ${{ matrix.composer-flags }}
             - run: vendor/bin/phpunit ${{ matrix.phpunit-flags }}
