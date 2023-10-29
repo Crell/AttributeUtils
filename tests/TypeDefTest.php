@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils;
 
 use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -21,6 +22,23 @@ class TypeDefTest extends TestCase
         $def = new TypeDef($rType);
 
         $test($def);
+    }
+
+    #[Test, RequiresPhp('>=8.2')]
+    public function analyze_dnf_attributes(): void
+    {
+        $rType = (new \ReflectionClass(TypeDef\TypeExamples82::class))
+            ->getMethod('returnsDnf')
+            ->getReturnType();
+
+        $def = new TypeDef($rType);
+
+        static::assertFalse($def->allowsNull);
+        static::assertFalse($def->isSimple());
+        static::assertEquals(TypeComplexity::Compound, $def->complexity);
+        static::assertTrue($def->accepts('int'));
+        static::assertTrue($def->accepts(Implementer::class));
+        static::assertFalse($def->accepts(SomeClass::class));
     }
 
     public static function typeDefProvider(): iterable
