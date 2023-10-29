@@ -13,6 +13,12 @@ class TypeDef
     /**
      * Normalized to DNF form. (ORed list of ANDs.)
      *
+     * eg (A&B)|C:
+     * [
+     *     [A, B],
+     *     [C],
+     * ]
+     *
      * @var array<array<string>>
      */
     private array $type = [[]];
@@ -106,7 +112,7 @@ class TypeDef
     }
 
     /**
-     * @return array<array<int, string>>
+     * @return array<int, string>
      */
     protected function parseIntersectionType(\ReflectionIntersectionType $type): array
     {
@@ -116,7 +122,7 @@ class TypeDef
     /**
      *
      *
-     * @param array<string>|array<array<string>> $type
+     * @param array<array<string>> $type
      */
     protected function deriveComplexity(array $type): TypeComplexity
     {
