@@ -265,7 +265,13 @@ class AttributeParser
         $parameterName = $subject->getName();
         $methodName = $subject->getDeclaringFunction()->name;
 
-        foreach ($this->classAncestors($subject->getDeclaringClass()->name) as $class) {
+        $declaringClass = $subject->getDeclaringClass()?->name;
+
+        if (!$declaringClass) {
+            return;
+        }
+
+        foreach ($this->classAncestors($declaringClass) as $class) {
             $rClass = new \ReflectionClass($class);
             if ($rClass->hasMethod($methodName)) {
                 $rMethod = $rClass->getMethod($methodName);
