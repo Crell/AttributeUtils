@@ -473,7 +473,7 @@ class MyClass implements ParseProperties
 
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]
-class FancyName implements Transitive
+class FancyName implements TransitiveProperty
 {
     public function __construct(public readonly string $name = '') {}
 }
