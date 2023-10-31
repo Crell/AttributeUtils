@@ -322,7 +322,7 @@ Note: In order to make use of multi-value sub-attributes, the attribute class it
 
 ### Finalizing an attribute
 
-Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
+Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt-in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
 
 ### Caching
 
