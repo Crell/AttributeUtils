@@ -6,9 +6,10 @@ namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
 use Crell\AttributeUtils\FromReflectionParameter;
+use Crell\AttributeUtils\Inheritable;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class ParameterWithReflection implements FromReflectionParameter
+class ParameterWithReflection implements FromReflectionParameter, Inheritable
 {
     public function __construct(
         public int $x = 1,

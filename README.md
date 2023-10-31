@@ -320,6 +320,10 @@ Note that if a multi-value sub-attribute is `Inheritable`, ancestor classes will
 
 Note: In order to make use of multi-value sub-attributes, the attribute class itself must be marked as "repeatable" as in the example above or PHP will generate an error.  However, that is not sufficient for the Analyzer to parse it as multi-value.  That's because attributes may also be multi-value when implementing scopes, but still only single-value from the Analzyer's point of view.  See the section on Scopes below.
 
+### Finalizing an attribute
+
+Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
+
 ### Caching
 
 The main `Analyzer` class does no caching whatsoever.  However, it implements a `ClassAnalyzer` interface which allows it to be easily wrapped in other implementations that provide a caching layer.
@@ -341,10 +345,6 @@ Wrappers may also compose each other, so the following would be an entirely vali
 ```php
 $analyzer = new MemoryCacheAnalyzer(new Psr6CacheAnalyzer(new Analyzer(), $psr6CachePool));
 ```
-
-## Finalizing an attribute
-
-Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
 
 ## Advanced features
 
@@ -473,7 +473,7 @@ class MyClass implements ParseProperties
 
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS)]
-class FancyName implements Transitive
+class FancyName implements TransitiveProperty
 {
     public function __construct(public readonly string $name = '') {}
 }
@@ -606,11 +606,12 @@ class Alias implements Multivalue
 
 #[Alias(first: 'Bruce', last: 'Wayne')]
 #[Alias(first: 'Bat', last: 'Man')]
-class Something
+class Hero
 {
+    // ...
 }
 
-$names = $analyzer->analyze(Something::class, Names::class);
+$names = $analyzer->analyze(Hero::class, Names::class);
 
 foreach ($names as $name) {
     print $name->fullName() . PHP_EOL;
@@ -687,6 +688,7 @@ class Alias implements Name
 #[Alias('The Caped Crusader')]
 class Hero
 {
+    // ...
 }
 ```
 
@@ -699,9 +701,7 @@ Note that the interface must be marked `Multivalue` so that `Analyzer` will allo
 In a similar vein, it's possible to use sub-attributes to declare that a component may be marked with one of a few attributes, but only one of them.
 
 ```php
-interface DisplayType
-{
-}
+interface DisplayType {}
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Screen implements DisplayType
@@ -771,7 +771,7 @@ If you discover any security related issues, please email larry at garfieldtech 
 - [Larry Garfield][link-author]
 - [All Contributors][link-contributors]
 
-Development of this library is sponsored by [TYPO3 GmbH](https://typo3.com/).
+Initial development of this library was sponsored by [TYPO3 GmbH](https://typo3.com/).
 
 ## License
 

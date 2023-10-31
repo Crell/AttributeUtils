@@ -9,6 +9,9 @@ trait CollectEnumCases
     /** @var ReflectEnumCase[] */
     public readonly array $cases;
 
+    /**
+     * @param ReflectEnumCase[] $cases
+     */
     public function setCases(array $cases): void
     {
         $this->cases = $cases;

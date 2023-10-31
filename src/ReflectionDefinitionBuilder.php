@@ -57,6 +57,8 @@ class ReflectionDefinitionBuilder
             ?? ($includeByDefault ?  new $attributeType() : null);
 
         if ($def instanceof $reflectionInterface) {
+            // This is just too dynamic for PHPstan to handle.
+            // @phpstan-ignore-next-line
             $def->fromReflection($reflection);
         }
 

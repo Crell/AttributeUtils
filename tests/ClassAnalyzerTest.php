@@ -59,15 +59,13 @@ use Crell\AttributeUtils\Records\PropertiesWithMultipleSubattributes;
 use Crell\AttributeUtils\Records\PropertyThatTakesClassDefault;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
 use Crell\AttributeUtils\TypeDef\Suit;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ClassAnalyzerTest extends TestCase
 {
-
-    /**
-     * @test
-     * @dataProvider attributeTestProvider()
-     */
+    #[Test, DataProvider('attributeTestProvider')]
     public function analyze_classes(string $subject, string $attribute, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -77,9 +75,7 @@ class ClassAnalyzerTest extends TestCase
         $test($classDef);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function missing_required_fields(): void
     {
         $this->expectException(RequiredAttributeArgumentsMissing::class);
@@ -89,10 +85,7 @@ class ClassAnalyzerTest extends TestCase
 
     }
 
-    /**
-     * @test
-     * @dataProvider attributeObjectTestProvider()
-     */
+    #[Test, DataProvider('attributeObjectTestProvider')]
     public function analyze_objects(object $subject, string $attribute, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -102,9 +95,7 @@ class ClassAnalyzerTest extends TestCase
         $test($classDef);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function analyze_anonymous_objects(): void
     {
         $subject = new class {
@@ -123,7 +114,7 @@ class ClassAnalyzerTest extends TestCase
     /**
      * @see analyze_classes()
      */
-    public function attributeTestProvider(): \Generator
+    public static function attributeTestProvider(): \Generator
     {
         yield 'Generic' => [
             'subject' => Point::class,
@@ -276,6 +267,15 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
+        yield 'Parameter with sub attributes' => [
+            'subject' => ClassWithMethodsAndProperties::class,
+            'attribute' => ClassMethodsProperties::class,
+            'test' => static function (ClassMethodsProperties $classDef) {
+                static::assertEquals(5, $classDef->methods['methodTwo']->parameters['three']->x);
+                static::assertEquals('three', $classDef->methods['methodTwo']->parameters['three']->name);
+            },
+        ];
+
         yield 'Class with constants' => [
             'subject' => ClassWithConstantsChild::class,
             'attribute' => ClassWithClassConstants::class,
@@ -422,10 +422,7 @@ class ClassAnalyzerTest extends TestCase
         // This should probably error somehow, but not sure how.
     }
 
-    /**
-     * @test
-     * @dataProvider scopedAttributeTestProvider()
-     */
+    #[Test, DataProvider('scopedAttributeTestProvider')]
     public function analyze_classes_scoped(string $subject, string $attribute, array $scopes, callable $tests): void
     {
         $analyzer = new Analyzer();
@@ -434,7 +431,7 @@ class ClassAnalyzerTest extends TestCase
         $tests($classDef);
     }
 
-    public function scopedAttributeTestProvider(): iterable
+    public static function scopedAttributeTestProvider(): iterable
     {
         yield 'Incl by default: true; scope: One' => [
             'subject' => ClassWithScopes::class,
@@ -741,9 +738,9 @@ class ClassAnalyzerTest extends TestCase
     /**
      * @see analyze_objects()
      */
-    public function attributeObjectTestProvider(): iterable
+    public static function attributeObjectTestProvider(): iterable
     {
-        $tests = iterator_to_array($this->attributeTestProvider());
+        $tests = iterator_to_array(self::attributeTestProvider());
 
         // For enum tests, skip those entirely since there's nothing to instantiate.
         if (function_exists('\enum_exists')) {

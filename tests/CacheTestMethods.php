@@ -9,6 +9,7 @@ use Crell\AttributeUtils\Attributes\ScopedClass;
 use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\Point;
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * Use this trait in a test class for each cache implementation.
@@ -39,9 +40,7 @@ trait CacheTestMethods
         };
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function cache_analysis(): void
     {
         $analyzer = $this->getTestSubject();
@@ -54,9 +53,7 @@ trait CacheTestMethods
         self::assertNotSame($def1, $def3);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function cache_analysis_scopes(): void
     {
         $analyzer = $this->getTestSubject();

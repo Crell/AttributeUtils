@@ -194,6 +194,8 @@ class AttributeParser
             && $class = $this->getPropertyClass($target))
         {
             return pipe($this->classAncestors($class),
+                // PHPStan gets confused by firstValue() and thinks $c is a string, not class-string.
+                // @phpstan-ignore-next-line
                 firstValue(fn (string $c): array => $this->getAttributes(new \ReflectionClass($c), $name)),
             ) ?? [];
         }
@@ -216,20 +218,12 @@ class AttributeParser
         yield $subject;
 
         if (is_a($attributeType, Inheritable::class, true)) {
-            // PHPStan doesn't understand that this is guaranteed type safe, so
-            // ignore it.
             yield from match(get_class($subject)) {
-                // @phpstan-ignore-next-line
                 \ReflectionClass::class => $this->classInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionObject::class => $this->classInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionProperty::class => $this->classElementInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionMethod::class => $this->classElementInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionClassConstant::class => $this->classElementInheritanceTree($subject),
-                // @phpstan-ignore-next-line
                 \ReflectionParameter::class => $this->parameterInheritanceTree($subject),
                 // If it's an enum, there's nothing to inherit so just stub that out.
                 \ReflectionEnum::class => [],
@@ -271,10 +265,16 @@ class AttributeParser
         $parameterName = $subject->getName();
         $methodName = $subject->getDeclaringFunction()->name;
 
-        foreach ($this->classAncestors($subject->getDeclaringClass()->name) as $class) {
+        $declaringClass = $subject->getDeclaringClass()?->name;
+
+        if (!$declaringClass) {
+            return;
+        }
+
+        foreach ($this->classAncestors($declaringClass) as $class) {
             $rClass = new \ReflectionClass($class);
             if ($rClass->hasMethod($methodName)) {
-                $rMethod = $rClass->getMethod($parameterName);
+                $rMethod = $rClass->getMethod($methodName);
                 foreach ($rMethod->getParameters() as $rParam) {
                     if ($rParam->name === $parameterName) {
                         yield $rParam;
@@ -318,11 +318,13 @@ class AttributeParser
     /**
      * Returns a list of all class and interface parents of a class.
      *
+     * @param class-string $class
      * @return array<class-string>
      */
     public function classAncestors(string $class, bool $includeClass = true): array
     {
         // These methods both return associative arrays, making + safe.
+        /** @var array<class-string> $ancestors */
         $ancestors = class_parents($class) + class_implements($class);
         return $includeClass
             ? [$class => $class] + $ancestors
@@ -335,7 +337,7 @@ class AttributeParser
      *
      * @param \ReflectionProperty $rProperty
      *   The property to check
-     * @return string|null
+     * @return class-string|null
      *   The class/interface name, or null.
      */
     protected function getPropertyClass(\ReflectionProperty $rProperty): ?string

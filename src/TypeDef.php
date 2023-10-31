@@ -13,6 +13,12 @@ class TypeDef
     /**
      * Normalized to DNF form. (ORed list of ANDs.)
      *
+     * eg (A&B)|C:
+     * [
+     *     [A, B],
+     *     [C],
+     * ]
+     *
      * @var array<array<string>>
      */
     private array $type = [[]];
@@ -35,9 +41,6 @@ class TypeDef
             return;
         }
 
-        // PHPStan thinks this property is already assigned, despite
-        // the return statement above. This is a bug in PHPStan.
-        // @phpstan-ignore-next-line
         $this->allowsNull = $type->allowsNull();
 
         // PHPStan thinks this property is already assigned, despite
@@ -49,9 +52,6 @@ class TypeDef
             \ReflectionIntersectionType::class => [$this->parseIntersectionType($type)],
         };
 
-        // PHPStan thinks this property is already assigned, despite
-        // the return statement above. This is a bug in PHPStan.
-        // @phpstan-ignore-next-line
         $this->complexity = $this->deriveComplexity($this->type);
     }
 
@@ -103,16 +103,15 @@ class TypeDef
      */
     protected function parseUnionType(\ReflectionUnionType $type): array
     {
-        $translate = static fn (\ReflectionType $innerType): array => match($innerType::class) {
+        $translate = fn (\ReflectionType $innerType): array => match($innerType::class) {
             \ReflectionNamedType::class => [$innerType->getName()],
-            // This technically cannot happen until 8.2, assuming we get DNF types, but planning ahead...
-            //\ReflectionIntersectionType::class => $this->parseIntersectionType($innerType),
+            \ReflectionIntersectionType::class => $this->parseIntersectionType($innerType),
         };
         return array_map($translate, $type->getTypes());
     }
 
     /**
-     * @return array<array<int, string>>
+     * @return array<int, string>
      */
     protected function parseIntersectionType(\ReflectionIntersectionType $type): array
     {
@@ -122,7 +121,7 @@ class TypeDef
     /**
      *
      *
-     * @param array<string>|array<array<string>> $type
+     * @param array<array<string>> $type
      */
     protected function deriveComplexity(array $type): TypeComplexity
     {

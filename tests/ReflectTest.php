@@ -15,17 +15,14 @@ use Crell\AttributeUtils\Records\Reflect\Complete;
 use Crell\AttributeUtils\Records\Reflect\SampleTrait;
 use Crell\AttributeUtils\TypeDef\BackedSuit;
 use Crell\AttributeUtils\TypeDef\Suit;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires PHP >= 8.1.0
- */
 class ReflectTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider classAttributeExamples()
-     */
+    #[Test, DataProvider('classAttributeExamples')]
     public function analyze_classes(string $subject, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -34,10 +31,8 @@ class ReflectTest extends TestCase
 
         $test($classDef);
     }
-    /**
-     * @test
-     * @dataProvider enumAttributeExamples()
-     */
+
+    #[Test, DataProvider('enumAttributeExamples')]
     public function analyze_enums(string $subject, callable $test): void
     {
         $analyzer = new Analyzer();
@@ -47,7 +42,7 @@ class ReflectTest extends TestCase
         $test($classDef);
     }
 
-    public function enumAttributeExamples(): iterable
+    public static function enumAttributeExamples(): iterable
     {
         yield Suit::class => [
             'subject' => Suit::class,
@@ -86,7 +81,7 @@ class ReflectTest extends TestCase
         ];
     }
 
-    public function classAttributeExamples(): iterable
+    public static function classAttributeExamples(): iterable
     {
         yield NoProps::class => [
             'subject' => NoProps::class,
