@@ -606,11 +606,12 @@ class Alias implements Multivalue
 
 #[Alias(first: 'Bruce', last: 'Wayne')]
 #[Alias(first: 'Bat', last: 'Man')]
-class Something
+class Hero
 {
+    // ...
 }
 
-$names = $analyzer->analyze(Something::class, Names::class);
+$names = $analyzer->analyze(Hero::class, Names::class);
 
 foreach ($names as $name) {
     print $name->fullName() . PHP_EOL;
@@ -687,6 +688,7 @@ class Alias implements Name
 #[Alias('The Caped Crusader')]
 class Hero
 {
+    // ...
 }
 ```
 
@@ -699,9 +701,7 @@ Note that the interface must be marked `Multivalue` so that `Analyzer` will allo
 In a similar vein, it's possible to use sub-attributes to declare that a component may be marked with one of a few attributes, but only one of them.
 
 ```php
-interface DisplayType
-{
-}
+interface DisplayType {}
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Screen implements DisplayType
