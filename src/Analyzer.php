@@ -126,11 +126,10 @@ class Analyzer implements ClassAnalyzer
         // PHPStan doesn't understand this syntax style of sscanf(), so skip it.
         // @phpstan-ignore-next-line
         [$classAndMethod, $passedCount, $file, $line, $expectedCount] = sscanf(
-            // @phpstan-ignore-next-line
             string: $message,
             format: "Too few arguments to function %s::%s, %d passed in %s on line %d and exactly %d expected"
         );
-        [$className, $methodName] = \explode('::', $classAndMethod);
+        [$className, $methodName] = \explode('::', $classAndMethod ?? '');
 
         throw RequiredAttributeArgumentsMissing::create($className, $error);
     }
