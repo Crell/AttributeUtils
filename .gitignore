@@ -6,3 +6,4 @@ vendor
 /vendor-bin/**/vendor
 .env
 profiles
+.idea
