@@ -9,7 +9,6 @@ class FuncAnalyzer implements FunctionAnalyzer
         $parser = new AttributeParser($scopes);
         $defBuilder = new ReflectionDefinitionBuilder($parser);
 
-
         try {
             $subject = new \ReflectionFunction($function);
 

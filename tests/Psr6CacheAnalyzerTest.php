@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class Psr6CacheAnalyzerTest extends TestCase
 {
-    use CacheTestMethods;
+    use ClassAnalyzerCacheTestMethods;
 
     public function getTestSubject(): ClassAnalyzer
     {
