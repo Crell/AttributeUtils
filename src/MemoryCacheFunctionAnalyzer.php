@@ -9,6 +9,11 @@ namespace Crell\AttributeUtils;
  */
 class MemoryCacheFunctionAnalyzer implements FunctionAnalyzer
 {
+    /**
+     * @var array<string, array<string, array<string, object>>>
+     */
+    private array $cache = [];
+
     public function __construct(
         private readonly FunctionAnalyzer $analyzer,
     ) {}
