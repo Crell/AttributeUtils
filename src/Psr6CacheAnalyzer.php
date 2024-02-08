@@ -12,8 +12,8 @@ use Psr\Cache\CacheItemPoolInterface;
 class Psr6CacheAnalyzer implements ClassAnalyzer
 {
     public function __construct(
-        private ClassAnalyzer $analyzer,
-        private CacheItemPoolInterface $pool,
+        private readonly ClassAnalyzer          $analyzer,
+        private readonly CacheItemPoolInterface $pool,
     ) {}
 
     public function analyze(object|string $class, string $attribute, array $scopes = []): object
