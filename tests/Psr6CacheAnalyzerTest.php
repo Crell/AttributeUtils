@@ -15,5 +15,4 @@ class Psr6CacheAnalyzerTest extends TestCase
     {
         return new Psr6CacheAnalyzer($this->getMockAnalyzer(), new MemoryPool());
     }
-
 }

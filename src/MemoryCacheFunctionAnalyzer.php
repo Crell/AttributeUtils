@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Crell\AttributeUtils;
 
 /**
@@ -10,7 +12,6 @@ class MemoryCacheFunctionAnalyzer implements FunctionAnalyzer
     public function __construct(
         private readonly FunctionAnalyzer $analyzer,
     ) {}
-
 
     public function analyze(string|\Closure $function, string $attribute, array $scopes = []): object
     {
