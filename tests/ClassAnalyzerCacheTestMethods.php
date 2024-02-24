@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\Test;
 /**
  * Use this trait in a test class for each cache implementation.
  */
-trait CacheTestMethods
+trait ClassAnalyzerCacheTestMethods
 {
     abstract public function getTestSubject(): ClassAnalyzer;
 

@@ -518,6 +518,46 @@ As a last resort, an attribute may also implement the [`CustomAnalysis`](src/Cus
 
 The Analyzer is designed to be usable on its own without any setup.  Making it available via a Dependency Injection Container is recommended.  An appropriate cache wrapper should also be included in the DI configuration.
 
+## Function analysis
+
+There is also support for retrieving attributes on functions, via a separate analyzer (that works essentially the same way).  The `FuncAnalyzer` class implements the `FunctionAnalyzer` interface.
+
+```php
+use Crell\AttributeUtils\FuncAnalyzer;
+
+#[MyFunc]
+function beep(int $a) {}
+
+$closure = #[MyClosure] fn(int $a) => $a + 1;
+
+// For functions...
+$analyzer = new FuncAnalyzer();
+$funcDef = $analyzer->analyze('beep', MyFunc::class);
+
+// For closures
+$analyzer = new FuncAnalyzer();
+$funcDef = $analyzer->analyze($closure, MyFunc::class);
+```
+
+Sub-attributes, `ParseParameters`, and `Finalizable` all work on functions exactly as they do on classes and methods, as do scopes.  There is also a corresponding `FromReflectionFunction` interface for receiving the `ReflectionFunction` object.
+
+There are also cache wrappers available for the FuncAnalyzer as well.  They work the same way as on the class analyzer.
+
+```php
+# In-memory cache.
+$analyzer = new MemoryCacheFunctionAnalyzer(new FuncAnalyzer());
+
+# PSR-6 cache.
+$anaylzer = new Psr6CacheFunctionAnalyzer(new FuncAnalyzer(), $somePsr6CachePoolObject);
+
+# Both caches.
+$analyzer = new MemoryCacheFunctionAnalyzer(
+    new Psr6CacheFunctionAnalyzer(new FuncAnalyzer(), $psr6CachePool)
+);
+```
+
+As with the class analyzer, it's best to wire these up in your DI container.
+
 ## The Reflect library
 
 One of the many uses for `Analyzer` is to extract reflection information from a class.  Sometimes you only need some of it, but there's no reason you can't grab all of it.  The result is an attribute that can carry all the same information as reflection, but can be cached if desired while reflection objects cannot be.

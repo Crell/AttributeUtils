@@ -14,7 +14,7 @@ class MemoryCacheAnalyzer implements ClassAnalyzer
      */
     private array $cache = [];
 
-    public function __construct(private ClassAnalyzer $analyzer)
+    public function __construct(private readonly ClassAnalyzer $analyzer)
     {}
 
     public function analyze(object|string $class, string $attribute, array $scopes = []): object

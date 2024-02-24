@@ -8,11 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 class MemoryCacheAnalyzerTest extends TestCase
 {
-    use CacheTestMethods;
+    use ClassAnalyzerCacheTestMethods;
 
     public function getTestSubject(): ClassAnalyzer
     {
         return new MemoryCacheAnalyzer($this->getMockAnalyzer());
     }
-
 }

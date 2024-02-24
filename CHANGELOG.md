@@ -4,6 +4,11 @@ All notable changes to `AttributeUtils` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 1.1.0 - 2024-02-24
+
+### Added
+- Added a separate analyzer for functions and closures.
+
 ## 1.0.0 - 2023-10-30
 
 ### Added

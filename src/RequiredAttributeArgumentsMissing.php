@@ -6,7 +6,7 @@ namespace Crell\AttributeUtils;
 
 class RequiredAttributeArgumentsMissing extends \LogicException
 {
-    public string $attributeType;
+    public readonly string $attributeType;
 
     public static function create(string $attributeType, \Throwable $previous): self
     {

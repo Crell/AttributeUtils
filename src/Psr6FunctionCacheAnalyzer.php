@@ -6,19 +6,21 @@ namespace Crell\AttributeUtils;
 
 use Psr\Cache\CacheItemPoolInterface;
 
-/**
- * PSR-6 bridge for caching the analyzer.
- */
-class Psr6CacheAnalyzer implements ClassAnalyzer
+class Psr6FunctionCacheAnalyzer implements FunctionAnalyzer
 {
     public function __construct(
-        private readonly ClassAnalyzer          $analyzer,
+        private readonly FunctionAnalyzer $analyzer,
         private readonly CacheItemPoolInterface $pool,
     ) {}
 
-    public function analyze(object|string $class, string $attribute, array $scopes = []): object
+    public function analyze(\Closure|string $function, string $attribute, array $scopes = []): object
     {
-        $key = $this->buildKey($class, $attribute, $scopes);
+        // We cannot cache a closure, as we have no reliable identifier for it.
+        if ($function instanceof \Closure) {
+            return $this->analyzer->analyze($function, $attribute, $scopes);
+        }
+
+        $key = $this->buildKey($function, $attribute, $scopes);
 
         $item = $this->pool->getItem($key);
         if ($item->isHit()) {
@@ -27,7 +29,7 @@ class Psr6CacheAnalyzer implements ClassAnalyzer
 
         // No expiration; the cached data would only need to change
         // if the source code changes.
-        $value = $this->analyzer->analyze($class, $attribute, $scopes);
+        $value = $this->analyzer->analyze($function, $attribute, $scopes);
         $item->set($value);
         $this->pool->save($item);
         return $value;
@@ -39,10 +41,10 @@ class Psr6CacheAnalyzer implements ClassAnalyzer
      * @param array<string|null> $scopes
      *   The scopes for which this analysis should run.
      */
-    private function buildKey(object|string $class, string $attribute, array $scopes): string
+    private function buildKey(string $function, string $attribute, array $scopes): string
     {
         $parts = [
-            is_object($class) ? $class::class : $class,
+            $function,
             $attribute,
             implode(',', $scopes),
         ];

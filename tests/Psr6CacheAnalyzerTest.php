@@ -9,11 +9,10 @@ use PHPUnit\Framework\TestCase;
 
 class Psr6CacheAnalyzerTest extends TestCase
 {
-    use CacheTestMethods;
+    use ClassAnalyzerCacheTestMethods;
 
     public function getTestSubject(): ClassAnalyzer
     {
         return new Psr6CacheAnalyzer($this->getMockAnalyzer(), new MemoryPool());
     }
-
 }

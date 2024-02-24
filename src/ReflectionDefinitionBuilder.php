@@ -17,7 +17,7 @@ class ReflectionDefinitionBuilder
 {
     public function __construct(
         protected readonly AttributeParser $parser,
-        protected readonly Analyzer $analyzer,
+        protected readonly ?Analyzer $analyzer = null,
     ) {}
 
     /**
@@ -64,7 +64,7 @@ class ReflectionDefinitionBuilder
 
         $this->loadSubAttributes($def, $reflection);
 
-        if ($def instanceof CustomAnalysis) {
+        if ($def instanceof CustomAnalysis && $this->analyzer) {
             $def->customAnalysis($this->analyzer);
         }
 
@@ -105,7 +105,7 @@ class ReflectionDefinitionBuilder
             $def->setParameters($parameters);
         }
 
-        if ($def instanceof CustomAnalysis) {
+        if ($def instanceof CustomAnalysis && $this->analyzer) {
             $def->customAnalysis($this->analyzer);
         }
 
