@@ -42,8 +42,9 @@
     },
     "scripts": {
         "phpstan": "vendor/bin/phpstan",
+        "test": "vendor/bin/phpunit",
         "all-checks": [
-            "phpunit",
+            "@test",
             "@phpstan"
         ],
         "benchmarks": "vendor/bin/phpbench run benchmarks --report=aggregate"
