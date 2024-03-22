@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils;
 
 use function Crell\fp\afilter;
-use function Crell\fp\all;
 use function Crell\fp\amap;
 use function Crell\fp\firstValue;
 use function Crell\fp\method;
