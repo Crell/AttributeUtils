@@ -135,14 +135,22 @@ class ReflectionDefinitionBuilder
                         }
                         $this->loadSubAttributes($sub, $reflection);
                     }
-                    $attribute->$callback($subs);
+                    if ($callback instanceof \Closure) {
+                        $callback($subs);
+                    } else {
+                        $attribute->$callback($subs);
+                    }
                 } else {
                     $sub = $this->parser->getInheritedAttribute($reflection, $type);
                     if ($sub instanceof Finalizable) {
                         $sub->finalize();
                     }
                     $this->loadSubAttributes($sub, $reflection);
-                    $attribute->$callback($sub);
+                    if ($callback instanceof \Closure) {
+                        $callback($sub);
+                    } else {
+                        $attribute->$callback($sub);
+                    }
                 }
             }
         }

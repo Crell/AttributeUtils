@@ -14,6 +14,7 @@ use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
+use Crell\AttributeUtils\Attributes\ClosureSubAttributeMain;
 use Crell\AttributeUtils\Attributes\FinalizableClassAttribute;
 use Crell\AttributeUtils\Attributes\GenericClass;
 use Crell\AttributeUtils\Attributes\Labeled;
@@ -34,6 +35,7 @@ use Crell\AttributeUtils\InterfaceAttributes\Hero;
 use Crell\AttributeUtils\InterfaceAttributes\Name;
 use Crell\AttributeUtils\InterfaceAttributes\Names;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
+use Crell\AttributeUtils\Records\ClassWithClosureSubAttributes;
 use Crell\AttributeUtils\Records\ClassWithConstantsChild;
 use Crell\AttributeUtils\Records\ClassWithCustomizedFields;
 use Crell\AttributeUtils\Records\ClassWithCustomizedPropertiesExcludeByDefault;
@@ -406,6 +408,15 @@ class ClassAnalyzerTest extends TestCase
             'test' => static function (FinalizableClassAttribute $classDef) {
                 self::assertTrue($classDef->wasFinalized);
                 self::assertTrue($classDef->properties['foo']->greater);
+            },
+        ];
+
+        yield 'Closures work as sub-attribute callbacks' => [
+            'subject' => ClassWithClosureSubAttributes::class,
+            'attribute' => ClosureSubAttributeMain::class,
+            'test' => static function (ClosureSubAttributeMain $classDef) {
+                self::assertEquals('A', $classDef->referenced->a);
+                self::assertEquals('B', $classDef->inline->b);
             },
         ];
     }

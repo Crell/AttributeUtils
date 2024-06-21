@@ -18,7 +18,7 @@ namespace Crell\AttributeUtils;
 interface HasSubAttributes
 {
     /**
-     * @return array<string, string>
+     * @return array<string, string|\Closure>
      *   A mapping of attribute class name to the callback method that should be called with it.
      */
     public function subAttributes(): array;
