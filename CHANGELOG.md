@@ -4,6 +4,11 @@ All notable changes to `AttributeUtils` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 1.2.0 - FUTURE
+
+### Added
+- Sub-attribute callbacks may now be closures.  No need to reference methods by string anymore.
+
 ## 1.1.0 - 2024-02-24
 
 ### Added

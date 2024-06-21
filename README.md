@@ -263,7 +263,38 @@ $attribB = $analyzer->analyze(B::class, MainAttrib::class);
 print "$attribB->name, $attribB->age\n"; // prints "none, 0"
 ```
 
-The `subAttributes()` method returns an associative array of attribute class names mapped to methods to call.  After the `MainAttrib` is loaded, the Analyzer will look for any of the listed sub-attributes, and then pass their result to the corresponding method.  The main attribute can then save the whole sub-attribute, or pull pieces out of it to save, or whatever else it wants to do.
+The `subAttributes()` method returns an associative array of attribute class names mapped to methods to call.  They may be strings, or an inline closure, or a closed reference to a method, which may be private if desired.  For example:
+
+```php
+```php
+#[\Attribute(\Attribute::TARGET_CLASS)]
+class MainAttrib implements HasSubAttributes
+{
+    public readonly int $age;
+    public readonly string $name;
+
+    public function __construct(
+        public readonly string name = 'none',
+    ) {}
+
+    public function subAttributes(): array
+    {
+        return [
+            Age::class => $this->fromAge(...),
+            Name::class => function (?Name $sub) {
+                $this->name = $sub?->name ?? 'Anonymous';
+            }
+        ];
+    }
+
+    private function fromAge(?Age $sub): void
+    {
+        $this->age = $sub?->age ?? 0;
+    }
+}
+```
+
+After the `MainAttrib` is loaded, the Analyzer will look for any of the listed sub-attributes, and then pass their result to the corresponding method.  The main attribute can then save the whole sub-attribute, or pull pieces out of it to save, or whatever else it wants to do.
 
 An attribute may have any number of sub-attributes it wishes.
 
@@ -762,7 +793,7 @@ class DisplayInfo implements HasSubAttributes
 
     public function subAttributes(): array
     {
-        return [DisplayType::class => 'fromDisplayType'];
+        return [DisplayType::class => $this->fromDisplayType(...)];
     }
 
     public function fromDisplayType(?DisplayType $type): void
