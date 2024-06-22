@@ -266,7 +266,6 @@ print "$attribB->name, $attribB->age\n"; // prints "none, 0"
 The `subAttributes()` method returns an associative array of attribute class names mapped to methods to call.  They may be strings, or an inline closure, or a closed reference to a method, which may be private if desired.  For example:
 
 ```php
-```php
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class MainAttrib implements HasSubAttributes
 {
