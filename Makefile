@@ -17,3 +17,7 @@ test: build
 
 phpstan: build
 	$(compose_command) vendor/bin/phpstan
+
+clean:
+	rm -rf build
+	rm -rf .phpunit.cache
