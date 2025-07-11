@@ -21,7 +21,7 @@ class TypeDef
      *
      * @var array<array<string>>
      */
-    private array $type = [[]];
+    protected array $type = [[]];
 
     public readonly bool $allowsNull;
 
@@ -69,6 +69,16 @@ class TypeDef
     public function getSimpleType(): ?string
     {
         return $this->isSimple() ? $this->type[0][0] : null;
+    }
+
+    /**
+     * Returns a list of the unioned types, or null if it's not a union type.
+     *
+     * @return string[]|null
+     */
+    public function getUnionTypes(): ?array
+    {
+        return $this->complexity === TypeComplexity::Union ? array_column($this->type, 0) : null;
     }
 
     /**
