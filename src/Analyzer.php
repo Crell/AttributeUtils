@@ -28,6 +28,7 @@ class Analyzer implements ClassAnalyzer
             $classDef = $parser->getInheritedAttribute($subject, $attribute) ?? new $attribute;
 
             if ($classDef instanceof FromReflectionClass) {
+                /** @var \ReflectionClass<object> $subject */
                 $classDef->fromReflection($subject);
             }
 
