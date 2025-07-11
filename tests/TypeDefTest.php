@@ -44,7 +44,7 @@ class TypeDefTest extends TestCase
     public static function typeDefProvider(): iterable
     {
         yield 'simpleInt' => [
-            'subject' => 'simpleInt',
+            'methodName' => 'simpleInt',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -56,7 +56,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleString' => [
-            'subject' => 'simpleString',
+            'methodName' => 'simpleString',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -68,7 +68,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleStringNullable' => [
-            'subject' => 'simpleStringNullable',
+            'methodName' => 'simpleStringNullable',
             'test' => static function (TypeDef $typeDef) {
                 static::assertTrue($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -81,7 +81,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleStringNullableUnion' => [
-            'subject' => 'simpleStringNullableUnion',
+            'methodName' => 'simpleStringNullableUnion',
             'test' => static function (TypeDef $typeDef) {
                 static::assertTrue($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -94,7 +94,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleArray' => [
-            'subject' => 'simpleArray',
+            'methodName' => 'simpleArray',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -105,7 +105,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleVoid' => [
-            'subject' => 'simpleVoid',
+            'methodName' => 'simpleVoid',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -116,7 +116,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleNever' => [
-            'subject' => 'simpleNever',
+            'methodName' => 'simpleNever',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -125,7 +125,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'returnsStatic' => [
-            'subject' => 'returnsStatic',
+            'methodName' => 'returnsStatic',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -135,7 +135,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'simpleClass' => [
-            'subject' => 'simpleClass',
+            'methodName' => 'simpleClass',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -146,7 +146,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'scalarUnion' => [
-            'subject' => 'scalarUnion',
+            'methodName' => 'scalarUnion',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertFalse($typeDef->isSimple());
@@ -158,7 +158,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'mixedUnion' => [
-            'subject' => 'mixedUnion',
+            'methodName' => 'mixedUnion',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertFalse($typeDef->isSimple());
@@ -170,7 +170,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'intersection' => [
-            'subject' => 'intersection',
+            'methodName' => 'intersection',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertFalse($typeDef->isSimple());
@@ -181,7 +181,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'interfaceIntersection' => [
-            'subject' => 'interfaceIntersection',
+            'methodName' => 'interfaceIntersection',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertFalse($typeDef->isSimple());
@@ -193,7 +193,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'mixedReturn' => [
-            'subject' => 'mixedReturn',
+            'methodName' => 'mixedReturn',
             'test' => static function (TypeDef $typeDef) {
                 static::assertTrue($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -206,7 +206,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'noReturnType' => [
-            'subject' => 'noReturnType',
+            'methodName' => 'noReturnType',
             'test' => static function (TypeDef $typeDef) {
                 static::assertTrue($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());
@@ -219,7 +219,7 @@ class TypeDefTest extends TestCase
         ];
 
         yield 'returnsEnum' => [
-            'subject' => 'returnsEnum',
+            'methodName' => 'returnsEnum',
             'test' => static function (TypeDef $typeDef) {
                 static::assertFalse($typeDef->allowsNull);
                 static::assertTrue($typeDef->isSimple());

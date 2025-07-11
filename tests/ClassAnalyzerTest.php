@@ -448,7 +448,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
             'scopes' => ['One'],
-            'test' => static function(ScopedClass $classDef) {
+            'tests' => static function(ScopedClass $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('A', $classDef->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->val);
@@ -473,7 +473,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
             'scopes' => ['Two'],
-            'test' => static function(ScopedClass $classDef) {
+            'tests' => static function(ScopedClass $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('B', $classDef->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->val);
@@ -498,7 +498,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopes::class,
             'attribute' => ScopedClass::class,
             'scopes' => [],
-            'test' => static function(ScopedClass $classDef) {
+            'tests' => static function(ScopedClass $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('Z', $classDef->val);
                 self::assertEquals('Z', $classDef->methods['aMethod']->val);
@@ -523,7 +523,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesNotDefault::class,
             'attribute' => ScopedClassNoDefaultInclude::class,
             'scopes' => ['One'],
-            'test' => static function(ScopedClassNoDefaultInclude $classDef) {
+            'tests' => static function(ScopedClassNoDefaultInclude $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('A', $classDef->val);
                 self::assertEquals('A', $classDef->methods['aMethod']->val);
@@ -548,7 +548,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesNotDefault::class,
             'attribute' => ScopedClassNoDefaultInclude::class,
             'scopes' => ['Two'],
-            'test' => static function(ScopedClassNoDefaultInclude $classDef) {
+            'tests' => static function(ScopedClassNoDefaultInclude $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertEquals('B', $classDef->val);
                 self::assertEquals('B', $classDef->methods['aMethod']->val);
@@ -573,7 +573,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesNotDefault::class,
             'attribute' => ScopedClassNoDefaultInclude::class,
             'scopes' => [],
-            'test' => static function(ScopedClassNoDefaultInclude $classDef) {
+            'tests' => static function(ScopedClassNoDefaultInclude $classDef) {
                 // Common to all cases, just to verify all components can be scoped.
                 self::assertArrayNotHasKey('noAttrib', $classDef->properties);
                 self::assertEquals('Z', $classDef->methods['aMethod']->val);
@@ -598,7 +598,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
             'scopes' => [],
-            'test' => static function(Labeled $classDef) {
+            'tests' => static function(Labeled $classDef) {
                 self::assertEquals('Installation', $classDef->properties['install']->name);
                 self::assertEquals('Setup', $classDef->properties['setup']->name);
                 self::assertEquals('Untitled', $classDef->properties['login']->name);
@@ -610,7 +610,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
             'scopes' => ['es'],
-            'test' => static function(Labeled $classDef) {
+            'tests' => static function(Labeled $classDef) {
                 self::assertEquals('Instalación', $classDef->properties['install']->name);
                 self::assertEquals('Configurar', $classDef->properties['setup']->name);
                 self::assertEquals('Untitled', $classDef->properties['login']->name);
@@ -622,7 +622,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
             'scopes' => ['de'],
-            'test' => static function(Labeled $classDef) {
+            'tests' => static function(Labeled $classDef) {
                 self::assertEquals('Installation', $classDef->properties['install']->name);
                 self::assertEquals('Einrichten', $classDef->properties['setup']->name);
                 self::assertEquals('Einloggen', $classDef->properties['login']->name);
@@ -634,7 +634,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => LabeledApp::class,
             'attribute' => Labeled::class,
             'scopes' => ['fr'],
-            'test' => static function(Labeled $classDef) {
+            'tests' => static function(Labeled $classDef) {
                 self::assertEquals('Installation', $classDef->properties['install']->name);
                 self::assertEquals('Setup', $classDef->properties['setup']->name);
                 self::assertArrayNotHasKey('login', $classDef->properties);
@@ -646,7 +646,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesMulti::class,
             'attribute' => ScopedClassMulti::class,
             'scopes' => ['One'],
-            'test' => static function(ScopedClassMulti $classDef) {
+            'tests' => static function(ScopedClassMulti $classDef) {
                 self::assertEquals('A', $classDef->val);
 
                 self::assertEquals('A', $classDef->properties['inOne']->val);
@@ -663,7 +663,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesMulti::class,
             'attribute' => ScopedClassMulti::class,
             'scopes' => ['Two'],
-            'test' => static function(ScopedClassMulti $classDef) {
+            'tests' => static function(ScopedClassMulti $classDef) {
                 self::assertEquals('B', $classDef->val);
 
                 self::assertArrayNotHasKey('inOne', $classDef->properties);
@@ -680,7 +680,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesMulti::class,
             'attribute' => ScopedClassMulti::class,
             'scopes' => ['Three'],
-            'test' => static function(ScopedClassMulti $classDef) {
+            'tests' => static function(ScopedClassMulti $classDef) {
                 self::assertEquals('Z', $classDef->val);
 
                 self::assertArrayNotHasKey('inOne', $classDef->properties);
@@ -697,7 +697,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesMulti::class,
             'attribute' => ScopedClassMulti::class,
             'scopes' => [],
-            'test' => static function(ScopedClassMulti $classDef) {
+            'tests' => static function(ScopedClassMulti $classDef) {
                 self::assertEquals('Z', $classDef->val);
 
                 self::assertArrayNotHasKey('inOne', $classDef->properties);
@@ -714,7 +714,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesMulti::class,
             'attribute' => ScopedClassMulti::class,
             'scopes' => [null],
-            'test' => static function(ScopedClassMulti $classDef) {
+            'tests' => static function(ScopedClassMulti $classDef) {
                 self::assertEquals('Z', $classDef->val);
 
                 self::assertArrayNotHasKey('inOne', $classDef->properties);
@@ -731,7 +731,7 @@ class ClassAnalyzerTest extends TestCase
             'subject' => ClassWithScopesMulti::class,
             'attribute' => ScopedClassMulti::class,
             'scopes' => ['One', 'Two'],
-            'test' => static function(ScopedClassMulti $classDef) {
+            'tests' => static function(ScopedClassMulti $classDef) {
                 // The lexically first wins.
                 self::assertEquals('A', $classDef->val);
 
