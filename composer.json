@@ -21,11 +21,11 @@
         "crell/fp": "~1.0.0"
     },
     "require-dev": {
+        "fig/cache-util": "^2.0",
         "phpbench/phpbench": "^1.2",
-        "phpstan/phpstan": "^1.10",
-        "phpunit/phpunit": "~10.3",
-        "psr/cache": "^3.0",
-        "psr/cache-util": "^2.0"
+        "phpstan/phpstan": "~2",
+        "phpunit/phpunit": "~10.5",
+        "psr/cache": "^3.0"
     },
     "suggest": {
         "psr/cache": "Caching analyzer rests is recommended, and a bridge for psr/cache is included."
