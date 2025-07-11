@@ -68,6 +68,9 @@ class ReflectClass implements FromReflectionClass, ParseMethods, ParseStaticMeth
      */
     public readonly ClassType $structType;
 
+    /**
+     * @param \ReflectionClass<object> $subject
+     */
     public function fromReflection(\ReflectionClass $subject): void
     {
         $this->phpName = $subject->getName();

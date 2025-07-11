@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Attributes\Reflect;
 
+// @phpstan-ignore trait.unused (I don't know why PHPStan thinks this is unused. It very much is used.)
 trait CollectParameters
 {
     /** @var ReflectParameter[] */

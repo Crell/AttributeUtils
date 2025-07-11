@@ -17,5 +17,8 @@ namespace Crell\AttributeUtils;
  */
 interface FromReflectionEnum
 {
+    /**
+     * @param \ReflectionEnum<\UnitEnum> $subject
+     */
     public function fromReflection(\ReflectionEnum $subject): void;
 }

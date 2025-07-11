@@ -17,5 +17,8 @@ namespace Crell\AttributeUtils;
  */
 interface FromReflectionClass
 {
+    /**
+     * @param \ReflectionClass<object> $subject
+     */
     public function fromReflection(\ReflectionClass $subject): void;
 }

@@ -235,9 +235,9 @@ class AttributeParser
      *
      * This includes both classes and interfaces.
      *
-     * @param \ReflectionClass $subject
+     * @param \ReflectionClass<object> $subject
      *   The reflection of the class for which we want the ancestors.
-     * @return iterable<\ReflectionClass>
+     * @return iterable<\ReflectionClass<object>>
      * @throws \ReflectionException
      */
     protected function classInheritanceTree(\ReflectionClass $subject): iterable
@@ -293,7 +293,7 @@ class AttributeParser
      *
      * @param \ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject
      *   The reflection of the component for which we want the ancestors.
-     * @return iterable<\Reflector>
+     * @return iterable<\ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant>
      * @throws \ReflectionException
      */
     protected function classElementInheritanceTree(\ReflectionProperty|\ReflectionMethod|\ReflectionClassConstant $subject): iterable
@@ -309,6 +309,7 @@ class AttributeParser
         foreach ($this->classAncestors($subject->getDeclaringClass()->name) as $class) {
             $rClass = new \ReflectionClass($class);
             if ($rClass->$hasMethod($subjectName)) {
+                // @phpstan-ignore generator.valueType (PHPStan thinks this could be false, but I'm pretty sure it's wrong.)
                 yield $rClass->$getMethod($subjectName);
             }
         }
@@ -323,7 +324,7 @@ class AttributeParser
     public function classAncestors(string $class, bool $includeClass = true): array
     {
         // These methods both return associative arrays, making + safe.
-        /** @var array<class-string> $ancestors */
+        /** @var array<string, class-string> $ancestors */
         $ancestors = class_parents($class) + class_implements($class);
         return $includeClass
             ? [$class => $class] + $ancestors

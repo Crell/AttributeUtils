@@ -2,7 +2,6 @@ parameters:
     level: 8
     paths:
         - src
-    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
         - '#Match expression does not handle remaining value#'
         - '#has an uninitialized readonly property (.*). Assign it in the constructor.#'
