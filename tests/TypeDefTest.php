@@ -151,6 +151,7 @@ class TypeDefTest extends TestCase
                 static::assertFalse($typeDef->allowsNull);
                 static::assertFalse($typeDef->isSimple());
                 static::assertEquals(TypeComplexity::Union, $typeDef->complexity);
+                static::assertEquals(['string', 'int'], $typeDef->getUnionTypes());
                 static::assertTrue($typeDef->accepts('int'));
                 static::assertTrue($typeDef->accepts('string'));
                 static::assertFalse($typeDef->accepts(SomeClass::class));
@@ -163,6 +164,7 @@ class TypeDefTest extends TestCase
                 static::assertFalse($typeDef->allowsNull);
                 static::assertFalse($typeDef->isSimple());
                 static::assertEquals(TypeComplexity::Union, $typeDef->complexity);
+                static::assertEquals([SomeClass::class, 'string'], $typeDef->getUnionTypes());
                 static::assertTrue($typeDef->accepts(SomeClass::class));
                 static::assertTrue($typeDef->accepts('string'));
                 static::assertFalse($typeDef->accepts(OtherClass::class));
