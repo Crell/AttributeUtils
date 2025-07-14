@@ -131,7 +131,6 @@ class ReflectionDefinitionBuilder
                     $subs = $this->parser->getInheritedAttributes($reflection, $type);
                     foreach ($subs as $sub) {
                         $this->applySubattributeFeatures($sub, $reflection);
-                        $this->loadSubAttributes($sub, $reflection);
                     }
                     if ($callback instanceof \Closure) {
                         $callback($subs);
@@ -143,7 +142,6 @@ class ReflectionDefinitionBuilder
                     if ($sub) {
                         $this->applySubattributeFeatures($sub, $reflection);
                     }
-                    $this->loadSubAttributes($sub, $reflection);
                     if ($callback instanceof \Closure) {
                         $callback($sub);
                     } else {
@@ -156,6 +154,7 @@ class ReflectionDefinitionBuilder
 
     protected function applySubattributeFeatures(object $attribute, \Reflector $reflection): void
     {
+        // For each possible type, check for a FromReflection interface.
         if ($attribute instanceof FromReflectionClass) {
             /** @var \ReflectionClass<object> $reflection */
             $attribute->fromReflection($reflection);
@@ -167,6 +166,8 @@ class ReflectionDefinitionBuilder
         if ($attribute instanceof Finalizable) {
             $attribute->finalize();
         }
+        // Call recursively to allow sub-attributes on sub-attributes. (Yo Dawg.)
+        $this->loadSubAttributes($attribute, $reflection);
     }
 
     /**
