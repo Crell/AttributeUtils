@@ -60,6 +60,9 @@ use Crell\AttributeUtils\Records\Point;
 use Crell\AttributeUtils\Records\PropertiesWithMultipleSubattributes;
 use Crell\AttributeUtils\Records\PropertyThatTakesClassDefault;
 use Crell\AttributeUtils\Records\TransitiveFieldClass;
+use Crell\AttributeUtils\SubattributeReflection\ClassAllFeaturesForSubAttrib;
+use Crell\AttributeUtils\SubattributeReflection\ClassWithAllFeaturesForSubAttribReflection;
+use Crell\AttributeUtils\SubattributeReflection\EnumForSubAttrib;
 use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -207,12 +210,25 @@ class ClassAnalyzerTest extends TestCase
             },
         ];
 
-        yield 'Subattributes with FromReflection' => [
-            'subject' => ClassWithPropertySubAttributesUsingReflection::class,
-            'attribute' => ConfigurableClassWithProperties::class,
-            'test' => static function(ConfigurableClassWithProperties $classDef) {
+        yield 'Subattributes with FromReflection (class)' => [
+            'subject' => ClassWithAllFeaturesForSubAttribReflection::class,
+            'attribute' => ClassAllFeaturesForSubAttrib::class,
+            'test' => static function(ClassAllFeaturesForSubAttrib $classDef) {
                 static::assertEquals('A', $classDef->a);
-                static::assertEquals('prop', $classDef->properties['prop']->subattrib->name);
+                static::assertEquals(ClassWithAllFeaturesForSubAttribReflection::class, $classDef->sub->name);
+                static::assertEquals('classA', $classDef->properties['classA']->sub->name);
+                static::assertEquals('method', $classDef->methods['method']->sub->name);
+                static::assertEquals('parameter', $classDef->methods['method']->parameters['parameter']->sub->name);
+                static::assertEquals('AConstant', $classDef->constants['AConstant']->sub->name);
+            },
+        ];
+
+        yield 'Subattributes with FromReflection (enum)' => [
+            'subject' => EnumForSubAttrib::class,
+            'attribute' => ClassAllFeaturesForSubAttrib::class,
+            'test' => static function(ClassAllFeaturesForSubAttrib $classDef) {
+                static::assertEquals(EnumForSubAttrib::class, $classDef->sub->name);
+                static::assertEquals('Case', $classDef->cases['Case']->sub->name);
             },
         ];
 

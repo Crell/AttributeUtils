@@ -155,14 +155,29 @@ class ReflectionDefinitionBuilder
     protected function applySubattributeFeatures(object $attribute, \Reflector $reflection): void
     {
         // For each possible type, check for a FromReflection interface.
-        if ($attribute instanceof FromReflectionClass) {
+        if ($reflection instanceof \ReflectionClass && ! $reflection instanceof \ReflectionEnum && $attribute instanceof FromReflectionClass) {
             /** @var \ReflectionClass<object> $reflection */
             $attribute->fromReflection($reflection);
         }
-        if ($attribute instanceof FromReflectionProperty) {
-            /** @var \ReflectionProperty $reflection */
+        if ($reflection instanceof \ReflectionEnum && $attribute instanceof FromReflectionEnum) {
             $attribute->fromReflection($reflection);
         }
+        if ($reflection instanceof \ReflectionFunction && $attribute instanceof FromReflectionFunction) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionProperty && $attribute instanceof FromReflectionProperty) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionMethod && $attribute instanceof FromReflectionMethod) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionClassConstant && $attribute instanceof FromReflectionClassConstant) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionParameter && $attribute instanceof FromReflectionParameter) {
+            $attribute->fromReflection($reflection);
+        }
+
         if ($attribute instanceof Finalizable) {
             $attribute->finalize();
         }
