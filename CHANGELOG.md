@@ -4,6 +4,16 @@ All notable changes to `AttributeUtils` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 1.3.0 - 2025-07-14
+
+### Added
+- Add union type introspection to `TypeDef`.
+- Sub-attributed may now implement the `FromReflection*` methods.
+
+### Fixed
+- Improved PHPStan conformance.
+- Assorted improvements to dev tooling setup.
+
 ## 1.2.0 - 2024-07-11
 
 ### Added
