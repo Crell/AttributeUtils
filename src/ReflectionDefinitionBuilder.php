@@ -130,9 +130,7 @@ class ReflectionDefinitionBuilder
                 if ($this->isMultivalueAttribute($type)) {
                     $subs = $this->parser->getInheritedAttributes($reflection, $type);
                     foreach ($subs as $sub) {
-                        if ($sub instanceof Finalizable) {
-                            $sub->finalize();
-                        }
+                        $this->applySubattributeFeatures($sub, $reflection);
                         $this->loadSubAttributes($sub, $reflection);
                     }
                     if ($callback instanceof \Closure) {
@@ -142,8 +140,8 @@ class ReflectionDefinitionBuilder
                     }
                 } else {
                     $sub = $this->parser->getInheritedAttribute($reflection, $type);
-                    if ($sub instanceof Finalizable) {
-                        $sub->finalize();
+                    if ($sub) {
+                        $this->applySubattributeFeatures($sub, $reflection);
                     }
                     $this->loadSubAttributes($sub, $reflection);
                     if ($callback instanceof \Closure) {
@@ -153,6 +151,21 @@ class ReflectionDefinitionBuilder
                     }
                 }
             }
+        }
+    }
+
+    protected function applySubattributeFeatures(object $attribute, \Reflector $reflection): void
+    {
+        if ($attribute instanceof FromReflectionClass) {
+            /** @var \ReflectionClass<object> $reflection */
+            $attribute->fromReflection($reflection);
+        }
+        if ($attribute instanceof FromReflectionProperty) {
+            /** @var \ReflectionProperty $reflection */
+            $attribute->fromReflection($reflection);
+        }
+        if ($attribute instanceof Finalizable) {
+            $attribute->finalize();
         }
     }
 

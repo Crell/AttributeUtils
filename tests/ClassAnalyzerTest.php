@@ -15,24 +15,23 @@ use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
 use Crell\AttributeUtils\Attributes\ClassWithReflection;
 use Crell\AttributeUtils\Attributes\ClassWithSubSubAttributes;
 use Crell\AttributeUtils\Attributes\ClosureSubAttributeMain;
+use Crell\AttributeUtils\Attributes\ConfigurableClassWithProperties;
 use Crell\AttributeUtils\Attributes\FinalizableClassAttribute;
 use Crell\AttributeUtils\Attributes\GenericClass;
+use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\Labeled;
 use Crell\AttributeUtils\Attributes\PropertyTakesClassDefaultClass;
 use Crell\AttributeUtils\Attributes\ScopedClass;
-use Crell\AttributeUtils\Attributes\InheritableClassAttributeMain;
 use Crell\AttributeUtils\Attributes\ScopedClassMulti;
 use Crell\AttributeUtils\Attributes\ScopedClassNoDefaultInclude;
 use Crell\AttributeUtils\ExclusiveOptions\Audio;
 use Crell\AttributeUtils\ExclusiveOptions\AudioData;
 use Crell\AttributeUtils\ExclusiveOptions\BothData;
 use Crell\AttributeUtils\ExclusiveOptions\DisplayInfo;
-use Crell\AttributeUtils\ExclusiveOptions\DisplayType;
 use Crell\AttributeUtils\ExclusiveOptions\NoData;
 use Crell\AttributeUtils\ExclusiveOptions\Screen;
 use Crell\AttributeUtils\ExclusiveOptions\ScreenData;
 use Crell\AttributeUtils\InterfaceAttributes\Hero;
-use Crell\AttributeUtils\InterfaceAttributes\Name;
 use Crell\AttributeUtils\InterfaceAttributes\Names;
 use Crell\AttributeUtils\Records\AttributesInheritChild;
 use Crell\AttributeUtils\Records\ClassWithClosureSubAttributes;
@@ -43,11 +42,12 @@ use Crell\AttributeUtils\Records\ClassWithDefaultFields;
 use Crell\AttributeUtils\Records\ClassWithExcludedProperties;
 use Crell\AttributeUtils\Records\ClassWithExtraAnalysisSource;
 use Crell\AttributeUtils\Records\ClassWithFinalizableAttributes;
-use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\ClassWithInterface;
 use Crell\AttributeUtils\Records\ClassWithMethodsAndProperties;
 use Crell\AttributeUtils\Records\ClassWithPropertiesWithReflection;
+use Crell\AttributeUtils\Records\ClassWithPropertySubAttributesUsingReflection;
 use Crell\AttributeUtils\Records\ClassWithRecursiveSubAttributes;
+use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\ClassWithScopesMulti;
 use Crell\AttributeUtils\Records\ClassWithScopesNotDefault;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
@@ -201,9 +201,18 @@ class ClassAnalyzerTest extends TestCase
             'test' => static function(ClassWithPropertiesWithSubAttributes $classDef) {
                 static::assertEquals('C', $classDef->c);
                 static::assertEquals('A', $classDef->properties['hasSub']->a);
-                static::assertEquals('B', $classDef->properties['hasSub']->b);
+                static::assertEquals('B', $classDef->properties['hasSub']->subattrib->b);
                 static::assertEquals('A', $classDef->properties['noSub']->a);
-                static::assertEquals('B', $classDef->properties['noSub']->b);
+                static::assertEquals('B', $classDef->properties['noSub']->subattrib->b);
+            },
+        ];
+
+        yield 'Subattributes with FromReflection' => [
+            'subject' => ClassWithPropertySubAttributesUsingReflection::class,
+            'attribute' => ConfigurableClassWithProperties::class,
+            'test' => static function(ConfigurableClassWithProperties $classDef) {
+                static::assertEquals('A', $classDef->a);
+                static::assertEquals('prop', $classDef->properties['prop']->subattrib->name);
             },
         ];
 
