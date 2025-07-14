@@ -6,7 +6,6 @@ namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
 use Crell\AttributeUtils\HasSubAttributes;
-use Crell\AttributeUtils\ParseProperties;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class ClassWithOwnSubAttributes implements HasSubAttributes

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\InterfaceAttributes;
 
 use Attribute;
-use Crell\AttributeUtils\Multivalue;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 class Alias implements Name

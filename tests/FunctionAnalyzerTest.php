@@ -10,6 +10,9 @@ use Crell\AttributeUtils\Attributes\Functions\ParameterAttrib;
 use Crell\AttributeUtils\Attributes\Functions\RequiredArg;
 use Crell\AttributeUtils\Attributes\Functions\SubChild;
 use Crell\AttributeUtils\Attributes\Functions\SubParent;
+use Crell\AttributeUtils\SubattributeReflection\ComponentAttribute;
+use Crell\AttributeUtils\SubattributeReflection\FuncAllFeaturesForSubAttrib;
+use Crell\AttributeUtils\SubattributeReflection\SubAttributeReflect;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +32,12 @@ function has_sub_attributes() {}
 function has_parameters(
     #[ParameterAttrib] int $first,
     #[ParameterAttrib('Override')] int $second,
+) {}
+
+
+#[FuncAllFeaturesForSubAttrib, SubAttributeReflect]
+function func_for_subattrib(
+    #[ComponentAttribute, SubAttributeReflect] string $parameter,
 ) {}
 
 class FunctionAnalyzerTest extends TestCase
@@ -99,6 +108,15 @@ class FunctionAnalyzerTest extends TestCase
             'test' => static function(HasParameters $funcDef) use ($ns) {
                 static::assertEquals('default', $funcDef->parameters['first']->a);
                 static::assertEquals('Override', $funcDef->parameters['second']->a);
+            },
+        ];
+
+        yield 'Subattributes with FromReflection (function)' => [
+            'subject' => "{$ns}func_for_subattrib",
+            'attribute' => FuncAllFeaturesForSubAttrib::class,
+            'test' => static function(FuncAllFeaturesForSubAttrib $funcDef) use ($ns) {
+                static::assertEquals("{$ns}func_for_subattrib", $funcDef->sub->name);
+                static::assertEquals('parameter', $funcDef->parameters['parameter']->sub->name);
             },
         ];
     }

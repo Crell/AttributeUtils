@@ -130,10 +130,7 @@ class ReflectionDefinitionBuilder
                 if ($this->isMultivalueAttribute($type)) {
                     $subs = $this->parser->getInheritedAttributes($reflection, $type);
                     foreach ($subs as $sub) {
-                        if ($sub instanceof Finalizable) {
-                            $sub->finalize();
-                        }
-                        $this->loadSubAttributes($sub, $reflection);
+                        $this->applySubattributeFeatures($sub, $reflection);
                     }
                     if ($callback instanceof \Closure) {
                         $callback($subs);
@@ -142,10 +139,9 @@ class ReflectionDefinitionBuilder
                     }
                 } else {
                     $sub = $this->parser->getInheritedAttribute($reflection, $type);
-                    if ($sub instanceof Finalizable) {
-                        $sub->finalize();
+                    if ($sub) {
+                        $this->applySubattributeFeatures($sub, $reflection);
                     }
-                    $this->loadSubAttributes($sub, $reflection);
                     if ($callback instanceof \Closure) {
                         $callback($sub);
                     } else {
@@ -154,6 +150,39 @@ class ReflectionDefinitionBuilder
                 }
             }
         }
+    }
+
+    protected function applySubattributeFeatures(object $attribute, \Reflector $reflection): void
+    {
+        // For each possible type, check for a FromReflection interface.
+        if ($reflection instanceof \ReflectionClass && ! $reflection instanceof \ReflectionEnum && $attribute instanceof FromReflectionClass) {
+            /** @var \ReflectionClass<object> $reflection */
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionEnum && $attribute instanceof FromReflectionEnum) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionFunction && $attribute instanceof FromReflectionFunction) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionProperty && $attribute instanceof FromReflectionProperty) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionMethod && $attribute instanceof FromReflectionMethod) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionClassConstant && $attribute instanceof FromReflectionClassConstant) {
+            $attribute->fromReflection($reflection);
+        }
+        if ($reflection instanceof \ReflectionParameter && $attribute instanceof FromReflectionParameter) {
+            $attribute->fromReflection($reflection);
+        }
+
+        if ($attribute instanceof Finalizable) {
+            $attribute->finalize();
+        }
+        // Call recursively to allow sub-attributes on sub-attributes. (Yo Dawg.)
+        $this->loadSubAttributes($attribute, $reflection);
     }
 
     /**

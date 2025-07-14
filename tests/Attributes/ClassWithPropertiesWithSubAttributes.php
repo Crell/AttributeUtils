@@ -31,7 +31,7 @@ class ClassWithPropertiesWithSubAttributes implements ParseProperties, HasSubAtt
 
     public function propertyAttribute(): string
     {
-        return PropertyWithSubAttributes::class;
+        return ConfigurablePropertyWithSubAttributes::class;
     }
 
     public function subAttributes(): array

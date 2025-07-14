@@ -16,7 +16,6 @@ use Crell\AttributeUtils\Records\Reflect\SampleTrait;
 use Crell\AttributeUtils\TypeDef\BackedSuit;
 use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 

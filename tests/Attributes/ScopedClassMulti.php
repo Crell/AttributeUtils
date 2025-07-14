@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Attributes;
 
 use Attribute;
-use Crell\AttributeUtils\Attributes\Reflect\CollectMethods;
 use Crell\AttributeUtils\Attributes\Reflect\CollectProperties;
 use Crell\AttributeUtils\ParseProperties;
 use Crell\AttributeUtils\SupportsScopes;
