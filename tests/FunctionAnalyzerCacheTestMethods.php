@@ -4,13 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils;
 
-use Crell\AttributeUtils\Attributes\ClassWithProperties;
 use Crell\AttributeUtils\Attributes\Functions\IncludesReflection;
 use Crell\AttributeUtils\Attributes\Functions\SubParent;
-use Crell\AttributeUtils\Attributes\ScopedClass;
-use Crell\AttributeUtils\Records\ClassWithDefaultFields;
-use Crell\AttributeUtils\Records\ClassWithScopes;
-use Crell\AttributeUtils\Records\Point;
 use PHPUnit\Framework\Attributes\Test;
 
 #[IncludesReflection]

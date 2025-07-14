@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Crell\AttributeUtils\Records;
 
 use Crell\AttributeUtils\Attributes\ClassWithPropertiesWithSubAttributes;
-use Crell\AttributeUtils\Attributes\MultiSubAttribute;
 use Crell\AttributeUtils\Attributes\ConfigurablePropertyWithSubAttributes;
+use Crell\AttributeUtils\Attributes\MultiSubAttribute;
 use Crell\AttributeUtils\Attributes\PropertySubAttribute;
 
 #[ClassWithPropertiesWithSubAttributes]

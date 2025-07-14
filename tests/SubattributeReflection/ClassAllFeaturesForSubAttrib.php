@@ -8,13 +8,11 @@ use Attribute;
 use Crell\AttributeUtils\Attributes\Reflect\CollectClassConstants;
 use Crell\AttributeUtils\Attributes\Reflect\CollectEnumCases;
 use Crell\AttributeUtils\Attributes\Reflect\CollectMethods;
-use Crell\AttributeUtils\Attributes\Reflect\CollectParameters;
 use Crell\AttributeUtils\Attributes\Reflect\CollectProperties;
 use Crell\AttributeUtils\HasSubAttributes;
 use Crell\AttributeUtils\ParseClassConstants;
 use Crell\AttributeUtils\ParseEnumCases;
 use Crell\AttributeUtils\ParseMethods;
-use Crell\AttributeUtils\ParseParameters;
 use Crell\AttributeUtils\ParseProperties;
 
 #[Attribute(Attribute::TARGET_CLASS)]

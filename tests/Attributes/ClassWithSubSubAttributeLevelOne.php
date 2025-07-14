@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\AttributeUtils\Attributes;
 
-use \Attribute;
+use Attribute;
 use Crell\AttributeUtils\HasSubAttributes;
+
 use function Crell\fp\amap;
 use function Crell\fp\prop;
 

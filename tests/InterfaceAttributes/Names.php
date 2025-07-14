@@ -6,6 +6,7 @@ namespace Crell\AttributeUtils\InterfaceAttributes;
 
 use Attribute;
 use Crell\AttributeUtils\HasSubAttributes;
+
 use function Crell\fp\method;
 
 #[Attribute(Attribute::TARGET_CLASS)]
