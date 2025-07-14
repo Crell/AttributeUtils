@@ -6,7 +6,7 @@
 
 AttributeUtils provides utilities to simplify working with and reading Attributes in PHP 8.1 and later.
 
-Its primary tool is the Class Analyzer, which allows you to analyze a given class or enum with respect to some attribute class.  Attribute classes may implement various interfaces in order to opt-in to additional behavior, as described below.  The overall intent is to provide a simple but powerful framework for reading metadata off of a class, including with reflection data.
+Its primary tool is the Class Analyzer, which allows you to analyze a given class or enum with respect to some attribute class.  Attribute classes may implement various interfaces in order to opt in to additional behavior, as described below.  The overall intent is to provide a simple but powerful framework for reading metadata off of a class, including with reflection data.
 
 ## Install
 
@@ -83,7 +83,7 @@ There are similarly [`FromReflectionProperty`](src/FromReflectionProperty.php), 
 
 ### Additional class components
 
-The class attribute may also opt-in to analyzing various portions of the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [`ParseStaticProperties`](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
+The class attribute may also opt in to analyzing various portions of the class, such as its properties, methods, and constants.  It does so by implementing the [`ParseProperties`](src/ParseProperties.php), [`ParseStaticProperties`](src/ParseStaticProperties.php), [`ParseMethods`](src/ParseMethods.php), [`ParseStaticMethods`](src/ParseStaticMethods.php), or [`ParseClassConstants`](src/ParseClassConstants.php) interfaces, respectively.  They all work the same way, so we'll look at properties in particular.
 
 An example is the easiest way to explain it:
 
@@ -299,7 +299,7 @@ An attribute may have any number of sub-attributes it wishes.
 
 Note that if the sub-attribute is missing, `null` will be passed to the method.  That is to allow a sub-attribute to have required parameters if and only if it is specified, while keeping the sub-attribute itself optional.  You therefore *must* make the callback method's argument nullable.
 
-Sub-attributes may also be `Inheritable`.
+Sub-attributes may also be `Inheritable`, and may also implement the various `FromReflection*` interfaces.
 
 ### Multi-value sub-attributes
 
@@ -352,7 +352,7 @@ Note: In order to make use of multi-value sub-attributes, the attribute class it
 
 ### Finalizing an attribute
 
-Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt-in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
+Attributes that opt-in to several functional interfaces may not always have an easy time of knowing when to do default handling.  It may not be obvious when the attribute setup is "done."  Attribute classes may therefore opt in to the [`Finalizable`](src/Finalizable.php) interface.  If specified, it is guaranteed to be the last method called on the attribute.  The attribute may then do whatever final preparation is appropriate to consider the object "ready."
 
 ### Caching
 
