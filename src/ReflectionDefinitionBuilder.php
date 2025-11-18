@@ -17,7 +17,7 @@ class ReflectionDefinitionBuilder
 {
     public function __construct(
         protected readonly AttributeParser $parser,
-        protected readonly ?Analyzer $analyzer = null,
+        protected readonly ?ClassAnalyzer $analyzer = null,
     ) {}
 
     /**
