@@ -822,7 +822,7 @@ In this example, `$displayInfoA->type` will be an instance of `Screen`, `$displa
 
 Interfaces may also implement attributes. This is useful for cases in which you want to define a type map at the interface level.
 
-Note: in this case, make sure the class implements the `Inheritable` interface, to return the expected values.
+Note: in this case, make sure the attribute class implements the `Inheritable` interface, so that implementing classes can inherit it.
 
 ```php
 use Crell\AttributeUtils\Inheritable;
