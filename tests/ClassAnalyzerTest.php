@@ -49,6 +49,7 @@ use Crell\AttributeUtils\Records\ClassWithScopes;
 use Crell\AttributeUtils\Records\ClassWithScopesMulti;
 use Crell\AttributeUtils\Records\ClassWithScopesNotDefault;
 use Crell\AttributeUtils\Records\ClassWithSubAttributes;
+use Crell\AttributeUtils\Records\EnumWithInterface;
 use Crell\AttributeUtils\Records\LabeledApp;
 use Crell\AttributeUtils\Records\MissingPropertyAttributeArguments;
 use Crell\AttributeUtils\Records\MultiuseClass;
@@ -413,6 +414,15 @@ class ClassAnalyzerTest extends TestCase
             'attribute' => ClassWithOwnSubAttributes::class,
             'test' => static function(ClassWithOwnSubAttributes $classDef) {
                 self::assertEquals('C', $classDef->c);
+            },
+        ];
+
+        yield 'Enum implementing interface' => [
+            'subject' => EnumWithInterface::class,
+            'attribute' => BasicClass::class,
+            'test' => static function(mixed $classDef) {
+                self::assertEquals(5, $classDef->a);
+                self::assertEquals(10, $classDef->b);
             },
         ];
 

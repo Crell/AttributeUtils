@@ -818,6 +818,54 @@ In this case, a class may be marked with either `Screen` or `Audio`, but not bot
 
 In this example, `$displayInfoA->type` will be an instance of `Screen`, `$displayInfoB->type` will be an instance of `Audio`, and `$displayInfoC->type` will be `null`.
 
+### Interface using attributes
+
+Interfaces may also implement attributes. This is useful for cases in which you want to define a type map at the interface level.
+
+Note: in this case, make sure the attribute class implements the `Inheritable` interface, so that implementing classes can inherit it.
+
+```php
+use Crell\AttributeUtils\Inheritable;
+
+#[Attribute(Attribute::TARGET_CLASS)]
+final class Application implements Inheritable
+{
+    public function __construct(
+        public readonly string $name,
+    ) {
+    }
+}
+
+#[Application(name: 'app')]
+interface Something
+{
+}
+
+enum MyEnum: string implements Something
+{
+    case A = 'a';
+    case B = 'b';
+}
+
+#[Application(name: 'other-app')]
+enum AnotherEnum: string implements Something
+{
+    case A = 'a';
+    case B = 'b';
+}
+
+
+$analyzer = new Crell\AttributeUtils\Analyzer();
+
+/** @var Application $anotherEnumAttributes */
+$enumAttributes = $analyzer->analyze(MyEnum::class, Application::class);
+print $enumAttributes->name . PHP_EOL; // Prints 'app'
+
+/** @var Application $classAttributes */
+$anotherEnumAttributes = $analyzer->analyze(AnotherEnum::class, Application::class);
+print $anotherEnumAttributes->name . PHP_EOL; // Prints 'other-app'
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.

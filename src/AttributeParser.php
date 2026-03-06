@@ -224,8 +224,7 @@ class AttributeParser
                 \ReflectionMethod::class => $this->classElementInheritanceTree($subject),
                 \ReflectionClassConstant::class => $this->classElementInheritanceTree($subject),
                 \ReflectionParameter::class => $this->parameterInheritanceTree($subject),
-                // If it's an enum, there's nothing to inherit so just stub that out.
-                \ReflectionEnum::class => [],
+                \ReflectionEnum::class => $this->classInheritanceTree($subject),
             };
         }
     }
@@ -235,7 +234,7 @@ class AttributeParser
      *
      * This includes both classes and interfaces.
      *
-     * @param \ReflectionClass<object> $subject
+     * @param \ReflectionClass<object>|\ReflectionEnum<\UnitEnum> $subject
      *   The reflection of the class for which we want the ancestors.
      * @return iterable<\ReflectionClass<object>>
      * @throws \ReflectionException
