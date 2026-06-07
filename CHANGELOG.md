@@ -4,6 +4,11 @@ All notable changes to `AttributeUtils` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 1.3.1 - 2026-06-07
+
+### Added
+- Support inheritance determination for enums that implement interfaces.
+
 ## 1.3.0 - 2025-07-14
 
 ### Added
