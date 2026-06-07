@@ -14,6 +14,7 @@ use Crell\AttributeUtils\SubattributeReflection\ComponentAttribute;
 use Crell\AttributeUtils\SubattributeReflection\FuncAllFeaturesForSubAttrib;
 use Crell\AttributeUtils\SubattributeReflection\SubAttributeReflect;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -40,6 +41,7 @@ function func_for_subattrib(
     #[ComponentAttribute, SubAttributeReflect] string $parameter,
 ) {}
 
+#[Medium]
 class FunctionAnalyzerTest extends TestCase
 {
     protected string $ns;

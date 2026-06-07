@@ -64,9 +64,11 @@ use Crell\AttributeUtils\SubattributeReflection\ClassWithAllFeaturesForSubAttrib
 use Crell\AttributeUtils\SubattributeReflection\EnumForSubAttrib;
 use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Medium;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[Medium]
 class ClassAnalyzerTest extends TestCase
 {
     #[Test, DataProvider('attributeTestProvider')]

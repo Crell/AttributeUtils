@@ -7,9 +7,11 @@ namespace Crell\AttributeUtils;
 use Crell\AttributeUtils\TypeDef\Suit;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[Small]
 class TypeDefTest extends TestCase
 {
     #[Test, DataProvider('typeDefProvider')]
